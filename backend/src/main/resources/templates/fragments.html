@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"/></head>
+<body>
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark" style="background:#13233f;">
+  <div class="container">
+    <a class="navbar-brand fw-bold" th:href="@{/}">🚲 BikeShare</a>
+    <div class="ms-auto d-flex gap-2">
+      <a class="btn btn-outline-light btn-sm" th:href="@{/account/bikes}">Proposez votre vélo</a>
+      <a class="btn btn-sm text-white" style="background:#1fa67a;" th:href="@{/account}"
+         sec:authorize="isAuthenticated()">Mon compte</a>
+      <a class="btn btn-sm text-white" style="background:#1fa67a;" th:href="@{/login}"
+         sec:authorize="!isAuthenticated()">Se connecter</a>
+    </div>
+  </div>
+</nav>
+<footer th:fragment="footer" class="text-white text-center py-4 mt-5" style="background:#13233f;">
+  <p class="mb-0">🚲 BikeShare — Plateforme de location de vélos entre particuliers</p>
+</footer>
+</body>
+</html>

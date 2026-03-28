@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"/><title>Inscription — BikeShare</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/></head>
+<body class="bg-light">
+<div class="container" style="max-width:480px;margin-top:6vh">
+  <div class="card shadow-sm border-0 rounded-4 p-4">
+    <h3 class="mb-3">Créer un compte</h3>
+    <form th:action="@{/register}" th:object="${user}" method="post">
+      <div class="row">
+        <div class="col">
+          <label class="form-label">Prénom</label>
+          <input class="form-control mb-1" th:field="*{firstName}"
+                 th:classappend="${#fields.hasErrors('firstName')} ? 'is-invalid'"/>
+          <div class="invalid-feedback mb-2" th:errors="*{firstName}"></div>
+        </div>
+        <div class="col">
+          <label class="form-label">Nom</label>
+          <input class="form-control mb-1" th:field="*{lastName}"
+                 th:classappend="${#fields.hasErrors('lastName')} ? 'is-invalid'"/>
+          <div class="invalid-feedback mb-2" th:errors="*{lastName}"></div>
+        </div>
+      </div>
+      <label class="form-label">Email</label>
+      <input class="form-control mb-1" type="email" th:field="*{email}"
+             th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"/>
+      <div class="invalid-feedback mb-2" th:errors="*{email}"></div>
+      <label class="form-label">Adresse</label>
+      <input class="form-control mb-2" th:field="*{adresse}"/>
+      <div class="row">
+        <div class="col">
+          <label class="form-label">Code postal</label>
+          <input class="form-control mb-1" th:field="*{postalCode}"
+                 th:classappend="${#fields.hasErrors('postalCode')} ? 'is-invalid'"/>
+          <div class="invalid-feedback mb-2" th:errors="*{postalCode}"></div>
+        </div>
+        <div class="col">
+          <label class="form-label">Localité</label>
+          <input class="form-control mb-2" th:field="*{locality}"/>
+        </div>
+      </div>
+      <label class="form-label">Mot de passe</label>
+      <input class="form-control mb-1" type="password" th:field="*{password}"
+             th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'"/>
+      <div class="invalid-feedback mb-3" th:errors="*{password}"></div>
+      <button class="btn text-white w-100 mt-2" style="background:#1fa67a;">Créer mon compte</button>
+    </form>
+    <p class="text-center mt-3 mb-0">Déjà inscrit ? <a th:href="@{/login}">Se connecter</a></p>
+  </div>
+</div>
+</body>
+</html>
