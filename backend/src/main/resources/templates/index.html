@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8"/>
+  <title>BikeShare — Louez un vélo entre particuliers</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+</head>
+<body>
+<nav th:replace="~{fragments :: navbar}"></nav>
+
+<header class="py-5 text-white" style="background:linear-gradient(135deg,#13233f,#1fa67a);">
+  <div class="container">
+    <h1 class="fw-bold">Louez un vélo à Bruxelles</h1>
+    <p class="lead">Location de vélos entre particuliers, simple et sécurisée.</p>
+    <form th:action="@{/search}" method="get" class="row g-2 bg-white p-3 rounded-4 shadow text-dark">
+      <div class="col-md-5"><input class="form-control" name="locality" placeholder="Où ? (ville, code postal)"/></div>
+      <div class="col-md-4">
+        <select class="form-select" name="categoryId">
+          <option value="">Toutes les catégories</option>
+          <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.category}"></option>
+        </select>
+      </div>
+      <div class="col-md-3"><button class="btn w-100 text-white" style="background:#1fa67a;">Rechercher</button></div>
+    </form>
+  </div>
+</header>
+
+<section class="container py-5">
+  <h2 class="mb-4">Vélos disponibles près de vous</h2>
+  <div class="row g-4">
+    <div class="col-md-4" th:each="bike : ${bikes}">
+      <div class="card h-100 shadow-sm border-0 rounded-4">
+        <img class="card-img-top rounded-top-4" style="height:200px;object-fit:cover;"
+             th:src="${!bike.photos.isEmpty()} ? @{'/uploads/photo-bike/' + ${bike.photos[0].url}} : 'https://placehold.co/600x400?text=Velo'" alt="vélo"/>
+        <div class="card-body">
+          <h5 class="card-title" th:text="${bike.brand + ' ' + bike.model}">Btwin Riverside</h5>
+          <p class="text-muted mb-1" th:text="${bike.locality}">Bruxelles</p>
+          <p class="fw-bold" th:text="${bike.price != null ? bike.price.middlePrice + ' €/jour' : ''}">12 €/jour</p>
+          <a class="btn btn-sm text-white" style="background:#13233f;" th:href="@{'/bikes/' + ${bike.id}}">Voir le détail</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>
