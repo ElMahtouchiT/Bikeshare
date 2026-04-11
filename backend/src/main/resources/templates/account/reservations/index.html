@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Mes réservations — BikeShare</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+</head>
+<body>
+<nav th:replace="~{fragments :: navbar}"></nav>
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Mes réservations</h2>
+    <a th:href="@{/account}" class="btn btn-outline-secondary btn-sm">&larr; Mon compte</a>
+  </div>
+
+  <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+  <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+  <div th:if="${reservations.isEmpty()}" class="alert alert-info">
+    Vous n'avez pas encore de réservation.
+  </div>
+
+  <div class="table-responsive" th:if="${!reservations.isEmpty()}">
+    <table class="table table-hover align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>#</th>
+          <th>Vélo</th>
+          <th>Du</th>
+          <th>Au</th>
+          <th>Durée</th>
+          <th>Statut</th>
+          <th>Prix</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="r : ${reservations}">
+          <td th:text="${r.id}"></td>
+          <td th:text="${r.bike != null ? r.bike.brand + ' ' + r.bike.model : '—'}"></td>
+          <td th:text="${r.startLocation}"></td>
+          <td th:text="${r.endLocation}"></td>
+          <td th:text="${r.duration != null ? r.duration + ' j' : '—'}"></td>
+          <td>
+            <span class="badge"
+                  th:classappend="${r.statut == 'CONFIRMED' or r.statut == 'NOW'} ? 'bg-success' :
+                                  (${r.statut == 'PENDING'} ? 'bg-warning text-dark' :
+                                  (${r.statut == 'CANCELLED'} ? 'bg-danger' : 'bg-secondary'))"
+                  th:text="${r.statut}"></span>
+          </td>
+          <td th:text="${r.totalPrice != null ? r.totalPrice + ' €' : '—'}"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>
