@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Mes vélos — BikeShare</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+</head>
+<body>
+<nav th:replace="~{fragments :: navbar}"></nav>
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Mes vélos</h2>
+    <a th:href="@{/account}" class="btn btn-outline-secondary btn-sm">&larr; Mon compte</a>
+  </div>
+
+  <div th:if="${bikes.isEmpty()}" class="alert alert-info">
+    Vous n'avez pas encore de vélo enregistré.
+  </div>
+
+  <div class="row g-4" th:if="${!bikes.isEmpty()}">
+    <div class="col-md-4" th:each="bike : ${bikes}">
+      <div class="card h-100 shadow-sm border-0 rounded-4">
+        <img class="card-img-top rounded-top-4" style="height:180px;object-fit:cover;"
+             th:src="${!bike.photos.isEmpty()} ? @{'/uploads/photo-bike/' + ${bike.photos[0].url}} : 'https://placehold.co/600x400?text=Velo'"
+             alt="vélo"/>
+        <div class="card-body">
+          <h5 class="card-title" th:text="${bike.brand + ' ' + bike.model}"></h5>
+          <p class="text-muted mb-1" th:text="${bike.locality}"></p>
+          <p class="mb-1">
+            <span class="badge" th:classappend="${bike.online} ? 'bg-success' : 'bg-secondary'"
+                  th:text="${bike.online} ? 'En ligne' : 'Hors ligne'"></span>
+          </p>
+          <p class="fw-bold" th:text="${bike.price != null ? bike.price.middlePrice + ' €/jour' : 'Prix non défini'}"></p>
+          <a class="btn btn-sm text-white" style="background:#13233f;" th:href="@{'/bikes/' + ${bike.id}}">Voir</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>
