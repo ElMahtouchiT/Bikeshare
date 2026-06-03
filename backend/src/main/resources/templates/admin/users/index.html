@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Utilisateurs — Admin BikeShare</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+</head>
+<body>
+<nav th:replace="~{fragments :: navbar}"></nav>
+
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-0">Gestion des utilisateurs</h2>
+      <p class="text-muted mb-0 small">Modifier les rôles et supprimer des comptes</p>
+    </div>
+    <a th:href="@{/admin}" class="btn btn-outline-secondary btn-sm">&larr; Dashboard</a>
+  </div>
+
+  <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+  <div th:if="${error}"   class="alert alert-danger"  th:text="${error}"></div>
+
+  <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <table class="table table-hover align-middle mb-0">
+      <thead style="background:#13233f;" class="text-white">
+        <tr>
+          <th class="px-3">#</th>
+          <th>Nom</th>
+          <th>Email</th>
+          <th>Rôle actuel</th>
+          <th>Demande suppression</th>
+          <th>Changer le rôle</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="u : ${users}">
+          <td class="px-3 text-muted small" th:text="${u.id}"></td>
+          <td th:text="${u.firstName + ' ' + u.lastName}"></td>
+          <td class="text-muted small" th:text="${u.email}"></td>
+          <td>
+            <span th:each="r : ${u.roles}"
+                  class="badge me-1"
+                  th:classappend="${r.role == 'ROLE_ADMIN'} ? 'bg-danger' :
+                                  (${r.role == 'ROLE_MEMBER'} ? 'bg-success' : 'bg-secondary')"
+                  th:text="${r.role.replace('ROLE_', '')}"></span>
+          </td>
+          <td>
+            <span th:if="${u.deleteRequested}" class="badge bg-warning text-dark">Demandée</span>
+            <span th:unless="${u.deleteRequested}" class="text-muted small">—</span>
+          </td>
+          <td>
+            <form th:action="@{'/admin/users/' + ${u.id} + '/role'}" method="post" class="d-flex gap-1">
+              <select name="roleName" class="form-select form-select-sm" style="width:auto;">
+                <option th:each="r : ${roles}"
+                        th:value="${r.role}"
+                        th:text="${r.role.replace('ROLE_', '')}"
+                        th:selected="${u.roles != null and !u.roles.isEmpty() and u.roles[0].role == r.role}">
+                </option>
+              </select>
+              <button class="btn btn-sm btn-outline-primary">OK</button>
+            </form>
+          </td>
+          <td>
+            <form th:action="@{'/admin/users/' + ${u.id} + '/delete'}" method="post"
+                  onsubmit="return confirm('Supprimer cet utilisateur ?')">
+              <button class="btn btn-sm btn-outline-danger">🗑</button>
+            </form>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

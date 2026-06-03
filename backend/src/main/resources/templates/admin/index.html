@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Administration — BikeShare</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+</head>
+<body>
+<nav th:replace="~{fragments :: navbar}"></nav>
+
+<div class="container py-5">
+
+  <div class="d-flex align-items-center gap-3 mb-4">
+    <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
+         style="width:48px;height:48px;background:#13233f;font-size:1.2rem;">⚙</div>
+    <div>
+      <h2 class="mb-0">Tableau de bord Admin</h2>
+      <p class="text-muted mb-0 small">BikeShare — espace d'administration</p>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 text-center">
+        <div class="h2 fw-bold" style="color:#1fa67a;" th:text="${totalUsers}">0</div>
+        <div class="text-muted small">Membres inscrits</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 text-center">
+        <div class="h2 fw-bold" style="color:#13233f;" th:text="${totalBikes}">0</div>
+        <div class="text-muted small">Vélos enregistrés</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 text-center">
+        <div class="h2 fw-bold text-warning" th:text="${totalReservations}">0</div>
+        <div class="text-muted small">Réservations confirmées</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 text-center">
+        <div class="h2 fw-bold text-danger" th:text="${pendingClaims}">0</div>
+        <div class="text-muted small">Réclamations en attente</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Revenus -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm rounded-4 p-4">
+        <div class="text-muted small mb-1">Chiffre d'affaires total</div>
+        <div class="h3 fw-bold text-success" th:text="${totalRevenue} + ' €'">0 €</div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm rounded-4 p-4">
+        <div class="text-muted small mb-1">Bénéfice BikeShare (commissions)</div>
+        <div class="h3 fw-bold" style="color:#1fa67a;" th:text="${totalBenefit} + ' €'">0 €</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation admin -->
+  <div class="row g-3">
+    <div class="col-md-4">
+      <a th:href="@{/admin/users}" class="card border-0 shadow-sm rounded-4 p-4 text-decoration-none text-dark d-block">
+        <div class="fs-2 mb-2">👥</div>
+        <div class="fw-bold">Gestion des utilisateurs</div>
+        <div class="text-muted small">Modifier les rôles, supprimer des comptes</div>
+      </a>
+    </div>
+    <div class="col-md-4">
+      <a th:href="@{/admin/claims}" class="card border-0 shadow-sm rounded-4 p-4 text-decoration-none text-dark d-block">
+        <div class="fs-2 mb-2">📋</div>
+        <div class="fw-bold">Réclamations</div>
+        <div class="text-muted small">Traiter les litiges entre membres</div>
+      </a>
+    </div>
+    <div class="col-md-4">
+      <a th:href="@{/admin/evaluations}" class="card border-0 shadow-sm rounded-4 p-4 text-decoration-none text-dark d-block">
+        <div class="fs-2 mb-2">⭐</div>
+        <div class="fw-bold">Évaluations</div>
+        <div class="text-muted small">Modérer les avis laissés sur les vélos</div>
+      </a>
+    </div>
+  </div>
+
+</div>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

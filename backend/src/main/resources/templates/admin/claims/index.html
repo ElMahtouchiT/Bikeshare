@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Réclamations — Admin BikeShare</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+</head>
+<body>
+<nav th:replace="~{fragments :: navbar}"></nav>
+
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-0">Réclamations</h2>
+      <p class="text-muted mb-0 small">Litiges soumis par les membres</p>
+    </div>
+    <a th:href="@{/admin}" class="btn btn-outline-secondary btn-sm">&larr; Dashboard</a>
+  </div>
+
+  <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+  <div th:if="${claims.isEmpty()}" class="alert alert-info">Aucune réclamation.</div>
+
+  <div th:unless="${claims.isEmpty()}" class="d-flex flex-column gap-3">
+    <div th:each="c : ${claims}" class="card border-0 shadow-sm rounded-4 p-4">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <span class="badge me-2"
+                th:classappend="${c.status == 'FINISHED'} ? 'bg-success' :
+                                (${c.status == 'IN_PROGRESS'} ? 'bg-warning text-dark' : 'bg-danger')"
+                th:text="${c.status}"></span>
+          <span class="fw-bold" th:text="'Réservation #' + ${c.reservationId}"></span>
+          <span class="text-muted small ms-2" th:text="'par ' + ${c.claimantRole}"></span>
+        </div>
+        <span class="text-muted small"
+              th:text="${c.createdAt != null ? #temporals.format(c.createdAt, 'dd/MM/yyyy') : ''}"></span>
+      </div>
+      <p class="mb-2" th:text="${c.message}"></p>
+      <div th:if="${c.response}" class="alert alert-secondary py-2 mb-2">
+        <strong>Réponse admin :</strong> <span th:text="${c.response}"></span>
+      </div>
+      <form th:unless="${c.status == 'FINISHED'}"
+            th:action="@{'/admin/claims/' + ${c.id} + '/resolve'}" method="post">
+        <button class="btn btn-sm btn-success">✔ Clôturer</button>
+      </form>
+    </div>
+  </div>
+</div>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

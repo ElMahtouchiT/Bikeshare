@@ -16,9 +16,12 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final CustomUserDetailService userDetailService;
+    private final LoginSuccessHandler     loginSuccessHandler;
 
-    public SecurityConfig(CustomUserDetailService userDetailService) {
-        this.userDetailService = userDetailService;
+    public SecurityConfig(CustomUserDetailService userDetailService,
+                          LoginSuccessHandler loginSuccessHandler) {
+        this.userDetailService  = userDetailService;
+        this.loginSuccessHandler = loginSuccessHandler;
     }
 
     @Bean
@@ -45,7 +48,7 @@ public class SecurityConfig {
                     .hasAnyAuthority("ROLE_MEMBER", "ROLE_ADMIN")
                 .anyRequest().authenticated())
             .formLogin(form -> form.loginPage("/login")
-                .defaultSuccessUrl("/account", true).permitAll())
+                .successHandler(loginSuccessHandler).permitAll())
             .logout(logout -> logout.logoutSuccessUrl("/").permitAll())
             .authenticationProvider(authenticationProvider())
             .csrf(AbstractHttpConfigurer::disable);
