@@ -11,4 +11,8 @@ public interface UserServiceI {
     User saveUser(User user);
     void deleteUser(Long id);
     long getTotalUsers();
+    User updateProfile(Long userId, String firstName, String lastName,
+                       String adresse, String locality, String postalCode,
+                       String phone, String iban, String bic);
+    void requestDeletion(Long userId);
 }

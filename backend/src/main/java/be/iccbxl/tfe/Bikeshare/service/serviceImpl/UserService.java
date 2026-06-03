@@ -36,4 +36,32 @@ public class UserService implements UserServiceI {
         if (member != null) user.getRoles().add(member);
         return userRepository.save(user);
     }
+
+    /** Mise à jour du profil : seuls les champs autorisés sont modifiés (pas email, pas mot de passe). */
+    @Override
+    public User updateProfile(Long userId, String firstName, String lastName,
+                               String adresse, String locality, String postalCode,
+                               String phone, String iban, String bic) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) return null;
+        if (firstName != null && !firstName.isBlank()) user.setFirstName(firstName);
+        if (lastName  != null && !lastName.isBlank())  user.setLastName(lastName);
+        user.setAdresse(adresse);
+        user.setLocality(locality);
+        user.setPostalCode(postalCode);
+        user.setPhone(phone);
+        user.setIban(iban);
+        user.setBic(bic);
+        return userRepository.save(user);
+    }
+
+    /** Marque le compte comme demandant sa suppression. */
+    @Override
+    public void requestDeletion(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            user.setDeleteRequested(true);
+            userRepository.save(user);
+        }
+    }
 }

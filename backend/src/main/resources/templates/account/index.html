@@ -6,15 +6,40 @@
 <body>
 <nav th:replace="~{fragments :: navbar}"></nav>
 <div class="container py-5">
-  <h2 th:text="'Bonjour ' + ${user.firstName}">Bonjour</h2>
-  <div class="row g-3 mt-2">
-    <div class="col-md-4"><div class="card p-3"><div class="h3" th:text="${bikeCount}">0</div><div class="text-muted">Vélos en ligne</div></div></div>
-    <div class="col-md-4"><div class="card p-3"><div class="h3" th:text="${confirmedRentalsAsTenant}">0</div><div class="text-muted">Locations confirmées</div></div></div>
-    <div class="col-md-4"><div class="card p-3">
-      <a class="btn text-white" style="background:#1fa67a;" th:href="@{/account/bikes}">Mes vélos</a>
-      <a class="btn btn-outline-secondary mt-2" th:href="@{/account/reservations}">Mes réservations</a>
-    </div></div>
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-0" th:text="'Bonjour ' + ${user.firstName} + ' !'">Bonjour</h2>
+      <p class="text-muted mb-0" th:text="${user.email}"></p>
+    </div>
+    <a th:href="@{/account/profile}" class="btn btn-outline-secondary btn-sm">
+      ✏️ Modifier mon profil
+    </a>
   </div>
+
+  <div class="row g-3">
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 text-center">
+        <div class="h2 text-success fw-bold" th:text="${bikeCount}">0</div>
+        <div class="text-muted small">Vélos en ligne</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 text-center">
+        <div class="h2 fw-bold" style="color:#13233f;" th:text="${confirmedRentalsAsTenant}">0</div>
+        <div class="text-muted small">Locations confirmées</div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm rounded-4 p-3 d-flex flex-column gap-2">
+        <a class="btn text-white" style="background:#1fa67a;" th:href="@{/account/bikes}">🚲 Mes vélos</a>
+        <a class="btn btn-outline-secondary" th:href="@{/account/reservations}">📅 Mes réservations</a>
+        <a class="btn btn-outline-secondary" th:href="@{/account/gains}">💶 Mes gains</a>
+        <a class="btn btn-outline-secondary" th:href="@{/account/profile}">👤 Mon profil</a>
+      </div>
+    </div>
+  </div>
+
 </div>
 <footer th:replace="~{fragments :: footer}"></footer>
 </body>

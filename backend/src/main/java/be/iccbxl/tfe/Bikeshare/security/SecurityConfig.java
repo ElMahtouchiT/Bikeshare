@@ -40,7 +40,8 @@ public class SecurityConfig {
                                  "/login", "/css/**", "/js/**", "/images/**", "/uploads/**",
                                  "/ws/**", "/v3/api-docs/**", "/swagger-ui/**", "/api/bikes/**").permitAll()
                 .requestMatchers("/admin/**", "/api/admin/**", "/api/dashboard/**").hasAuthority("ROLE_ADMIN")
-                .requestMatchers("/account/**", "/reservations", "/api/reservations/**", "/api/messages/**")
+                .requestMatchers("/account/**", "/reservations",
+                                 "/api/reservations/**", "/api/messages/**")
                     .hasAnyAuthority("ROLE_MEMBER", "ROLE_ADMIN")
                 .anyRequest().authenticated())
             .formLogin(form -> form.loginPage("/login")

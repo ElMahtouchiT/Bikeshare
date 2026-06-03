@@ -64,6 +64,9 @@ public class User {
 
     private boolean isVerified;
 
+    @Column(name = "delete_requested", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean deleteRequested;
+
     /** Vélos proposés par cet utilisateur (propriétaire). */
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Bike> ownedBikes;
