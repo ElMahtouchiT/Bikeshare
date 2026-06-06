@@ -26,22 +26,22 @@
       <div class="d-flex gap-2 align-items-center">
 
         <!-- Visiteur non connecté -->
-        <sec:authorize access="!isAuthenticated()">
+        <th:block sec:authorize="!isAuthenticated()">
           <a class="btn btn-outline-light btn-sm" th:href="@{/bikes}">Voir les vélos</a>
           <a class="btn btn-sm text-white" style="background:#1fa67a;" th:href="@{/login}">Se connecter</a>
           <a class="btn btn-sm btn-outline-light" th:href="@{/register}">S'inscrire</a>
-        </sec:authorize>
+        </th:block>
 
-        <!-- Membre connecté -->
-        <sec:authorize access="hasAuthority('ROLE_MEMBER') and !hasAuthority('ROLE_ADMIN')">
+        <!-- Membre connecté (pas admin) -->
+        <th:block sec:authorize="hasAuthority('ROLE_MEMBER') and !hasAuthority('ROLE_ADMIN')">
           <a class="btn btn-outline-light btn-sm" th:href="@{/account/bikes}">Proposer un vélo</a>
           <a class="btn btn-sm text-white" style="background:#1fa67a;" th:href="@{/account}">Mon compte</a>
-        </sec:authorize>
+        </th:block>
 
         <!-- Admin connecté -->
-        <sec:authorize access="hasAuthority('ROLE_ADMIN')">
+        <th:block sec:authorize="hasAuthority('ROLE_ADMIN')">
           <a class="btn btn-sm text-white" style="background:#1fa67a;" th:href="@{/account}">Mon compte</a>
-        </sec:authorize>
+        </th:block>
 
       </div>
     </div>
