@@ -19,9 +19,10 @@
 
     <!-- Colonne gauche : infos vélo -->
     <div class="col-md-7">
-      <img class="img-fluid rounded-4 shadow-sm w-100" style="max-height:360px;object-fit:cover;"
-           th:src="${!bike.photos.isEmpty()} ? @{'/uploads/photo-bike/' + ${bike.photos[0].url}} : 'https://placehold.co/600x400?text=Velo'"
-           alt="photo du vélo"/>
+         <img class="img-fluid rounded-4 shadow-sm w-100" style="max-height:360px;object-fit:cover;" alt="photo du vélo"
+              th:with="type=${bike.bikeType != null ? bike.bikeType.toLowerCase() : 'city'}, n=${bike.id % 9 + 1}"
+              th:src="@{'/images/bikes/' + ${type} + ${n} + '.avif'}"
+              onerror="this.onerror=null;this.src='https://placehold.co/600x400?text=Velo';"/>
 
       <h2 class="mt-3 fw-bold" th:text="${bike.brand + ' ' + bike.model}"></h2>
       <p class="text-muted">

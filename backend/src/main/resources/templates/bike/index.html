@@ -10,8 +10,10 @@
   <div class="row g-4">
     <div class="col-md-3" th:each="bike : ${bikes}">
       <div class="card h-100 shadow-sm border-0 rounded-4">
-        <img class="card-img-top rounded-top-4" style="height:160px;object-fit:cover;"
-             th:src="${!bike.photos.isEmpty()} ? @{'/uploads/photo-bike/' + ${bike.photos[0].url}} : 'https://placehold.co/600x400?text=Velo'"/>
+           <img class="card-img-top rounded-top-4" style="height:180px;object-fit:cover;" alt="vélo"
+                th:with="type=${bike.bikeType != null ? bike.bikeType.toLowerCase() : 'city'}, n=${bike.id % 9 + 1}"
+                th:src="@{'/images/bikes/' + ${type} + ${n} + '.avif'}"
+                onerror="this.onerror=null;this.src='https://placehold.co/600x400?text=Velo';"/>
         <div class="card-body">
           <h6 th:text="${bike.brand + ' ' + bike.model}"></h6>
           <p class="text-muted small mb-1" th:text="${bike.locality}"></p>
