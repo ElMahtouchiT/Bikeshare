@@ -1,0 +1,11 @@
+target/
+*.class
+*.jar
+*.war
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+uploads/
+*.log
+application-prod.properties
