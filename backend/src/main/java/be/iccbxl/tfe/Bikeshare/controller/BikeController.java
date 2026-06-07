@@ -6,6 +6,7 @@ import be.iccbxl.tfe.Bikeshare.service.serviceImpl.EvaluationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,9 @@ public class BikeController {
 
     @Autowired private BikeService bikeService;
     @Autowired private EvaluationService evaluationService;
+
+    @Value("${google.maps.api.key:}")
+    private String googleMapsApiKey;
 
     @GetMapping("/bikes")
     public String getAllBikes(Model model) {
@@ -32,6 +36,7 @@ public class BikeController {
         model.addAttribute("bike", bike);
         model.addAttribute("averageRating", bikeService.calculateAverageRating(bike));
         model.addAttribute("evaluations", evaluationService.getEvaluationsByBikeId(id));
+        model.addAttribute("googleMapsApiKey", googleMapsApiKey);
         return "bike/show";
     }
 }
