@@ -28,9 +28,10 @@
     <div class="col-md-4" th:each="bike : ${bikes}">
       <div class="card h-100 shadow-sm border-0 rounded-4">
            <img class="card-img-top rounded-top-4" style="height:160px;object-fit:cover;" alt="vélo"
-                th:with="type=${bike.bikeType != null ? bike.bikeType.toLowerCase() : 'city'}, n=${bike.id % 9 + 1}, hasPhoto=${bike.photos != null and !bike.photos.isEmpty()}"
-                th:src="${hasPhoto} ? @{${bike.photos[0].url}} : @{'/images/bikes/' + ${type} + ${n} + '.avif'}"
-                onerror="this.onerror=null;this.src='https://placehold.co/600x400?text=Velo';"/>
+                th:with="type=${bike.bikeType != null ? bike.bikeType.toLowerCase() : 'city'}, n=${bike.id % 9 + 1}, fallback=${'/images/bikes/' + type + n + '.avif'}, imgPath=${(bike.photos != null and !bike.photos.isEmpty()) ? bike.photos[0].url : fallback}"
+                th:src="@{${imgPath}}"
+                th:attr="data-fallback=@{${fallback}}"
+                onerror="if(this.dataset.fb){this.onerror=null;this.src='https://placehold.co/600x400?text=Velo';}else{this.dataset.fb=1;this.src=this.getAttribute('data-fallback');}"/>
         <div class="card-body">
           <h5 class="card-title" th:text="${bike.brand + ' ' + bike.model}"></h5>
           <p class="text-muted mb-1" th:text="${bike.locality}"></p>

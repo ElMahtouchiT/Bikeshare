@@ -20,9 +20,10 @@
     <!-- Colonne gauche : infos vélo -->
     <div class="col-md-7">
          <img class="img-fluid rounded-4 shadow-sm w-100" style="max-height:360px;object-fit:cover;" alt="photo du vélo"
-              th:with="type=${bike.bikeType != null ? bike.bikeType.toLowerCase() : 'city'}, n=${bike.id % 9 + 1}, hasPhoto=${bike.photos != null and !bike.photos.isEmpty()}"
-              th:src="${hasPhoto} ? @{${bike.photos[0].url}} : @{'/images/bikes/' + ${type} + ${n} + '.avif'}"
-              onerror="this.onerror=null;this.src='https://placehold.co/600x400?text=Velo';"/>
+              th:with="type=${bike.bikeType != null ? bike.bikeType.toLowerCase() : 'city'}, n=${bike.id % 9 + 1}, fallback=${'/images/bikes/' + type + n + '.avif'}, imgPath=${(bike.photos != null and !bike.photos.isEmpty()) ? bike.photos[0].url : fallback}"
+              th:src="@{${imgPath}}"
+              th:attr="data-fallback=@{${fallback}}"
+              onerror="if(this.dataset.fb){this.onerror=null;this.src='https://placehold.co/600x400?text=Velo';}else{this.dataset.fb=1;this.src=this.getAttribute('data-fallback');}"/>
 
       <!-- Miniatures (si plusieurs photos uploadées) -->
       <div class="row g-2 mt-1" th:if="${bike.photos != null and bike.photos.size() > 1}">
