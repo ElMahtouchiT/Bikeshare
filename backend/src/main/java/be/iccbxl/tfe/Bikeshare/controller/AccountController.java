@@ -40,7 +40,8 @@ public class AccountController {
     @GetMapping("/account")
     public String account(@AuthenticationPrincipal CustomUserDetail userDetails, Model model) {
         if (userDetails == null) return "redirect:/login";
-        User user = userDetails.getUser();
+        User user = userService.getUserById(userDetails.getUser().getId());
+        if (user == null) return "redirect:/login";
 
         long bikeCount = bikeService.getBikesByUser(user).size();
         int confirmedAsTenant = 0;
@@ -295,7 +296,7 @@ public class AccountController {
     @GetMapping("/account/profile")
     public String editProfileForm(@AuthenticationPrincipal CustomUserDetail userDetails, Model model) {
         if (userDetails == null) return "redirect:/login";
-        model.addAttribute("user", userDetails.getUser());
+        model.addAttribute("user", userService.getUserById(userDetails.getUser().getId()));
         return "account/profile/edit";
     }
 
@@ -310,12 +311,20 @@ public class AccountController {
             @RequestParam(required = false) String phone,
             @RequestParam(required = false) String iban,
             @RequestParam(required = false) String bic,
+            @RequestParam(value = "photo", required = false) MultipartFile photo,
             RedirectAttributes redirectAttributes) {
 
         if (userDetails == null) return "redirect:/login";
-        userService.updateProfile(
+        User user = userService.updateProfile(
                 userDetails.getUser().getId(),
                 firstName, lastName, adresse, locality, postalCode, phone, iban, bic);
+
+        if (user != null && photo != null && !photo.isEmpty()) {
+            String filename = fileStorageService.store(photo, "profiles");
+            user.setPhotoUrl("/uploads/profiles/" + filename);
+            userService.saveUser(user);
+        }
+
         redirectAttributes.addFlashAttribute("success", "Profil mis à jour avec succès.");
         return "redirect:/account/profile";
     }

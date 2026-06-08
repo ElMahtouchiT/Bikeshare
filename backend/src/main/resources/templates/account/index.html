@@ -8,9 +8,17 @@
 <div class="container py-5">
 
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h2 class="mb-0" th:text="'Bonjour ' + ${user.firstName} + ' !'">Bonjour</h2>
-      <p class="text-muted mb-0" th:text="${user.email}"></p>
+    <div class="d-flex align-items-center gap-3">
+      <img th:if="${user.photoUrl != null and !user.photoUrl.isEmpty()}" th:src="@{${user.photoUrl}}"
+           alt="photo de profil" class="rounded-circle" style="width:56px;height:56px;object-fit:cover;"/>
+      <div th:unless="${user.photoUrl != null and !user.photoUrl.isEmpty()}"
+           class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold"
+           style="width:56px;height:56px;background:#1fa67a;"
+           th:text="${user.firstName != null ? user.firstName.substring(0,1).toUpperCase() + user.lastName.substring(0,1).toUpperCase() : 'U'}"></div>
+      <div>
+        <h2 class="mb-0" th:text="'Bonjour ' + ${user.firstName} + ' !'">Bonjour</h2>
+        <p class="text-muted mb-0" th:text="${user.email}"></p>
+      </div>
     </div>
     <a th:href="@{/account/profile}" class="btn btn-outline-secondary btn-sm">
       ✏️ Modifier mon profil
