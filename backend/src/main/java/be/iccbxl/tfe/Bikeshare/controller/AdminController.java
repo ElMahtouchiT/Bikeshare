@@ -1,5 +1,6 @@
 package be.iccbxl.tfe.Bikeshare.controller;
 
+import be.iccbxl.tfe.Bikeshare.model.Bike;
 import be.iccbxl.tfe.Bikeshare.model.Role;
 import be.iccbxl.tfe.Bikeshare.model.User;
 import be.iccbxl.tfe.Bikeshare.repository.RoleRepository;
@@ -10,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -39,7 +41,42 @@ public class AdminController {
         model.addAttribute("pendingClaims",
                 claimService.getALlClaims().stream()
                         .filter(c -> "PENDING".equals(c.getStatus())).count());
+        model.addAttribute("pendingBikes",
+                bikeService.getAllBikes().stream()
+                        .filter(b -> b.getOnline() == null || !b.getOnline()).count());
         return "admin/index";
+    }
+
+    // ── Validation des vélos ──────────────────────────────────
+    @GetMapping("/bikes")
+    public String bikes(Model model) {
+        List<Bike> bikes = bikeService.getAllBikes();
+        // Vélos à valider (hors ligne) en premier
+        bikes.sort(Comparator.comparing(b -> b.getOnline() != null && b.getOnline()));
+        long pending = bikes.stream().filter(b -> b.getOnline() == null || !b.getOnline()).count();
+        model.addAttribute("bikes", bikes);
+        model.addAttribute("pendingBikes", pending);
+        return "admin/bikes/index";
+    }
+
+    @PostMapping("/bikes/{id}/publish")
+    public String publishBike(@PathVariable Long id, RedirectAttributes ra) {
+        Bike bike = bikeService.getBikeById(id);
+        if (bike == null) { ra.addFlashAttribute("error", "Vélo introuvable."); return "redirect:/admin/bikes"; }
+        bike.setOnline(true);
+        bikeService.saveBike(bike);
+        ra.addFlashAttribute("success", "Vélo « " + bike.getBrand() + " " + bike.getModel() + " » publié dans le catalogue.");
+        return "redirect:/admin/bikes";
+    }
+
+    @PostMapping("/bikes/{id}/unpublish")
+    public String unpublishBike(@PathVariable Long id, RedirectAttributes ra) {
+        Bike bike = bikeService.getBikeById(id);
+        if (bike == null) { ra.addFlashAttribute("error", "Vélo introuvable."); return "redirect:/admin/bikes"; }
+        bike.setOnline(false);
+        bikeService.saveBike(bike);
+        ra.addFlashAttribute("success", "Vélo « " + bike.getBrand() + " " + bike.getModel() + " » retiré du catalogue.");
+        return "redirect:/admin/bikes";
     }
 
     // ── Gestion des utilisateurs ──────────────────────────────

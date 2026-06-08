@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Validation des vélos — Admin BikeShare</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+</head>
+<body>
+<nav th:replace="~{fragments :: navbar}"></nav>
+
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-0">Validation des vélos</h2>
+      <p class="text-muted mb-0 small">Publier ou retirer les annonces du catalogue public</p>
+    </div>
+    <a th:href="@{/admin}" class="btn btn-outline-secondary btn-sm">&larr; Dashboard</a>
+  </div>
+
+  <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+  <div th:if="${error}"   class="alert alert-danger"  th:text="${error}"></div>
+
+  <div th:if="${pendingBikes > 0}" class="alert alert-warning">
+    <strong th:text="${pendingBikes}">0</strong> vélo(s) en attente de validation.
+  </div>
+  <div th:if="${pendingBikes == 0}" class="alert alert-info">
+    Aucun vélo en attente. Toutes les annonces sont traitées.
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <table class="table table-hover align-middle mb-0">
+      <thead style="background:#13233f;" class="text-white">
+        <tr>
+          <th class="px-3">#</th>
+          <th>Vélo</th>
+          <th>Propriétaire</th>
+          <th>Localité</th>
+          <th>Prix</th>
+          <th>Statut</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="bike : ${bikes}" th:classappend="${bike.online == null or !bike.online} ? 'table-warning' : ''">
+          <td class="px-3 text-muted small" th:text="${bike.id}"></td>
+          <td>
+            <div class="fw-semibold" th:text="${bike.brand + ' ' + bike.model}"></div>
+            <div class="text-muted small" th:text="${bike.bikeType}"></div>
+          </td>
+          <td class="small" th:text="${bike.user != null ? bike.user.firstName + ' ' + bike.user.lastName : '—'}"></td>
+          <td class="small" th:text="${bike.locality}"></td>
+          <td class="small" th:text="${bike.price != null ? bike.price.middlePrice + ' €/jour' : '—'}"></td>
+          <td>
+            <span th:if="${bike.online}" class="badge bg-success">En ligne</span>
+            <span th:unless="${bike.online}" class="badge bg-secondary">Hors ligne</span>
+          </td>
+          <td>
+            <form th:if="${bike.online == null or !bike.online}"
+                  th:action="@{'/admin/bikes/' + ${bike.id} + '/publish'}" method="post">
+              <button class="btn btn-sm btn-success">Publier</button>
+            </form>
+            <form th:unless="${bike.online == null or !bike.online}"
+                  th:action="@{'/admin/bikes/' + ${bike.id} + '/unpublish'}" method="post"
+                  onsubmit="return confirm('Retirer ce vélo du catalogue ?');">
+              <button class="btn btn-sm btn-outline-secondary">Mettre hors ligne</button>
+            </form>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

@@ -65,22 +65,31 @@
 
   <!-- Navigation admin -->
   <div class="row g-3">
-    <div class="col-md-4">
-      <a th:href="@{/admin/users}" class="card border-0 shadow-sm rounded-4 p-4 text-decoration-none text-dark d-block">
+    <div class="col-md-3">
+      <a th:href="@{/admin/bikes}" class="card border-0 shadow-sm rounded-4 p-4 text-decoration-none text-dark d-block position-relative h-100">
+        <span th:if="${pendingBikes > 0}" class="position-absolute top-0 end-0 m-2 badge rounded-pill bg-danger"
+              th:text="${pendingBikes}">0</span>
+        <div class="fs-2 mb-2">🚲</div>
+        <div class="fw-bold">Validation des vélos</div>
+        <div class="text-muted small">Publier les annonces en attente</div>
+      </a>
+    </div>
+    <div class="col-md-3">
+      <a th:href="@{/admin/users}" class="card border-0 shadow-sm rounded-4 p-4 text-decoration-none text-dark d-block h-100">
         <div class="fs-2 mb-2">👥</div>
         <div class="fw-bold">Gestion des utilisateurs</div>
         <div class="text-muted small">Modifier les rôles, supprimer des comptes</div>
       </a>
     </div>
-    <div class="col-md-4">
-      <a th:href="@{/admin/claims}" class="card border-0 shadow-sm rounded-4 p-4 text-decoration-none text-dark d-block">
+    <div class="col-md-3">
+      <a th:href="@{/admin/claims}" class="card border-0 shadow-sm rounded-4 p-4 text-decoration-none text-dark d-block h-100">
         <div class="fs-2 mb-2">📋</div>
         <div class="fw-bold">Réclamations</div>
         <div class="text-muted small">Traiter les litiges entre membres</div>
       </a>
     </div>
-    <div class="col-md-4">
-      <a th:href="@{/admin/evaluations}" class="card border-0 shadow-sm rounded-4 p-4 text-decoration-none text-dark d-block">
+    <div class="col-md-3">
+      <a th:href="@{/admin/evaluations}" class="card border-0 shadow-sm rounded-4 p-4 text-decoration-none text-dark d-block h-100">
         <div class="fs-2 mb-2">⭐</div>
         <div class="fw-bold">Évaluations</div>
         <div class="text-muted small">Modérer les avis laissés sur les vélos</div>
