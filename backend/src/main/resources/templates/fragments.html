@@ -36,11 +36,17 @@
         <th:block sec:authorize="hasAuthority('ROLE_MEMBER') and !hasAuthority('ROLE_ADMIN')">
           <a class="btn btn-outline-light btn-sm" th:href="@{/account/bikes/create}">Proposer un vélo</a>
           <a class="btn btn-sm text-white" style="background:#1fa67a;" th:href="@{/account}">Mon compte</a>
+          <form th:action="@{/logout}" method="post" class="m-0">
+            <button type="submit" class="btn btn-sm btn-outline-light">Déconnexion</button>
+          </form>
         </th:block>
 
         <!-- Admin connecté -->
         <th:block sec:authorize="hasAuthority('ROLE_ADMIN')">
           <a class="btn btn-sm text-white" style="background:#1fa67a;" th:href="@{/account}">Mon compte</a>
+          <form th:action="@{/logout}" method="post" class="m-0">
+            <button type="submit" class="btn btn-sm btn-outline-light">Déconnexion</button>
+          </form>
         </th:block>
 
       </div>
