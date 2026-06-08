@@ -15,6 +15,9 @@ import java.util.stream.Collectors;
 @Service
 public class ReservationService implements ReservationServiceI {
 
+    /** Statuts considérés comme « en cours » : bloquent la suppression du vélo. */
+    private static final List<String> ACTIVE_STATUSES = List.of("PENDING", "CONFIRMED", "NOW");
+
     @Autowired private ReservationRepository reservationRepository;
 
     @Override public List<Reservation> getAllReservations() { return reservationRepository.findAll(); }
@@ -51,5 +54,10 @@ public class ReservationService implements ReservationServiceI {
     @Override
     public long getTotalConfirmedReservations() {
         return reservationRepository.countByStatut("CONFIRMED");
+    }
+
+    @Override
+    public boolean hasActiveReservations(Long bikeId) {
+        return reservationRepository.existsByBikeIdAndStatutIn(bikeId, ACTIVE_STATUSES);
     }
 }

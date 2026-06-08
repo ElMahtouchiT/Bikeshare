@@ -10,19 +10,26 @@
 <div class="container py-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Mes vélos</h2>
-    <a th:href="@{/account}" class="btn btn-outline-secondary btn-sm">&larr; Mon compte</a>
+    <div class="d-flex gap-2">
+      <a th:href="@{/account/bikes/create}" class="btn btn-sm text-white" style="background:#1fa67a;">+ Proposer un vélo</a>
+      <a th:href="@{/account}" class="btn btn-outline-secondary btn-sm">&larr; Mon compte</a>
+    </div>
   </div>
+
+  <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+  <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
   <div th:if="${bikes.isEmpty()}" class="alert alert-info">
     Vous n'avez pas encore de vélo enregistré.
+    <a th:href="@{/account/bikes/create}" class="alert-link ms-1">Proposez votre premier vélo</a>.
   </div>
 
   <div class="row g-4" th:if="${!bikes.isEmpty()}">
     <div class="col-md-4" th:each="bike : ${bikes}">
       <div class="card h-100 shadow-sm border-0 rounded-4">
            <img class="card-img-top rounded-top-4" style="height:160px;object-fit:cover;" alt="vélo"
-                th:with="type=${bike.bikeType != null ? bike.bikeType.toLowerCase() : 'city'}, n=${bike.id % 9 + 1}"
-                th:src="@{'/images/bikes/' + ${type} + ${n} + '.avif'}"
+                th:with="type=${bike.bikeType != null ? bike.bikeType.toLowerCase() : 'city'}, n=${bike.id % 9 + 1}, hasPhoto=${bike.photos != null and !bike.photos.isEmpty()}"
+                th:src="${hasPhoto} ? @{${bike.photos[0].url}} : @{'/images/bikes/' + ${type} + ${n} + '.avif'}"
                 onerror="this.onerror=null;this.src='https://placehold.co/600x400?text=Velo';"/>
         <div class="card-body">
           <h5 class="card-title" th:text="${bike.brand + ' ' + bike.model}"></h5>
@@ -32,7 +39,14 @@
                   th:text="${bike.online} ? 'En ligne' : 'Hors ligne'"></span>
           </p>
           <p class="fw-bold" th:text="${bike.price != null ? bike.price.middlePrice + ' €/jour' : 'Prix non défini'}"></p>
-          <a class="btn btn-sm text-white" style="background:#13233f;" th:href="@{'/bikes/' + ${bike.id}}">Voir</a>
+          <div class="d-flex gap-2 flex-wrap">
+            <a class="btn btn-sm text-white" style="background:#13233f;" th:href="@{'/bikes/' + ${bike.id}}">Voir</a>
+            <a class="btn btn-sm btn-outline-secondary" th:href="@{'/account/bikes/' + ${bike.id} + '/edit'}">Modifier</a>
+            <form th:action="@{'/account/bikes/' + ${bike.id} + '/delete'}" method="post"
+                  onsubmit="return confirm('Supprimer définitivement cette annonce et ses photos ?');">
+              <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
+            </form>
+          </div>
         </div>
       </div>
     </div>

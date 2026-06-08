@@ -16,4 +16,7 @@ public interface ReservationServiceI {
     List<ReservationDTO> getReservationsByUser(User user);
     List<Reservation> getReservationsByStatusesAndUser(List<String> statuses, User user);
     long getTotalConfirmedReservations();
+
+    /** Vrai si le vélo a au moins une réservation en cours (PENDING, CONFIRMED ou NOW). */
+    boolean hasActiveReservations(Long bikeId);
 }

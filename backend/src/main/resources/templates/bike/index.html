@@ -11,8 +11,8 @@
     <div class="col-md-3" th:each="bike : ${bikes}">
       <div class="card h-100 shadow-sm border-0 rounded-4">
            <img class="card-img-top rounded-top-4" style="height:180px;object-fit:cover;" alt="vélo"
-                th:with="type=${bike.bikeType != null ? bike.bikeType.toLowerCase() : 'city'}, n=${bike.id % 9 + 1}"
-                th:src="@{'/images/bikes/' + ${type} + ${n} + '.avif'}"
+                th:with="type=${bike.bikeType != null ? bike.bikeType.toLowerCase() : 'city'}, n=${bike.id % 9 + 1}, hasPhoto=${bike.photos != null and !bike.photos.isEmpty()}"
+                th:src="${hasPhoto} ? @{${bike.photos[0].url}} : @{'/images/bikes/' + ${type} + ${n} + '.avif'}"
                 onerror="this.onerror=null;this.src='https://placehold.co/600x400?text=Velo';"/>
         <div class="card-body">
           <h6 th:text="${bike.brand + ' ' + bike.model}"></h6>

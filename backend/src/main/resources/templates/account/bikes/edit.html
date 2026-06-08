@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Modifier l'annonce — BikeShare</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+</head>
+<body>
+<nav th:replace="~{fragments :: navbar}"></nav>
+
+<div class="container py-5" style="max-width:720px;">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Modifier l'annonce</h2>
+    <a th:href="@{/account/bikes}" class="btn btn-outline-secondary btn-sm">&larr; Mes vélos</a>
+  </div>
+
+  <!-- Photos existantes -->
+  <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+    <h6 class="text-muted text-uppercase mb-3" style="font-size:.75rem;letter-spacing:.08em;">Photos actuelles</h6>
+    <div th:if="${bike.photos == null or bike.photos.isEmpty()}" class="text-muted small">
+      Aucune photo pour ce vélo. Ajoutez-en ci-dessous.
+    </div>
+    <div class="row g-3" th:unless="${bike.photos == null or bike.photos.isEmpty()}">
+      <div class="col-6 col-md-4" th:each="photo : ${bike.photos}">
+        <div class="position-relative">
+          <img class="img-fluid rounded-3 w-100" style="height:130px;object-fit:cover;" alt="photo du vélo"
+               th:src="@{${photo.url}}"/>
+          <form th:action="@{'/account/bikes/' + ${bike.id} + '/photos/' + ${photo.id} + '/delete'}"
+                method="post" class="position-absolute top-0 end-0 m-1"
+                onsubmit="return confirm('Supprimer cette photo ?');">
+            <button type="submit" class="btn btn-sm btn-danger rounded-circle" style="width:28px;height:28px;padding:0;"
+                    title="Supprimer">&times;</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0 rounded-4 p-4">
+    <form th:action="@{'/account/bikes/' + ${bike.id} + '/edit'}" method="post" enctype="multipart/form-data">
+
+      <!-- Identité du vélo -->
+      <h6 class="text-muted text-uppercase mb-3" style="font-size:.75rem;letter-spacing:.08em;">Identité du vélo</h6>
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Marque <span class="text-danger">*</span></label>
+          <input class="form-control" name="brand" th:value="${bike.brand}" required/>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Modèle <span class="text-danger">*</span></label>
+          <input class="form-control" name="bikeModel" th:value="${bike.model}" required/>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Type de vélo <span class="text-danger">*</span></label>
+          <select class="form-select" name="bikeType" required>
+            <option value="" disabled th:selected="${bike.bikeType == null}">Choisir…</option>
+            <option value="CITY"     th:selected="${bike.bikeType == 'CITY'}">Vélo de ville</option>
+            <option value="MTB"      th:selected="${bike.bikeType == 'MTB'}">VTT</option>
+            <option value="ROAD"     th:selected="${bike.bikeType == 'ROAD'}">Vélo de route</option>
+            <option value="ELECTRIC" th:selected="${bike.bikeType == 'ELECTRIC'}">Vélo électrique</option>
+            <option value="CARGO"    th:selected="${bike.bikeType == 'CARGO'}">Vélo cargo</option>
+            <option value="OTHER"    th:selected="${bike.bikeType == 'OTHER'}">Autre</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Catégorie</label>
+          <select class="form-select" name="categoryId">
+            <option value="" th:selected="${bike.category == null}">— Aucune —</option>
+            <option th:each="cat : ${categories}"
+                    th:value="${cat.id}"
+                    th:text="${cat.category}"
+                    th:selected="${bike.category != null and bike.category.id == cat.id}"></option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Taille de cadre</label>
+          <select class="form-select" name="frameSize">
+            <option value="" th:selected="${bike.frameSize == null}">—</option>
+            <option th:selected="${bike.frameSize == 'XS'}">XS</option>
+            <option th:selected="${bike.frameSize == 'S'}">S</option>
+            <option th:selected="${bike.frameSize == 'M'}">M</option>
+            <option th:selected="${bike.frameSize == 'L'}">L</option>
+            <option th:selected="${bike.frameSize == 'XL'}">XL</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Taille de roue</label>
+          <select class="form-select" name="wheelSize">
+            <option value="" th:selected="${bike.wheelSize == null}">—</option>
+            <option value="26&quot;"   th:selected="${bike.wheelSize == '26&quot;'}">26"</option>
+            <option value="27.5&quot;" th:selected="${bike.wheelSize == '27.5&quot;'}">27.5"</option>
+            <option value="28&quot;"   th:selected="${bike.wheelSize == '28&quot;'}">28"</option>
+            <option value="29&quot;"   th:selected="${bike.wheelSize == '29&quot;'}">29"</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Vitesses</label>
+          <input class="form-control" type="number" name="gears" min="1" max="33" th:value="${bike.gears}"/>
+        </div>
+        <div class="col-12">
+          <div class="form-check mt-1">
+            <input class="form-check-input" type="checkbox" name="electric" id="electric" value="true"
+                   th:checked="${bike.electric}"/>
+            <label class="form-check-label" for="electric">Vélo à assistance électrique (VAE)</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Localisation -->
+      <h6 class="text-muted text-uppercase mb-3 mt-4" style="font-size:.75rem;letter-spacing:.08em;">Localisation</h6>
+      <div class="row g-3 mb-3">
+        <div class="col-12">
+          <label class="form-label">Rue et numéro</label>
+          <input class="form-control" name="adresse" th:value="${bike.adresse}" placeholder="Rue de la Loi 1"/>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Code postal</label>
+          <input class="form-control" name="postalCode" th:value="${bike.postalCode}" placeholder="1000"/>
+        </div>
+        <div class="col-md-8">
+          <label class="form-label">Localité <span class="text-danger">*</span></label>
+          <input class="form-control" name="locality" th:value="${bike.locality}" placeholder="Bruxelles" required/>
+        </div>
+      </div>
+
+      <!-- Tarif et réservation -->
+      <h6 class="text-muted text-uppercase mb-3 mt-4" style="font-size:.75rem;letter-spacing:.08em;">Tarif et réservation</h6>
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <label class="form-label">Prix par jour (€) <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <input class="form-control" type="number" name="middlePrice" min="1" step="0.5"
+                   th:value="${bike.price != null ? bike.price.middlePrice : ''}" required/>
+            <span class="input-group-text">€/jour</span>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Mode de réservation</label>
+          <select class="form-select" name="reservationMode">
+            <option value="MANUAL"    th:selected="${bike.reservationMode == 'MANUAL' or bike.reservationMode == null}">Manuel (vous acceptez chaque demande)</option>
+            <option value="AUTOMATIC" th:selected="${bike.reservationMode == 'AUTOMATIC'}">Automatique</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Ajouter des photos -->
+      <h6 class="text-muted text-uppercase mb-3 mt-4" style="font-size:.75rem;letter-spacing:.08em;">Ajouter des photos</h6>
+      <div class="mb-4">
+        <input class="form-control" type="file" name="photos" accept="image/*" multiple/>
+        <div class="form-text">Les nouvelles photos s'ajoutent aux photos actuelles. 10 Mo maximum par fichier.</div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn text-white px-4" style="background:#1fa67a;">Enregistrer les modifications</button>
+        <a th:href="@{/account/bikes}" class="btn btn-outline-secondary">Annuler</a>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

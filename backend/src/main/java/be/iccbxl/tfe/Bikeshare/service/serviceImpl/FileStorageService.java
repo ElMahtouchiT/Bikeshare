@@ -24,4 +24,15 @@ public class FileStorageService {
             throw new RuntimeException("Échec du stockage du fichier", e);
         }
     }
+
+    /** Supprime le fichier physique correspondant à une URL web (ex : /uploads/bikes/xxx.jpg). */
+    public void delete(String webPath) {
+        if (webPath == null || webPath.isBlank()) return;
+        try {
+            String rel = webPath.startsWith("/uploads/") ? webPath.substring("/uploads/".length()) : webPath;
+            Files.deleteIfExists(root.resolve(rel));
+        } catch (IOException e) {
+            // Fichier déjà absent ou non supprimable : on ignore.
+        }
+    }
 }

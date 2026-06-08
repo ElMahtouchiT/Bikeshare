@@ -16,6 +16,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findByStatutInAndUser(List<String> statuses, User user);
 
     long countByStatut(String statut);
+    boolean existsByBikeIdAndStatutIn(Long bikeId, List<String> statuses);
 
     @Query("SELECT r.bike.id, COUNT(r) AS c FROM Reservation r GROUP BY r.bike.id ORDER BY c DESC")
     List<Object[]> findMostReservedBikes();

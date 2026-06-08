@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Proposer un vélo — BikeShare</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+</head>
+<body>
+<nav th:replace="~{fragments :: navbar}"></nav>
+
+<div class="container py-5" style="max-width:720px;">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Proposer un vélo</h2>
+    <a th:href="@{/account/bikes}" class="btn btn-outline-secondary btn-sm">&larr; Mes vélos</a>
+  </div>
+
+  <div class="card shadow-sm border-0 rounded-4 p-4">
+    <form th:action="@{/account/bikes/create}" method="post" enctype="multipart/form-data">
+
+      <!-- Identité du vélo -->
+      <h6 class="text-muted text-uppercase mb-3" style="font-size:.75rem;letter-spacing:.08em;">Identité du vélo</h6>
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Marque <span class="text-danger">*</span></label>
+          <input class="form-control" name="brand" placeholder="Trek, Decathlon…" required/>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Modèle <span class="text-danger">*</span></label>
+          <input class="form-control" name="bikeModel" placeholder="FX 3, Riverside 500…" required/>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Type de vélo <span class="text-danger">*</span></label>
+          <select class="form-select" name="bikeType" required>
+            <option value="" disabled selected>Choisir…</option>
+            <option value="CITY">Vélo de ville</option>
+            <option value="MTB">VTT</option>
+            <option value="ROAD">Vélo de route</option>
+            <option value="ELECTRIC">Vélo électrique</option>
+            <option value="CARGO">Vélo cargo</option>
+            <option value="OTHER">Autre</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Catégorie</label>
+          <select class="form-select" name="categoryId">
+            <option value="">— Aucune —</option>
+            <option th:each="cat : ${categories}"
+                    th:value="${cat.id}"
+                    th:text="${cat.category}"></option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Taille de cadre</label>
+          <select class="form-select" name="frameSize">
+            <option value="">—</option>
+            <option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Taille de roue</label>
+          <select class="form-select" name="wheelSize">
+            <option value="">—</option>
+            <option value="26&quot;">26"</option>
+            <option value="27.5&quot;">27.5"</option>
+            <option value="28&quot;">28"</option>
+            <option value="29&quot;">29"</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Vitesses</label>
+          <input class="form-control" type="number" name="gears" min="1" max="33" placeholder="ex : 7"/>
+        </div>
+        <div class="col-12">
+          <div class="form-check mt-1">
+            <input class="form-check-input" type="checkbox" name="electric" id="electric" value="true"/>
+            <label class="form-check-label" for="electric">Vélo à assistance électrique (VAE)</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Localisation -->
+      <h6 class="text-muted text-uppercase mb-3 mt-4" style="font-size:.75rem;letter-spacing:.08em;">Localisation</h6>
+      <div class="row g-3 mb-3">
+        <div class="col-12">
+          <label class="form-label">Rue et numéro</label>
+          <input class="form-control" name="adresse" placeholder="Rue de la Loi 1"/>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Code postal</label>
+          <input class="form-control" name="postalCode" placeholder="1000"/>
+        </div>
+        <div class="col-md-8">
+          <label class="form-label">Localité <span class="text-danger">*</span></label>
+          <input class="form-control" name="locality" placeholder="Bruxelles" required/>
+        </div>
+      </div>
+
+      <!-- Tarif et réservation -->
+      <h6 class="text-muted text-uppercase mb-3 mt-4" style="font-size:.75rem;letter-spacing:.08em;">Tarif et réservation</h6>
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <label class="form-label">Prix par jour (€) <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <input class="form-control" type="number" name="middlePrice" min="1" step="0.5"
+                   placeholder="ex : 15" required/>
+            <span class="input-group-text">€/jour</span>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Mode de réservation</label>
+          <select class="form-select" name="reservationMode">
+            <option value="MANUAL" selected>Manuel (vous acceptez chaque demande)</option>
+            <option value="AUTOMATIC">Automatique</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Photos -->
+      <h6 class="text-muted text-uppercase mb-3 mt-4" style="font-size:.75rem;letter-spacing:.08em;">Photos</h6>
+      <div class="mb-4">
+        <label class="form-label">Ajouter des photos</label>
+        <input class="form-control" type="file" name="photos" accept="image/*" multiple/>
+        <div class="form-text">Vous pouvez sélectionner plusieurs images (JPG, PNG…). 10 Mo maximum par fichier.</div>
+      </div>
+
+      <div class="alert alert-info small mb-4">
+        Votre vélo sera visible dans le catalogue après vérification par notre équipe.
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn text-white px-4" style="background:#1fa67a;">Enregistrer le vélo</button>
+        <a th:href="@{/account/bikes}" class="btn btn-outline-secondary">Annuler</a>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>
