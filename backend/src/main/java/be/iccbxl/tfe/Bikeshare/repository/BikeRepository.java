@@ -16,7 +16,9 @@ public interface BikeRepository extends JpaRepository<Bike, Long> {
     @Query("""
            SELECT b FROM Bike b
            WHERE b.online = true
-             AND (:locality IS NULL OR LOWER(b.locality) LIKE LOWER(CONCAT('%', :locality, '%')))
+             AND (:locality IS NULL
+                  OR LOWER(b.locality) LIKE LOWER(CONCAT('%', :locality, '%'))
+                  OR LOWER(b.postalCode) LIKE LOWER(CONCAT('%', :locality, '%')))
              AND (:categoryId IS NULL OR b.category.id = :categoryId)
              AND (:electric IS NULL OR b.electric = :electric)
            """)
