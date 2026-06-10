@@ -4,9 +4,11 @@ import be.iccbxl.tfe.Bikeshare.model.Bike;
 import be.iccbxl.tfe.Bikeshare.model.Evaluation;
 import be.iccbxl.tfe.Bikeshare.model.User;
 import be.iccbxl.tfe.Bikeshare.repository.BikeRepository;
+import be.iccbxl.tfe.Bikeshare.repository.UserRepository;
 import be.iccbxl.tfe.Bikeshare.service.BikeServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -15,6 +17,9 @@ public class BikeService implements BikeServiceI {
 
     @Autowired
     private BikeRepository bikeRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Override public List<Bike> getAllBikes() { return bikeRepository.findAll(); }
     @Override public List<Bike> getAllOnlineBikes() { return bikeRepository.findByOnlineTrue(); }
@@ -27,7 +32,25 @@ public class BikeService implements BikeServiceI {
         return bikeRepository.save(bike);
     }
 
-    @Override public void deleteBike(Long id) { bikeRepository.deleteById(id); }
+    /**
+     * Suppression d'un vélo. Comme {@code User.ownedBikes} est en cascade ALL + orphanRemoval,
+     * un simple {@code deleteById} est annulé par la re-cascade du propriétaire. On retire donc
+     * le vélo de la collection du propriétaire : l'orphanRemoval supprime alors réellement le
+     * vélo et ses entités liées (photos, prix, réservations).
+     */
+    @Override
+    @Transactional
+    public void deleteBike(Long id) {
+        Bike bike = bikeRepository.findById(id).orElse(null);
+        if (bike == null) return;
+        User owner = bike.getUser();
+        if (owner != null && owner.getOwnedBikes() != null
+                && owner.getOwnedBikes().removeIf(b -> b.getId().equals(id))) {
+            userRepository.save(owner);
+        } else {
+            bikeRepository.delete(bike);
+        }
+    }
     @Override public List<Bike> getBikesByUser(User user) { return bikeRepository.findByUser(user); }
 
     @Override
