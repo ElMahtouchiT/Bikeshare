@@ -60,4 +60,9 @@ public class ReservationService implements ReservationServiceI {
     public boolean hasActiveReservations(Long bikeId) {
         return reservationRepository.existsByBikeIdAndStatutIn(bikeId, ACTIVE_STATUSES);
     }
+
+    @Override
+    public List<Reservation> getReservationsOnOwnerBikes(User owner) {
+        return reservationRepository.findByBikeUserId(owner.getId());
+    }
 }

@@ -19,4 +19,7 @@ public interface ReservationServiceI {
 
     /** Vrai si le vélo a au moins une réservation en cours (PENDING, CONFIRMED ou NOW). */
     boolean hasActiveReservations(Long bikeId);
+
+    /** Réservations reçues : faites sur les vélos appartenant à ce propriétaire. */
+    List<Reservation> getReservationsOnOwnerBikes(User owner);
 }

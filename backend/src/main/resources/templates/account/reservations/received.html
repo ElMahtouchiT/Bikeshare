@@ -2,22 +2,25 @@
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8"/>
-  <title>Mes réservations — BikeShare</title>
+  <title>Réservations reçues — BikeShare</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
 </head>
 <body>
 <nav th:replace="~{fragments :: navbar}"></nav>
 <div class="container py-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Mes réservations</h2>
+    <div>
+      <h2 class="mb-0">Réservations reçues</h2>
+      <p class="text-muted mb-0 small">Demandes de location sur vos vélos</p>
+    </div>
     <a th:href="@{/account}" class="btn btn-outline-secondary btn-sm">&larr; Mon compte</a>
   </div>
 
   <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-  <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+  <div th:if="${error}"   class="alert alert-danger"  th:text="${error}"></div>
 
   <div th:if="${reservations.isEmpty()}" class="alert alert-info">
-    Vous n'avez pas encore de réservation.
+    Vous n'avez encore reçu aucune réservation sur vos vélos.
   </div>
 
   <div class="table-responsive" th:if="${!reservations.isEmpty()}">
@@ -26,11 +29,10 @@
         <tr>
           <th>#</th>
           <th>Vélo</th>
+          <th>Locataire</th>
           <th>Du</th>
           <th>Au</th>
-          <th>Durée</th>
           <th>Statut</th>
-          <th>Prix</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -38,9 +40,9 @@
         <tr th:each="r : ${reservations}">
           <td th:text="${r.id}"></td>
           <td th:text="${r.bike != null ? r.bike.brand + ' ' + r.bike.model : '—'}"></td>
+          <td th:text="${r.user != null ? r.user.firstName + ' ' + r.user.lastName : '—'}"></td>
           <td th:text="${r.startLocation}"></td>
           <td th:text="${r.endLocation}"></td>
-          <td th:text="${r.duration != null ? r.duration + ' j' : '—'}"></td>
           <td>
             <span class="badge"
                   th:classappend="${r.statut == 'CONFIRMED' or r.statut == 'NOW'} ? 'bg-success' :
@@ -48,10 +50,20 @@
                                   (${r.statut == 'CANCELLED' or r.statut == 'REFUSED'} ? 'bg-danger' : 'bg-secondary'))"
                   th:text="${r.statut}"></span>
           </td>
-          <td th:text="${r.totalPrice != null ? r.totalPrice + ' €' : '—'}"></td>
           <td>
-            <a class="btn btn-sm btn-outline-secondary"
-               th:href="@{'/account/reservations/' + ${r.id} + '/chat'}">💬</a>
+            <div class="d-flex gap-1 flex-wrap">
+              <form th:if="${r.statut == 'PENDING'}"
+                    th:action="@{'/account/reservations/' + ${r.id} + '/confirm'}" method="post">
+                <button class="btn btn-sm btn-success">Confirmer</button>
+              </form>
+              <form th:if="${r.statut == 'PENDING'}"
+                    th:action="@{'/account/reservations/' + ${r.id} + '/refuse'}" method="post"
+                    onsubmit="return confirm('Refuser cette réservation ?');">
+                <button class="btn btn-sm btn-outline-danger">Refuser</button>
+              </form>
+              <a class="btn btn-sm btn-outline-secondary"
+                 th:href="@{'/account/reservations/' + ${r.id} + '/chat'}">💬 Messagerie</a>
+            </div>
           </td>
         </tr>
       </tbody>

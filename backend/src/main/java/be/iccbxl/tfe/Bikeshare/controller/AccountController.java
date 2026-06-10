@@ -75,6 +75,72 @@ public class AccountController {
         return "account/reservations/index";
     }
 
+    /* ─── Réservations reçues (côté propriétaire) ───────────── */
+
+    @GetMapping("/account/received-reservations")
+    public String receivedReservations(@AuthenticationPrincipal CustomUserDetail userDetails, Model model) {
+        if (userDetails == null) return "redirect:/login";
+        model.addAttribute("reservations",
+                reservationService.getReservationsOnOwnerBikes(userDetails.getUser()));
+        return "account/reservations/received";
+    }
+
+    @PostMapping("/account/reservations/{id}/confirm")
+    public String confirmReservation(@PathVariable Long id,
+                                     @AuthenticationPrincipal CustomUserDetail userDetails,
+                                     RedirectAttributes redirectAttributes) {
+        return updateReservationStatusAsOwner(id, userDetails, "CONFIRMED",
+                "Réservation confirmée.", redirectAttributes);
+    }
+
+    @PostMapping("/account/reservations/{id}/refuse")
+    public String refuseReservation(@PathVariable Long id,
+                                    @AuthenticationPrincipal CustomUserDetail userDetails,
+                                    RedirectAttributes redirectAttributes) {
+        return updateReservationStatusAsOwner(id, userDetails, "REFUSED",
+                "Réservation refusée.", redirectAttributes);
+    }
+
+    private String updateReservationStatusAsOwner(Long id, CustomUserDetail userDetails,
+                                                  String status, String successMsg,
+                                                  RedirectAttributes redirectAttributes) {
+        if (userDetails == null) return "redirect:/login";
+        Reservation r = reservationService.getReservationById(id);
+        if (r == null || r.getBike() == null || r.getBike().getUser() == null
+                || !r.getBike().getUser().getId().equals(userDetails.getUser().getId())) {
+            redirectAttributes.addFlashAttribute("error", "Réservation introuvable ou accès refusé.");
+            return "redirect:/account/received-reservations";
+        }
+        r.setStatut(status);
+        reservationService.saveReservation(r);
+        redirectAttributes.addFlashAttribute("success", successMsg);
+        return "redirect:/account/received-reservations";
+    }
+
+    /* ─── Messagerie d'une réservation ──────────────────────── */
+
+    @GetMapping("/account/reservations/{id}/chat")
+    public String reservationChat(@PathVariable Long id,
+                                  @AuthenticationPrincipal CustomUserDetail userDetails,
+                                  Model model, RedirectAttributes redirectAttributes) {
+        if (userDetails == null) return "redirect:/login";
+        Reservation r = reservationService.getReservationById(id);
+        Long uid = userDetails.getUser().getId();
+        boolean isRenter = r != null && r.getUser() != null && r.getUser().getId().equals(uid);
+        boolean isOwner  = r != null && r.getBike() != null && r.getBike().getUser() != null
+                && r.getBike().getUser().getId().equals(uid);
+        if (r == null || (!isRenter && !isOwner)) {
+            redirectAttributes.addFlashAttribute("error", "Conversation introuvable ou accès refusé.");
+            return "redirect:/account/reservations";
+        }
+        User other = isRenter ? r.getBike().getUser() : r.getUser();
+        model.addAttribute("reservation", r);
+        model.addAttribute("currentUserId", uid);
+        model.addAttribute("otherName",
+                other != null ? other.getFirstName() + " " + other.getLastName() : "—");
+        return "account/reservations/chat";
+    }
+
     @GetMapping("/account/gains")
     public String myGains(@AuthenticationPrincipal CustomUserDetail userDetails, Model model) {
         if (userDetails == null) return "redirect:/login";
