@@ -44,6 +44,12 @@ public class ReservationController {
             return "redirect:/bikes/" + bikeId;
         }
 
+        if (reservationService.hasBookingOverlap(bikeId, start, end)) {
+            redirectAttributes.addFlashAttribute("error",
+                    "Ces dates ne sont plus disponibles : le vélo est déjà réservé sur cette période.");
+            return "redirect:/bikes/" + bikeId;
+        }
+
         Reservation r = new Reservation();
         r.setBike(bike);
         r.setUser(userDetails.getUser());

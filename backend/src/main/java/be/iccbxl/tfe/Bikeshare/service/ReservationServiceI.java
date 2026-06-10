@@ -3,6 +3,7 @@ package be.iccbxl.tfe.Bikeshare.service;
 import be.iccbxl.tfe.Bikeshare.DTO.ReservationDTO;
 import be.iccbxl.tfe.Bikeshare.model.Reservation;
 import be.iccbxl.tfe.Bikeshare.model.User;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface ReservationServiceI {
@@ -22,4 +23,10 @@ public interface ReservationServiceI {
 
     /** Réservations reçues : faites sur les vélos appartenant à ce propriétaire. */
     List<Reservation> getReservationsOnOwnerBikes(User owner);
+
+    /** Réservations qui bloquent le calendrier d'un vélo (CONFIRMED, NOW). */
+    List<Reservation> getBookedReservationsForBike(Long bikeId);
+
+    /** Vrai si la période [start, end] chevauche une réservation confirmée du vélo. */
+    boolean hasBookingOverlap(Long bikeId, LocalDate start, LocalDate end);
 }

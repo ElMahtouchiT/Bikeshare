@@ -9,6 +9,7 @@ import be.iccbxl.tfe.Bikeshare.service.ReservationServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,6 +18,9 @@ public class ReservationService implements ReservationServiceI {
 
     /** Statuts considérés comme « en cours » : bloquent la suppression du vélo. */
     private static final List<String> ACTIVE_STATUSES = List.of("PENDING", "CONFIRMED", "NOW");
+
+    /** Statuts qui bloquent le calendrier (réservation confirmée / en cours). */
+    private static final List<String> BOOKED_STATUSES = List.of("CONFIRMED", "NOW");
 
     @Autowired private ReservationRepository reservationRepository;
 
@@ -64,5 +68,19 @@ public class ReservationService implements ReservationServiceI {
     @Override
     public List<Reservation> getReservationsOnOwnerBikes(User owner) {
         return reservationRepository.findByBikeUserId(owner.getId());
+    }
+
+    @Override
+    public List<Reservation> getBookedReservationsForBike(Long bikeId) {
+        return reservationRepository.findByBikeIdAndStatutIn(bikeId, BOOKED_STATUSES);
+    }
+
+    @Override
+    public boolean hasBookingOverlap(Long bikeId, LocalDate start, LocalDate end) {
+        if (start == null || end == null) return false;
+        return getBookedReservationsForBike(bikeId).stream().anyMatch(r ->
+                r.getStartLocation() != null && r.getEndLocation() != null
+                        && !r.getStartLocation().isAfter(end)
+                        && !r.getEndLocation().isBefore(start));
     }
 }
