@@ -6,7 +6,7 @@
 <body>
 <nav th:replace="~{fragments :: navbar}"></nav>
 <div class="container py-5">
-  <h2 class="mb-4">Vélos disponibles</h2>
+  <h2 class="mb-4" th:text="#{catalogue.title}">Vélos disponibles</h2>
   <div class="row g-4">
     <div class="col-md-3" th:each="bike : ${bikes}">
       <div class="card h-100 shadow-sm border-0 rounded-4">
@@ -18,7 +18,7 @@
         <div class="card-body">
           <h6 th:text="${bike.brand + ' ' + bike.model}"></h6>
           <p class="text-muted small mb-1" th:text="${bike.locality}"></p>
-          <a class="btn btn-sm text-white" style="background:#13233f;" th:href="@{'/bikes/' + ${bike.id}}">Détail</a>
+          <a class="btn btn-sm text-white" style="background:#13233f;" th:href="@{'/bikes/' + ${bike.id}}" th:text="#{common.detail}">Détail</a>
         </div>
       </div>
     </div>

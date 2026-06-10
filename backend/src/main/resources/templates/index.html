@@ -11,23 +11,23 @@
 
 <header class="py-5 text-white" style="background:linear-gradient(135deg,#13233f,#1fa67a);">
   <div class="container">
-    <h1 class="fw-bold">Louez un vélo à Bruxelles</h1>
-    <p class="lead">Location de vélos entre particuliers, simple et sécurisée.</p>
+    <h1 class="fw-bold" th:text="#{home.hero.title}">Louez un vélo à Bruxelles</h1>
+    <p class="lead" th:text="#{home.hero.subtitle}">Location de vélos entre particuliers, simple et sécurisée.</p>
     <form th:action="@{/search}" method="get" class="row g-2 bg-white p-3 rounded-4 shadow text-dark">
-      <div class="col-md-5"><input class="form-control" name="locality" placeholder="Où ? (ville, code postal)"/></div>
+      <div class="col-md-5"><input class="form-control" name="locality" th:placeholder="#{home.search.placeholder}" placeholder="Où ? (ville, code postal)"/></div>
       <div class="col-md-4">
         <select class="form-select" name="categoryId">
-          <option value="">Toutes les catégories</option>
+          <option value="" th:text="#{home.search.allCategories}">Toutes les catégories</option>
           <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.category}"></option>
         </select>
       </div>
-      <div class="col-md-3"><button class="btn w-100 text-white" style="background:#1fa67a;">Rechercher</button></div>
+      <div class="col-md-3"><button class="btn w-100 text-white" style="background:#1fa67a;" th:text="#{common.search}">Rechercher</button></div>
     </form>
   </div>
 </header>
 
 <section class="container py-5">
-  <h2 class="mb-4">Vélos disponibles près de vous</h2>
+  <h2 class="mb-4" th:text="#{home.available}">Vélos disponibles près de vous</h2>
   <div class="row g-4">
     <div class="col-md-4" th:each="bike : ${bikes}">
       <div class="card h-100 shadow-sm border-0 rounded-4">

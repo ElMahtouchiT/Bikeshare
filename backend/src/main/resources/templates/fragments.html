@@ -15,37 +15,50 @@
       <!-- Liens centre -->
       <ul class="navbar-nav me-auto ms-3 gap-1">
         <li class="nav-item">
-          <a class="nav-link" th:href="@{/bikes}">Catalogue</a>
+          <a class="nav-link" th:href="@{/bikes}" th:text="#{nav.catalogue}">Catalogue</a>
         </li>
         <li class="nav-item" sec:authorize="hasAuthority('ROLE_ADMIN')">
-          <a class="nav-link text-warning fw-bold" th:href="@{/admin}">⚙ Administration</a>
+          <a class="nav-link text-warning fw-bold" th:href="@{/admin}"><span>⚙ </span><span th:text="#{nav.admin}">Administration</span></a>
         </li>
       </ul>
 
       <!-- Liens droite -->
       <div class="d-flex gap-2 align-items-center">
 
+        <!-- Sélecteur de langue -->
+        <div class="d-flex gap-1 align-items-center me-2" title="Langue / Language / Taal">
+          <span class="text-white-50">🌐</span>
+          <a href="#" class="small text-white text-decoration-none"
+             onclick="var u=new URL(location);u.searchParams.set('lang','fr');location=u;return false;">FR</a>
+          <span class="text-white-50 small">|</span>
+          <a href="#" class="small text-white text-decoration-none"
+             onclick="var u=new URL(location);u.searchParams.set('lang','en');location=u;return false;">EN</a>
+          <span class="text-white-50 small">|</span>
+          <a href="#" class="small text-white text-decoration-none"
+             onclick="var u=new URL(location);u.searchParams.set('lang','nl');location=u;return false;">NL</a>
+        </div>
+
         <!-- Visiteur non connecté -->
         <th:block sec:authorize="!isAuthenticated()">
-          <a class="btn btn-outline-light btn-sm" th:href="@{/bikes}">Voir les vélos</a>
-          <a class="btn btn-sm text-white" style="background:#1fa67a;" th:href="@{/login}">Se connecter</a>
-          <a class="btn btn-sm btn-outline-light" th:href="@{/register}">S'inscrire</a>
+          <a class="btn btn-outline-light btn-sm" th:href="@{/bikes}" th:text="#{nav.viewBikes}">Voir les vélos</a>
+          <a class="btn btn-sm text-white" style="background:#1fa67a;" th:href="@{/login}" th:text="#{nav.login}">Se connecter</a>
+          <a class="btn btn-sm btn-outline-light" th:href="@{/register}" th:text="#{nav.register}">S'inscrire</a>
         </th:block>
 
         <!-- Membre connecté (pas admin) -->
         <th:block sec:authorize="hasAuthority('ROLE_MEMBER') and !hasAuthority('ROLE_ADMIN')">
-          <a class="btn btn-outline-light btn-sm" th:href="@{/account/bikes/create}">Proposer un vélo</a>
-          <a class="btn btn-sm text-white" style="background:#1fa67a;" th:href="@{/account}">Mon compte</a>
+          <a class="btn btn-outline-light btn-sm" th:href="@{/account/bikes/create}" th:text="#{nav.proposeBike}">Proposer un vélo</a>
+          <a class="btn btn-sm text-white" style="background:#1fa67a;" th:href="@{/account}" th:text="#{nav.account}">Mon compte</a>
           <form th:action="@{/logout}" method="post" class="m-0">
-            <button type="submit" class="btn btn-sm btn-outline-light">Déconnexion</button>
+            <button type="submit" class="btn btn-sm btn-outline-light" th:text="#{nav.logout}">Déconnexion</button>
           </form>
         </th:block>
 
         <!-- Admin connecté -->
         <th:block sec:authorize="hasAuthority('ROLE_ADMIN')">
-          <a class="btn btn-sm text-white" style="background:#1fa67a;" th:href="@{/account}">Mon compte</a>
+          <a class="btn btn-sm text-white" style="background:#1fa67a;" th:href="@{/account}" th:text="#{nav.account}">Mon compte</a>
           <form th:action="@{/logout}" method="post" class="m-0">
-            <button type="submit" class="btn btn-sm btn-outline-light">Déconnexion</button>
+            <button type="submit" class="btn btn-sm btn-outline-light" th:text="#{nav.logout}">Déconnexion</button>
           </form>
         </th:block>
 
@@ -54,7 +67,7 @@
   </div>
 </nav>
 <footer th:fragment="footer" class="text-white text-center py-4 mt-5" style="background:#13233f;">
-  <p class="mb-0">🚲 BikeShare — Plateforme de location de vélos entre particuliers</p>
+  <p class="mb-0">🚲 <span th:text="#{footer.tagline}">BikeShare — Plateforme de location de vélos entre particuliers</span></p>
 </footer>
 </body>
 </html>

@@ -5,15 +5,15 @@
 <body class="bg-light">
 <div class="container" style="max-width:420px;margin-top:8vh">
   <div class="card shadow-sm border-0 rounded-4 p-4">
-    <h3 class="mb-3">Connexion</h3>
+    <h3 class="mb-3" th:text="#{login.title}">Connexion</h3>
     <div th:if="${param.registered}" class="alert alert-success py-2">Compte créé, connectez-vous.</div>
     <div th:if="${param.error}" class="alert alert-danger py-2">Identifiants invalides.</div>
     <form th:action="@{/login}" method="post">
-      <label class="form-label">Email</label><input class="form-control mb-2" name="username" type="email"/>
-      <label class="form-label">Mot de passe</label><input class="form-control mb-3" name="password" type="password"/>
-      <button class="btn text-white w-100" style="background:#1fa67a;">Se connecter</button>
+      <label class="form-label" th:text="#{login.email}">Email</label><input class="form-control mb-2" name="username" type="email"/>
+      <label class="form-label" th:text="#{login.password}">Mot de passe</label><input class="form-control mb-3" name="password" type="password"/>
+      <button class="btn text-white w-100" style="background:#1fa67a;" th:text="#{login.submit}">Se connecter</button>
     </form>
-    <p class="text-center mt-3 mb-0">Pas de compte ? <a th:href="@{/register}">Créer un compte</a></p>
+    <p class="text-center mt-3 mb-0"><span th:text="#{login.noAccount}">Pas de compte ?</span> <a th:href="@{/register}" th:text="#{login.registerLink}">Créer un compte</a></p>
   </div>
 </div>
 </body>
