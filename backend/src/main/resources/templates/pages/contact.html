@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Contact — BikeShare</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+</head>
+<body>
+<nav th:replace="~{fragments :: navbar}"></nav>
+
+<div class="container py-5" style="max-width:820px;">
+  <h2 class="mb-4">Contact</h2>
+  <p class="text-muted">Une question sur la location, votre compte ou un vélo ? Notre équipe est à votre disposition.</p>
+
+  <div class="row g-4 mt-2">
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+        <h5 class="mb-3">Coordonnées</h5>
+        <p class="mb-2">📍 Boulevard Anspach 1<br/>1000 Bruxelles, Belgique</p>
+        <p class="mb-2">✉️ <a href="mailto:contact@bikeshare.be">contact@bikeshare.be</a></p>
+        <p class="mb-0">☎️ +32 2 000 00 00</p>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+        <h5 class="mb-3">Horaires du support</h5>
+        <p class="mb-1">Du lundi au vendredi : 9h – 18h</p>
+        <p class="mb-1">Samedi : 10h – 14h</p>
+        <p class="mb-0">Dimanche et jours fériés : fermé</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert alert-info mt-4 mb-0">
+    Pour un problème lié à une location précise, vous pouvez aussi déposer une
+    <a th:href="@{/reclamation}" class="alert-link">réclamation</a>.
+  </div>
+</div>
+
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

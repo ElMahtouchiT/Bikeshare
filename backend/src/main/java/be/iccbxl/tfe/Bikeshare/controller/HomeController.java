@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class HomeController {
@@ -29,5 +31,30 @@ public class HomeController {
         model.addAttribute("categories", categoryService.getAllCategory());
         model.addAttribute("bikes", bikeService.search(locality, categoryId, electric));
         return "bike/index";
+    }
+
+    /* ─── Pages d'information (pied de page) ─────────────────── */
+
+    @GetMapping("/contact")
+    public String contact() { return "pages/contact"; }
+
+    @GetMapping("/conditions")
+    public String conditions() { return "pages/conditions"; }
+
+    @GetMapping("/mentions-legales")
+    public String mentionsLegales() { return "pages/mentions-legales"; }
+
+    @GetMapping("/reclamation")
+    public String reclamationForm() { return "pages/reclamation"; }
+
+    @PostMapping("/reclamation")
+    public String reclamationSubmit(@RequestParam String objet,
+                                    @RequestParam String email,
+                                    @RequestParam String message,
+                                    RedirectAttributes redirectAttributes) {
+        // Accusé de réception (l'envoi par e-mail / le stockage pourront être branchés ultérieurement)
+        redirectAttributes.addFlashAttribute("success",
+                "Votre réclamation a bien été envoyée. Notre équipe vous répondra dans les meilleurs délais.");
+        return "redirect:/reclamation";
     }
 }

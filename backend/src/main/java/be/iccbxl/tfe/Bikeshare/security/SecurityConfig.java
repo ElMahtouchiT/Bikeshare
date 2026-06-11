@@ -42,7 +42,8 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/bikes", "/bikes/**", "/search", "/register",
-                                 "/login", "/error", "/css/**", "/js/**", "/images/**", "/uploads/**",
+                                 "/login", "/error", "/contact", "/conditions", "/mentions-legales",
+                                 "/reclamation", "/css/**", "/js/**", "/images/**", "/uploads/**",
                                  "/ws/**", "/v3/api-docs/**", "/swagger-ui/**", "/api/bikes/**").permitAll()
                 .requestMatchers("/admin/**", "/api/admin/**", "/api/dashboard/**").hasAuthority("ROLE_ADMIN")
                 .requestMatchers("/account/**", "/reservations",
