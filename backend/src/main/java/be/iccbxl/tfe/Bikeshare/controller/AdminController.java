@@ -125,6 +125,19 @@ public class AdminController {
         return "redirect:/admin/claims";
     }
 
+    @PostMapping("/claims/{id}/respond")
+    public String respondToClaim(@PathVariable Long id,
+                                 @RequestParam String response,
+                                 RedirectAttributes ra) {
+        if (response == null || response.isBlank()) {
+            ra.addFlashAttribute("error", "La réponse ne peut pas être vide.");
+            return "redirect:/admin/claims";
+        }
+        claimService.addResponseToClaim(id, response);
+        ra.addFlashAttribute("success", "Réponse envoyée au membre.");
+        return "redirect:/admin/claims";
+    }
+
     // ── Gestion des évaluations ───────────────────────────────
     @GetMapping("/evaluations")
     public String evaluations(Model model) {

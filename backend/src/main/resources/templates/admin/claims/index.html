@@ -18,6 +18,7 @@
   </div>
 
   <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+  <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
   <div th:if="${claims.isEmpty()}" class="alert alert-info">Aucune réclamation.</div>
 
   <div th:unless="${claims.isEmpty()}" class="d-flex flex-column gap-3">
@@ -28,7 +29,7 @@
                 th:classappend="${c.status == 'FINISHED'} ? 'bg-success' :
                                 (${c.status == 'IN_PROGRESS'} ? 'bg-warning text-dark' : 'bg-danger')"
                 th:text="${c.status}"></span>
-          <span class="fw-bold" th:text="'Réservation #' + ${c.reservationId}"></span>
+          <span class="fw-bold" th:text="'Réservation #' + ${c.reservation != null ? c.reservation.id : '—'}"></span>
           <span class="text-muted small ms-2" th:text="'par ' + ${c.claimantRole}"></span>
         </div>
         <span class="text-muted small"
@@ -38,10 +39,22 @@
       <div th:if="${c.response}" class="alert alert-secondary py-2 mb-2">
         <strong>Réponse admin :</strong> <span th:text="${c.response}"></span>
       </div>
-      <form th:unless="${c.status == 'FINISHED'}"
-            th:action="@{'/admin/claims/' + ${c.id} + '/resolve'}" method="post">
-        <button class="btn btn-sm btn-success">✔ Clôturer</button>
-      </form>
+      <div th:unless="${c.status == 'FINISHED'}">
+        <!-- Réponse de l'administrateur -->
+        <form th:action="@{'/admin/claims/' + ${c.id} + '/respond'}" method="post" class="mb-2">
+          <label class="form-label small text-muted mb-1">Répondre au membre</label>
+          <div class="input-group">
+            <textarea class="form-control" name="response" rows="2" required
+                      placeholder="Écrivez votre réponse…"></textarea>
+            <button class="btn btn-outline-primary" type="submit">Répondre</button>
+          </div>
+        </form>
+        <!-- Clôture -->
+        <form th:action="@{'/admin/claims/' + ${c.id} + '/resolve'}" method="post"
+              onsubmit="return confirm('Clôturer définitivement cette réclamation ?');">
+          <button class="btn btn-sm btn-success">✔ Clôturer</button>
+        </form>
+      </div>
     </div>
   </div>
 </div>
