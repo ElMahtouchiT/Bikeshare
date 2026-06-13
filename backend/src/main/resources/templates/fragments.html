@@ -4,6 +4,11 @@
 <head><meta charset="UTF-8"/></head>
 <body>
 <nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark" style="background:#13233f;">
+  <!-- Sticky footer : le pied de page reste toujours en bas, même sur les pages courtes -->
+  <style>
+    body { min-height: 100vh; display: flex; flex-direction: column; }
+    body > footer { margin-top: auto; }
+  </style>
   <div class="container">
     <a class="navbar-brand fw-bold" th:href="@{/}">🚲 BikeShare</a>
 
@@ -63,7 +68,7 @@
     </div>
   </div>
 </nav>
-<footer th:fragment="footer" class="text-white pt-4 pb-3 mt-5" style="background:#13233f;">
+<footer th:fragment="footer" class="text-white pt-4 pb-3" style="background:#13233f;">
   <div class="container">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
       <span class="small">🚲 <span th:text="#{footer.tagline}">BikeShare — Plateforme de location de vélos entre particuliers</span></span>
