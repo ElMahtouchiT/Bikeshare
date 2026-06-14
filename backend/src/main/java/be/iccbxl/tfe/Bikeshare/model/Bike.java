@@ -77,13 +77,13 @@ public class Bike {
     @OneToMany(mappedBy = "bike", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Photo> photos = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "bike_feature",
             joinColumns = @JoinColumn(name = "bike_id"),
             inverseJoinColumns = @JoinColumn(name = "feature_id"))
     private List<Feature> features = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "bike_equipment",
             joinColumns = @JoinColumn(name = "bike_id"),
             inverseJoinColumns = @JoinColumn(name = "equipment_id"))
