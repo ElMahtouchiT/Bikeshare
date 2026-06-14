@@ -10,6 +10,7 @@ FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 # Le port est fourni par l'hébergeur via la variable PORT (cf. application.properties).
-# -XX:MaxRAMPercentage=75 : utiliser jusqu'à 75% de la RAM du conteneur pour le tas
-# (par défaut Java 17 ne prend que 25%, ce qui provoque des plantages mémoire / 502).
-ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75.0", "-jar", "app.jar"]
+# -Xmx256m : tas Java plafonné à 256 Mo. Un pourcentage trop élevé faisait dépasser
+# la RAM totale du conteneur (heap + metaspace + threads) -> OOM-kill et redémarrages
+# en boucle. 256 Mo suffisent largement (l'app tournait déjà avec ~128 Mo).
+ENTRYPOINT ["java", "-Xmx256m", "-jar", "app.jar"]
