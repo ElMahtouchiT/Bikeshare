@@ -40,6 +40,15 @@
           <a href="?lang=nl" class="small text-white text-decoration-none">NL</a>
         </div>
 
+        <!-- Cloche de notifications (tout membre/admin connecté) -->
+        <th:block sec:authorize="isAuthenticated()">
+          <a class="btn btn-sm btn-outline-light position-relative" th:href="@{/account/notifications}"
+             th:title="#{nav.notifications}">🔔<span
+                th:if="${notifUnreadCount != null and notifUnreadCount > 0}"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                th:text="${notifUnreadCount}">3</span></a>
+        </th:block>
+
         <!-- Visiteur non connecté -->
         <th:block sec:authorize="!isAuthenticated()">
           <a class="btn btn-outline-light btn-sm" th:href="@{/bikes}" th:text="#{nav.viewBikes}">Voir les vélos</a>

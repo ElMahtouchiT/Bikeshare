@@ -4,9 +4,11 @@ import be.iccbxl.tfe.Bikeshare.DTO.ChatMessageDTO;
 import be.iccbxl.tfe.Bikeshare.DTO.MapperDTO;
 import be.iccbxl.tfe.Bikeshare.model.ChatMessage;
 import be.iccbxl.tfe.Bikeshare.model.Reservation;
+import be.iccbxl.tfe.Bikeshare.model.User;
 import be.iccbxl.tfe.Bikeshare.security.CustomUserDetail;
 import be.iccbxl.tfe.Bikeshare.service.serviceImpl.ChatMessageService;
 import be.iccbxl.tfe.Bikeshare.service.serviceImpl.EmailService;
+import be.iccbxl.tfe.Bikeshare.service.serviceImpl.NotificationService;
 import be.iccbxl.tfe.Bikeshare.service.serviceImpl.ReservationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +31,7 @@ public class ChatController {
     @Autowired private ChatMessageService chatMessageService;
     @Autowired private ReservationService reservationService;
     @Autowired private EmailService emailService;
+    @Autowired private NotificationService notificationService;
 
     @MessageMapping("/chat/{reservationId}")
     @SendTo("/topic/messages/{reservationId}")
@@ -62,6 +65,21 @@ public class ChatController {
         message.setToUserId(dto.getToUserId());
         message.setSentAt(LocalDateTime.now());
         chatMessageService.save(message);
+
+        // Notifier le destinataire du nouveau message (cloche + page notifications)
+        try {
+            User renter = reservation.getUser();
+            User owner  = reservation.getBike().getUser();
+            boolean currentIsRenter = currentUserId.equals(renterId);
+            User from = currentIsRenter ? renter : owner;
+            User to   = currentIsRenter ? owner  : renter;
+            String preview = dto.getContent();
+            if (preview != null && preview.length() > 80) preview = preview.substring(0, 80) + "…";
+            notificationService.notify(to, from, reservation.getBike(), "MESSAGE", preview,
+                    "/account/reservations/" + reservationId + "/chat");
+        } catch (Exception e) {
+            logger.warn("Notification de message non créée : {}", e.getMessage());
+        }
 
         return MapperDTO.toChatMessageDTO(message);
     }

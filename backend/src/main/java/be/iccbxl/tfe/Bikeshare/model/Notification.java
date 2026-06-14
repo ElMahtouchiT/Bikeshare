@@ -17,6 +17,9 @@ public class Notification {
 
     private String message;
 
+    /** Lien optionnel vers la cible (ex. la conversation concernée). */
+    private String link;
+
     @Column(nullable = false)
     private String type;
 
