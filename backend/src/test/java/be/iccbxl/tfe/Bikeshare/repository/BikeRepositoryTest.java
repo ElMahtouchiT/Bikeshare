@@ -39,25 +39,25 @@ class BikeRepositoryTest {
 
     @Test
     void search_parLocalite() {
-        List<Bike> result = bikeRepository.search("Jette", null, null);
+        List<Bike> result = bikeRepository.search("Jette", null, null, null, null, null);
         assertThat(result).extracting(Bike::getBrand).containsExactly("Btwin");
     }
 
     @Test
     void search_parCodePostal() {
-        List<Bike> result = bikeRepository.search("1090", null, null);
+        List<Bike> result = bikeRepository.search("1090", null, null, null, null, null);
         assertThat(result).extracting(Bike::getBrand).containsExactly("Btwin");
     }
 
     @Test
     void search_ignoreLesVelosHorsLigne() {
-        List<Bike> result = bikeRepository.search("1000", null, null);
+        List<Bike> result = bikeRepository.search("1000", null, null, null, null, null);
         assertThat(result).extracting(Bike::getBrand).containsExactly("Trek");
     }
 
     @Test
     void search_sansFiltre_retourneTousLesVelosEnLigne() {
-        List<Bike> result = bikeRepository.search(null, null, null);
+        List<Bike> result = bikeRepository.search(null, null, null, null, null, null);
         assertThat(result).hasSize(2);
     }
 }
