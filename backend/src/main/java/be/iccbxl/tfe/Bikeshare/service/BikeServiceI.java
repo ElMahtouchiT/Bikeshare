@@ -14,7 +14,9 @@ public interface BikeServiceI {
     Bike updateBike(Long id, Bike bike);
     void deleteBike(Long id);
     List<Bike> getBikesByUser(User user);
-    List<Bike> search(String locality, Long categoryId, Boolean electric);
+    List<Bike> search(String locality, Long categoryId, String bikeType,
+                      Boolean electric, Double priceMin, Double priceMax);
+    List<String> getBikeTypes();
     double calculateAverageRating(Bike bike);
     Map<Long, Double> getAverageRatingsForBikes();
     Map<Long, Integer> getReviewCountsForBikes();

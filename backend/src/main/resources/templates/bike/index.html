@@ -7,6 +7,65 @@
 <nav th:replace="~{fragments :: navbar}"></nav>
 <div class="container py-5">
   <h2 class="mb-4" th:text="#{catalogue.title}">Vélos disponibles</h2>
+
+  <!-- Barre de filtres (GET vers /bikes, pré-remplie avec les valeurs courantes) -->
+  <form th:action="@{/bikes}" method="get" class="card border-0 shadow-sm rounded-4 p-3 mb-4">
+    <div class="row g-2 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label small mb-1" th:text="#{filter.location}">Ville ou code postal</label>
+        <input class="form-control" name="locality" th:value="${fLocality}"
+               th:placeholder="#{home.search.placeholder}"/>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small mb-1" th:text="#{filter.type}">Type de vélo</label>
+        <select class="form-select" name="bikeType">
+          <option value="" th:text="#{filter.all}">Tous</option>
+          <option th:each="t : ${bikeTypes}" th:value="${t}" th:text="${t}"
+                  th:selected="${t == fBikeType}"></option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small mb-1" th:text="#{filter.category}">Catégorie</label>
+        <select class="form-select" name="categoryId">
+          <option value="" th:text="#{home.search.allCategories}">Toutes les catégories</option>
+          <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.category}"
+                  th:selected="${fCategoryId != null and fCategoryId == c.id}"></option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small mb-1" th:text="#{filter.electric}">Électrique</label>
+        <select class="form-select" name="electric">
+          <option value="" th:selected="${fElectric == null}" th:text="#{filter.all}">Tous</option>
+          <option value="true" th:selected="${fElectric != null and fElectric}" th:text="#{filter.yes}">Oui</option>
+          <option value="false" th:selected="${fElectric != null and !fElectric}" th:text="#{filter.no}">Non</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <div class="row g-1">
+          <div class="col-6">
+            <label class="form-label small mb-1" th:text="#{filter.priceMin}">Prix min</label>
+            <input type="number" min="0" step="1" class="form-control" name="priceMin" th:value="${fPriceMin}"/>
+          </div>
+          <div class="col-6">
+            <label class="form-label small mb-1" th:text="#{filter.priceMax}">Prix max</label>
+            <input type="number" min="0" step="1" class="form-control" name="priceMax" th:value="${fPriceMax}"/>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="d-flex gap-2 mt-3 align-items-center">
+      <button class="btn text-white" style="background:#1fa67a;" th:text="#{filter.apply}">Filtrer</button>
+      <a th:href="@{/bikes}" class="btn btn-outline-secondary" th:text="#{filter.reset}">Réinitialiser</a>
+      <span class="ms-auto text-muted small">
+        <span th:text="${#lists.size(bikes)}">0</span> <span th:text="#{filter.results}">résultat(s)</span>
+      </span>
+    </div>
+  </form>
+
+  <div th:if="${#lists.isEmpty(bikes)}" class="alert alert-info" th:text="#{catalogue.empty}">
+    Aucun vélo ne correspond à votre recherche.
+  </div>
+
   <div class="row g-4">
     <div class="col-md-3" th:each="bike : ${bikes}">
       <div class="card h-100 shadow-sm border-0 rounded-4">
@@ -18,6 +77,8 @@
         <div class="card-body">
           <h6 th:text="${bike.brand + ' ' + bike.model}"></h6>
           <p class="text-muted small mb-1" th:text="${bike.locality}"></p>
+          <p class="fw-bold mb-2" th:if="${bike.price != null}"
+             th:text="${bike.price.middlePrice + ' €/jour'}">12 €/jour</p>
           <a class="btn btn-sm text-white" style="background:#13233f;" th:href="@{'/bikes/' + ${bike.id}}" th:text="#{common.detail}">Détail</a>
         </div>
       </div>

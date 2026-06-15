@@ -3,6 +3,7 @@ package be.iccbxl.tfe.Bikeshare.controller;
 import be.iccbxl.tfe.Bikeshare.model.Bike;
 import be.iccbxl.tfe.Bikeshare.model.Reservation;
 import be.iccbxl.tfe.Bikeshare.service.serviceImpl.BikeService;
+import be.iccbxl.tfe.Bikeshare.service.serviceImpl.CategoryService;
 import be.iccbxl.tfe.Bikeshare.service.serviceImpl.EvaluationService;
 import be.iccbxl.tfe.Bikeshare.service.serviceImpl.ReservationService;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +27,7 @@ public class BikeController {
     private static final Logger logger = LoggerFactory.getLogger(BikeController.class);
 
     @Autowired private BikeService bikeService;
+    @Autowired private CategoryService categoryService;
     @Autowired private EvaluationService evaluationService;
     @Autowired private ReservationService reservationService;
 
@@ -32,8 +35,24 @@ public class BikeController {
     private String googleMapsApiKey;
 
     @GetMapping("/bikes")
-    public String getAllBikes(Model model) {
-        model.addAttribute("bikes", bikeService.getAllOnlineBikes());
+    public String getAllBikes(@RequestParam(required = false) String locality,
+                              @RequestParam(required = false) Long categoryId,
+                              @RequestParam(required = false) String bikeType,
+                              @RequestParam(required = false) Boolean electric,
+                              @RequestParam(required = false) Double priceMin,
+                              @RequestParam(required = false) Double priceMax,
+                              Model model) {
+        model.addAttribute("bikes",
+                bikeService.search(locality, categoryId, bikeType, electric, priceMin, priceMax));
+        model.addAttribute("categories", categoryService.getAllCategory());
+        model.addAttribute("bikeTypes", bikeService.getBikeTypes());
+        // Valeurs courantes pour pré-remplir le formulaire de filtres
+        model.addAttribute("fLocality", locality);
+        model.addAttribute("fCategoryId", categoryId);
+        model.addAttribute("fBikeType", bikeType);
+        model.addAttribute("fElectric", electric);
+        model.addAttribute("fPriceMin", priceMin);
+        model.addAttribute("fPriceMax", priceMax);
         return "bike/index";
     }
 

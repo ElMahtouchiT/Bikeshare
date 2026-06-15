@@ -54,9 +54,16 @@ public class BikeService implements BikeServiceI {
     @Override public List<Bike> getBikesByUser(User user) { return bikeRepository.findByUser(user); }
 
     @Override
-    public List<Bike> search(String locality, Long categoryId, Boolean electric) {
+    public List<Bike> search(String locality, Long categoryId, String bikeType,
+                             Boolean electric, Double priceMin, Double priceMax) {
         if (locality != null && locality.isBlank()) locality = null;
-        return bikeRepository.search(locality, categoryId, electric);
+        if (bikeType != null && bikeType.isBlank()) bikeType = null;
+        return bikeRepository.search(locality, categoryId, bikeType, electric, priceMin, priceMax);
+    }
+
+    @Override
+    public List<String> getBikeTypes() {
+        return bikeRepository.findDistinctBikeTypes();
     }
 
     @Override

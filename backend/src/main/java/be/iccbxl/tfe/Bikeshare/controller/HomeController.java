@@ -23,14 +23,16 @@ public class HomeController {
         return "index";
     }
 
+    /** Ancienne URL de recherche : on redirige vers le catalogue filtré (source unique de vérité). */
     @GetMapping("/search")
     public String search(@RequestParam(required = false) String locality,
                          @RequestParam(required = false) Long categoryId,
                          @RequestParam(required = false) Boolean electric,
-                         Model model) {
-        model.addAttribute("categories", categoryService.getAllCategory());
-        model.addAttribute("bikes", bikeService.search(locality, categoryId, electric));
-        return "bike/index";
+                         RedirectAttributes redirectAttributes) {
+        if (locality != null && !locality.isBlank()) redirectAttributes.addAttribute("locality", locality);
+        if (categoryId != null) redirectAttributes.addAttribute("categoryId", categoryId);
+        if (electric != null) redirectAttributes.addAttribute("electric", electric);
+        return "redirect:/bikes";
     }
 
     /* ─── Pages d'information (pied de page) ─────────────────── */

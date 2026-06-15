@@ -35,8 +35,11 @@ public class BikeRestController {
     @GetMapping("/search")
     public List<BikeDTO> search(@RequestParam(required = false) String locality,
                                 @RequestParam(required = false) Long categoryId,
-                                @RequestParam(required = false) Boolean electric) {
-        return bikeService.search(locality, categoryId, electric).stream()
+                                @RequestParam(required = false) String bikeType,
+                                @RequestParam(required = false) Boolean electric,
+                                @RequestParam(required = false) Double priceMin,
+                                @RequestParam(required = false) Double priceMax) {
+        return bikeService.search(locality, categoryId, bikeType, electric, priceMin, priceMax).stream()
                 .map(MapperDTO::toBikeDTO).collect(Collectors.toList());
     }
 }
