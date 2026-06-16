@@ -49,9 +49,15 @@
                   th:text="${r.statut}"></span>
           </td>
           <td th:text="${r.totalPrice != null ? r.totalPrice + ' €' : '—'}"></td>
-          <td>
+          <td class="text-nowrap">
             <a class="btn btn-sm btn-outline-secondary"
                th:href="@{'/account/reservations/' + ${r.id} + '/chat'}">💬</a>
+            <!-- Évaluation : bouton si location terminée non évaluée, sinon la note déjà donnée -->
+            <a th:if="${r.statut == 'COMPLETED' and r.evaluationNote == null}"
+               class="btn btn-sm btn-warning"
+               th:href="@{'/account/reservations/' + ${r.id} + '/evaluate'}">⭐ <span th:text="#{eval.action}">Évaluer</span></a>
+            <span th:if="${r.evaluationNote != null}" class="badge bg-success"
+                  th:text="${r.evaluationNote} + ' ★'">4 ★</span>
           </td>
         </tr>
       </tbody>

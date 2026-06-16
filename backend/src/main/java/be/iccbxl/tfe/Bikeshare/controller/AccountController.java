@@ -35,6 +35,7 @@ public class AccountController {
     @Autowired private ReservationService reservationService;
     @Autowired private GainService gainService;
     @Autowired private NotificationService notificationService;
+    @Autowired private EvaluationService evaluationService;
     @Autowired private FileStorageService fileStorageService;
 
     @GetMapping("/account")
@@ -139,6 +140,71 @@ public class AccountController {
         model.addAttribute("otherName",
                 other != null ? other.getFirstName() + " " + other.getLastName() : "—");
         return "account/reservations/chat";
+    }
+
+    /* ─── Évaluation d'une location (par le locataire) ──────── */
+
+    @GetMapping("/account/reservations/{id}/evaluate")
+    public String evaluateForm(@PathVariable Long id,
+                               @AuthenticationPrincipal CustomUserDetail userDetails,
+                               Model model, RedirectAttributes redirectAttributes) {
+        if (userDetails == null) return "redirect:/login";
+        Reservation r = reservationService.getReservationById(id);
+        String error = evaluationBlockedReason(r, userDetails.getUser().getId());
+        if (error != null) {
+            redirectAttributes.addFlashAttribute("error", error);
+            return "redirect:/account/reservations";
+        }
+        model.addAttribute("reservation", r);
+        return "account/reservations/evaluate";
+    }
+
+    @PostMapping("/account/reservations/{id}/evaluate")
+    public String evaluateSubmit(@PathVariable Long id,
+                                 @AuthenticationPrincipal CustomUserDetail userDetails,
+                                 @RequestParam int note,
+                                 @RequestParam(required = false) String comment,
+                                 RedirectAttributes redirectAttributes) {
+        if (userDetails == null) return "redirect:/login";
+        Reservation r = reservationService.getReservationById(id);
+        String error = evaluationBlockedReason(r, userDetails.getUser().getId());
+        if (error != null) {
+            redirectAttributes.addFlashAttribute("error", error);
+            return "redirect:/account/reservations";
+        }
+        if (note < 1 || note > 5) {
+            redirectAttributes.addFlashAttribute("error", "La note doit être comprise entre 1 et 5.");
+            return "redirect:/account/reservations/" + id + "/evaluate";
+        }
+
+        evaluationService.createForReservation(r, note, comment);
+
+        // Notifier le propriétaire du vélo de l'évaluation reçue (cloche)
+        try {
+            User renter = r.getUser();
+            User owner = r.getBike().getUser();
+            String preview = (comment != null && !comment.isBlank())
+                    ? (comment.length() > 80 ? comment.substring(0, 80) + "…" : comment)
+                    : (note + "/5");
+            notificationService.notify(owner, renter, r.getBike(), "EVALUATION", preview,
+                    "/bikes/" + r.getBike().getId());
+        } catch (Exception e) {
+            logger.warn("Notification d'évaluation non créée : {}", e.getMessage());
+        }
+
+        redirectAttributes.addFlashAttribute("success", "Merci ! Votre évaluation a été enregistrée.");
+        return "redirect:/account/reservations";
+    }
+
+    /** Retourne la raison pour laquelle la réservation n'est pas évaluable par cet utilisateur, sinon null. */
+    private String evaluationBlockedReason(Reservation r, Long userId) {
+        if (r == null || r.getUser() == null || !r.getUser().getId().equals(userId))
+            return "Réservation introuvable ou accès refusé.";
+        if (!"COMPLETED".equalsIgnoreCase(r.getStatut()))
+            return "Vous ne pouvez évaluer qu'une location terminée.";
+        if (r.getEvaluation() != null)
+            return "Vous avez déjà évalué cette réservation.";
+        return null;
     }
 
     @GetMapping("/account/gains")

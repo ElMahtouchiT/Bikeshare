@@ -16,4 +16,5 @@ public class ReservationDTO {
     private BikeDTO bike;
     private UserDTO user;
     private Double totalPrice;
+    private Integer evaluationNote; // note de l'évaluation si la location a été évaluée, sinon null
 }

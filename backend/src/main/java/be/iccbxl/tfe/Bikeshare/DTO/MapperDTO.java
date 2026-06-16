@@ -102,6 +102,7 @@ public class MapperDTO {
         dto.setBike(toBikeDTO(r.getBike()));
         dto.setUser(toUserDTO(r.getUser()));
         if (r.getPayment() != null) dto.setTotalPrice(r.getPayment().getTotalPrice());
+        if (r.getEvaluation() != null) dto.setEvaluationNote(r.getEvaluation().getNote());
         return dto;
     }
 
