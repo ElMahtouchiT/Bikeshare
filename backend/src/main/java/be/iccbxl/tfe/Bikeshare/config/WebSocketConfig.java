@@ -11,7 +11,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws").withSockJS();
+        // setAllowedOriginPatterns("*") : derrière le proxy TLS de Railway, le contrôle
+        // same-origin par défaut rejette (403) le handshake du navigateur (l'app se croit
+        // en http://interne:8080). On autorise les origines ; l'authentification reste
+        // assurée par la session côté message STOMP.
+        registry.addEndpoint("/ws").setAllowedOriginPatterns("*").withSockJS();
     }
 
     @Override
