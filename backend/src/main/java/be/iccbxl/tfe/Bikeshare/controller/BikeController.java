@@ -72,7 +72,18 @@ public class BikeController {
             }
         }
 
+        // Galerie photos : images par type (bundlées dans le jar) — fiables même si les
+        // fichiers uploadés sont absents (disque éphémère en production).
+        String type = bike.getBikeType() != null ? bike.getBikeType().toLowerCase() : "city";
+        int slots = (bike.getPhotos() != null && !bike.getPhotos().isEmpty()) ? bike.getPhotos().size() : 4;
+        List<String> galleryUrls = new ArrayList<>();
+        for (int k = 0; k < slots; k++) {
+            int n = (int) ((bike.getId() + k) % 10) + 1; // 1..10, distinct par photo
+            galleryUrls.add("/images/bikes/" + type + n + ".avif");
+        }
+
         model.addAttribute("bike", bike);
+        model.addAttribute("galleryUrls", galleryUrls);
         model.addAttribute("averageRating", bikeService.calculateAverageRating(bike));
         model.addAttribute("evaluations", evaluationService.getEvaluationsByBikeId(id));
         model.addAttribute("googleMapsApiKey", googleMapsApiKey);
