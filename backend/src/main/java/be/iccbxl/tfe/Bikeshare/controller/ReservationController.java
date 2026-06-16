@@ -2,8 +2,10 @@ package be.iccbxl.tfe.Bikeshare.controller;
 
 import be.iccbxl.tfe.Bikeshare.model.Bike;
 import be.iccbxl.tfe.Bikeshare.model.Reservation;
+import be.iccbxl.tfe.Bikeshare.model.User;
 import be.iccbxl.tfe.Bikeshare.security.CustomUserDetail;
 import be.iccbxl.tfe.Bikeshare.service.serviceImpl.BikeService;
+import be.iccbxl.tfe.Bikeshare.service.serviceImpl.NotificationService;
 import be.iccbxl.tfe.Bikeshare.service.serviceImpl.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -21,6 +23,7 @@ public class ReservationController {
 
     @Autowired private ReservationService reservationService;
     @Autowired private BikeService bikeService;
+    @Autowired private NotificationService notificationService;
 
     @PostMapping("/reservations")
     public String create(
@@ -59,6 +62,19 @@ public class ReservationController {
         r.setAssurance(assurance);
         r.setStatut("AUTOMATIC".equalsIgnoreCase(bike.getReservationMode()) ? "CONFIRMED" : "PENDING");
         reservationService.addReservation(r);
+
+        // Notifier le propriétaire du vélo de la nouvelle réservation (cloche)
+        try {
+            User owner = bike.getUser();
+            User renter = userDetails.getUser();
+            if (owner != null && renter != null && !owner.getId().equals(renter.getId())) {
+                String preview = bike.getBrand() + " " + bike.getModel() + " · " + start + " → " + end;
+                notificationService.notify(owner, renter, bike, "RESERVATION", preview,
+                        "/account/received-reservations");
+            }
+        } catch (Exception e) {
+            // Ne pas bloquer la réservation si la notification échoue.
+        }
 
         redirectAttributes.addFlashAttribute("success", "Réservation créée avec le statut : " + r.getStatut());
         return "redirect:/account/reservations";

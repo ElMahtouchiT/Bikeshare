@@ -26,11 +26,13 @@
           <span th:switch="${n.type}">
             <span th:case="'MESSAGE'">💬</span>
             <span th:case="'EVALUATION'">⭐</span>
+            <span th:case="'RESERVATION'">📅</span>
             <span th:case="*">🔔</span>
           </span>
           <strong th:switch="${n.type}">
             <span th:case="'MESSAGE'" th:text="#{notif.type.MESSAGE}">Nouveau message de</span>
             <span th:case="'EVALUATION'" th:text="#{notif.type.EVALUATION}">Nouvelle évaluation de</span>
+            <span th:case="'RESERVATION'" th:text="#{notif.type.RESERVATION}">Nouvelle réservation de</span>
             <span th:case="*" th:text="#{nav.notifications}">Notification</span>
           </strong>
           <span th:if="${n.fromUser != null}"
