@@ -43,11 +43,13 @@
           <td th:text="${r.endLocation}"></td>
           <td th:text="${r.duration != null ? r.duration + ' j' : '—'}"></td>
           <td>
-            <span class="badge"
-                  th:classappend="${r.statut == 'CONFIRMED' or r.statut == 'NOW'} ? 'bg-success' :
-                                  (${r.statut == 'PENDING'} ? 'bg-warning text-dark' :
-                                  (${r.statut == 'CANCELLED' or r.statut == 'REFUSED'} ? 'bg-danger' : 'bg-secondary'))"
-                  th:text="${r.statut}"></span>
+            <span th:if="${r.statut == 'CANCELLED'}" class="badge bg-danger">Annulée</span>
+            <span th:if="${r.statut == 'REFUSED'}"   class="badge bg-danger">Refusée</span>
+            <span th:if="${r.statut == 'COMPLETED'}" class="badge bg-secondary">Terminée</span>
+            <th:block th:if="${r.statut == 'PENDING' or r.statut == 'CONFIRMED' or r.statut == 'NOW'}">
+              <span th:if="${r.paid}" class="badge bg-success">Confirmée et payée</span>
+              <span th:unless="${r.paid}" class="badge bg-warning text-dark">En attente de paiement</span>
+            </th:block>
           </td>
           <td th:text="${r.totalPrice != null ? r.totalPrice + ' €' : '—'}"></td>
           <td class="text-nowrap">
@@ -58,7 +60,6 @@
                   th:action="@{'/account/reservations/' + ${r.id} + '/pay'}" method="post" class="d-inline">
               <button type="submit" class="btn btn-sm text-white" style="background:#635bff;">💳 Payer</button>
             </form>
-            <span th:if="${r.paid}" class="badge bg-success">✓ Payé</span>
             <!-- Évaluation : bouton si location terminée non évaluée, sinon la note déjà donnée -->
             <a th:if="${r.statut == 'COMPLETED' and r.evaluationNote == null}"
                class="btn btn-sm btn-warning"
