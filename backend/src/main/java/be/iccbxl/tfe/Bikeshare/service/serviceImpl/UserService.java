@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserService implements UserServiceI {
@@ -53,6 +54,39 @@ public class UserService implements UserServiceI {
         user.setIban(iban);
         user.setBic(bic);
         return userRepository.save(user);
+    }
+
+    /* ─── Mot de passe oublié / réinitialisation ─── */
+
+    /** Crée un token de réinitialisation (valable 1h) pour l'email donné. Retourne le token, ou null si l'email est inconnu. */
+    public String createPasswordResetToken(String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) return null;
+        String token = UUID.randomUUID().toString();
+        user.setResetToken(token);
+        user.setResetTokenExpiry(LocalDateTime.now().plusHours(1));
+        userRepository.save(user);
+        return token;
+    }
+
+    /** Retourne l'utilisateur si le token existe et n'est pas expiré, sinon null. */
+    public User findByValidResetToken(String token) {
+        if (token == null || token.isBlank()) return null;
+        User user = userRepository.findByResetToken(token);
+        if (user == null || user.getResetTokenExpiry() == null
+                || user.getResetTokenExpiry().isBefore(LocalDateTime.now())) return null;
+        return user;
+    }
+
+    /** Réinitialise le mot de passe si le token est valide, puis invalide le token. */
+    public boolean resetPassword(String token, String newPassword) {
+        User user = findByValidResetToken(token);
+        if (user == null) return false;
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setResetToken(null);
+        user.setResetTokenExpiry(null);
+        userRepository.save(user);
+        return true;
     }
 
     /** Marque le compte comme demandant sa suppression. */

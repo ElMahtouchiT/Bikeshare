@@ -42,6 +42,7 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/bikes", "/bikes/**", "/search", "/register",
+                                 "/forgot-password", "/reset-password",
                                  "/login", "/error", "/contact", "/conditions", "/mentions-legales",
                                  "/reclamation", "/css/**", "/js/**", "/images/**", "/uploads/**",
                                  "/ws/**", "/v3/api-docs/**", "/swagger-ui/**", "/api/bikes/**").permitAll()

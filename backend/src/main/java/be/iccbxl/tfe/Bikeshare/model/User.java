@@ -69,6 +69,13 @@ public class User {
     @Column(name = "delete_requested", columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean deleteRequested;
 
+    /** Réinitialisation du mot de passe : token à usage unique + date d'expiration. */
+    @Column(name = "reset_token")
+    private String resetToken;
+
+    @Column(name = "reset_token_expiry")
+    private LocalDateTime resetTokenExpiry;
+
     /** Vélos proposés par cet utilisateur (propriétaire). */
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Bike> ownedBikes;
