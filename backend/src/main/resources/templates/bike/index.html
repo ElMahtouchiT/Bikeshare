@@ -57,10 +57,18 @@
       <button class="btn text-white" style="background:#1fa67a;" th:text="#{filter.apply}">Filtrer</button>
       <a th:href="@{/bikes}" class="btn btn-outline-secondary" th:text="#{filter.reset}">Réinitialiser</a>
       <span class="ms-auto text-muted small">
-        <span th:text="${#lists.size(bikes)}">0</span> <span th:text="#{filter.results}">résultat(s)</span>
+        <span th:text="${totalResults}">0</span> <span th:text="#{filter.results}">résultat(s)</span>
       </span>
     </div>
   </form>
+
+  <!-- Nombre de vélos par page -->
+  <div class="d-flex flex-wrap align-items-center gap-2 mb-3" th:if="${totalResults > 0}">
+    <span class="text-muted small" th:text="#{pagination.perPage}">Vélos par page :</span>
+    <a th:each="s : ${ {20, 50, 100} }"
+       th:href="@{/bikes(locality=${fLocality},categoryId=${fCategoryId},bikeType=${fBikeType},electric=${fElectric},priceMin=${fPriceMin},priceMax=${fPriceMax},page=1,size=${s})}"
+       class="btn btn-sm" th:classappend="${s == size} ? 'btn-dark' : 'btn-outline-secondary'" th:text="${s}">20</a>
+  </div>
 
   <div th:if="${#lists.isEmpty(bikes)}" class="alert alert-info" th:text="#{catalogue.empty}">
     Aucun vélo ne correspond à votre recherche.
@@ -84,6 +92,15 @@
       </div>
     </div>
   </div>
+
+  <!-- Navigation entre les pages (filtres conservés) -->
+  <nav th:if="${totalPages > 1}" class="d-flex justify-content-center align-items-center gap-3 mt-4">
+    <a class="btn btn-sm btn-outline-secondary" th:classappend="${page <= 1} ? 'disabled' : ''"
+       th:href="@{/bikes(locality=${fLocality},categoryId=${fCategoryId},bikeType=${fBikeType},electric=${fElectric},priceMin=${fPriceMin},priceMax=${fPriceMax},page=${page - 1},size=${size})}">&larr; <span th:text="#{pagination.prev}">Précédent</span></a>
+    <span class="text-muted small"><span th:text="#{pagination.page}">Page</span> <span th:text="${page}">1</span> / <span th:text="${totalPages}">1</span></span>
+    <a class="btn btn-sm btn-outline-secondary" th:classappend="${page >= totalPages} ? 'disabled' : ''"
+       th:href="@{/bikes(locality=${fLocality},categoryId=${fCategoryId},bikeType=${fBikeType},electric=${fElectric},priceMin=${fPriceMin},priceMax=${fPriceMax},page=${page + 1},size=${size})}"><span th:text="#{pagination.next}">Suivant</span> &rarr;</a>
+  </nav>
 </div>
 <footer th:replace="~{fragments :: footer}"></footer>
 </body>

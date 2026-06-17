@@ -41,9 +41,22 @@ public class BikeController {
                               @RequestParam(required = false) Boolean electric,
                               @RequestParam(required = false) Double priceMin,
                               @RequestParam(required = false) Double priceMax,
+                              @RequestParam(defaultValue = "1") int page,
+                              @RequestParam(defaultValue = "20") int size,
                               Model model) {
-        model.addAttribute("bikes",
-                bikeService.search(locality, categoryId, bikeType, electric, priceMin, priceMax));
+        List<Bike> all = bikeService.search(locality, categoryId, bikeType, electric, priceMin, priceMax);
+
+        // Pagination : tailles autorisées 20 / 50 / 100 (défaut 20)
+        if (size != 20 && size != 50 && size != 100) size = 20;
+        int total = all.size();
+        int totalPages = Math.max(1, (int) Math.ceil((double) total / size));
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+        int from = (page - 1) * size;
+        int to = Math.min(from + size, total);
+        List<Bike> pageBikes = (from < to) ? new ArrayList<>(all.subList(from, to)) : new ArrayList<>();
+
+        model.addAttribute("bikes", pageBikes);
         model.addAttribute("categories", categoryService.getAllCategory());
         model.addAttribute("bikeTypes", bikeService.getBikeTypes());
         // Valeurs courantes pour pré-remplir le formulaire de filtres
@@ -53,6 +66,11 @@ public class BikeController {
         model.addAttribute("fElectric", electric);
         model.addAttribute("fPriceMin", priceMin);
         model.addAttribute("fPriceMax", priceMax);
+        // Pagination
+        model.addAttribute("page", page);
+        model.addAttribute("size", size);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalResults", total);
         return "bike/index";
     }
 
