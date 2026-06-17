@@ -15,6 +15,7 @@
 
   <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
   <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+  <div th:if="${info}" class="alert alert-info" th:text="${info}"></div>
 
   <div th:if="${reservations.isEmpty()}" class="alert alert-info">
     Vous n'avez pas encore de réservation.
@@ -52,6 +53,12 @@
           <td class="text-nowrap">
             <a class="btn btn-sm btn-outline-secondary"
                th:href="@{'/account/reservations/' + ${r.id} + '/chat'}">💬</a>
+            <!-- Paiement Stripe : bouton si réservation active non payée, sinon badge « payé » -->
+            <form th:if="${!r.paid and (r.statut == 'CONFIRMED' or r.statut == 'PENDING' or r.statut == 'NOW')}"
+                  th:action="@{'/account/reservations/' + ${r.id} + '/pay'}" method="post" class="d-inline">
+              <button type="submit" class="btn btn-sm text-white" style="background:#635bff;">💳 Payer</button>
+            </form>
+            <span th:if="${r.paid}" class="badge bg-success">✓ Payé</span>
             <!-- Évaluation : bouton si location terminée non évaluée, sinon la note déjà donnée -->
             <a th:if="${r.statut == 'COMPLETED' and r.evaluationNote == null}"
                class="btn btn-sm btn-warning"

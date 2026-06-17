@@ -17,4 +17,5 @@ public class ReservationDTO {
     private UserDTO user;
     private Double totalPrice;
     private Integer evaluationNote; // note de l'évaluation si la location a été évaluée, sinon null
+    private boolean paid;           // vrai si un paiement PAID existe pour cette réservation
 }

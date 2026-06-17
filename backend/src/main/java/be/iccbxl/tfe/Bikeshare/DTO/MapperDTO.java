@@ -103,6 +103,7 @@ public class MapperDTO {
         dto.setUser(toUserDTO(r.getUser()));
         if (r.getPayment() != null) dto.setTotalPrice(r.getPayment().getTotalPrice());
         if (r.getEvaluation() != null) dto.setEvaluationNote(r.getEvaluation().getNote());
+        dto.setPaid(r.getPayment() != null && "PAID".equalsIgnoreCase(r.getPayment().getStatut()));
         return dto;
     }
 
