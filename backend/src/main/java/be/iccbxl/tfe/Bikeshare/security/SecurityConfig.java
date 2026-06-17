@@ -44,7 +44,7 @@ public class SecurityConfig {
                 .requestMatchers("/", "/bikes", "/bikes/**", "/search", "/register",
                                  "/forgot-password", "/reset-password",
                                  "/login", "/error", "/contact", "/conditions", "/mentions-legales",
-                                 "/reclamation", "/css/**", "/js/**", "/images/**", "/uploads/**",
+                                 "/reclamation", "/favicon.ico", "/css/**", "/js/**", "/images/**", "/uploads/**",
                                  "/ws/**", "/v3/api-docs/**", "/swagger-ui/**", "/api/bikes/**").permitAll()
                 .requestMatchers("/admin/**", "/api/admin/**", "/api/dashboard/**").hasAuthority("ROLE_ADMIN")
                 .requestMatchers("/account/**", "/reservations",
