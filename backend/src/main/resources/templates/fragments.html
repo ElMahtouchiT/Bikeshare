@@ -31,7 +31,7 @@
       <!-- Liens centre -->
       <ul class="navbar-nav me-auto ms-3 gap-1">
         <li class="nav-item">
-          <a class="nav-link" th:href="@{/bikes}" th:text="#{nav.catalogue}">Catalogue</a>
+          <a class="btn btn-sm text-white fw-semibold px-3" style="background:#1fa67a;" th:href="@{/bikes}" th:text="#{nav.catalogue}">Catalogue</a>
         </li>
         <li class="nav-item" sec:authorize="hasAuthority('ROLE_ADMIN')">
           <a class="nav-link text-warning fw-bold" th:href="@{/admin}"><span>⚙ </span><span th:text="#{nav.admin}">Administration</span></a>
@@ -62,7 +62,6 @@
 
         <!-- Visiteur non connecté -->
         <th:block sec:authorize="!isAuthenticated()">
-          <a class="btn btn-outline-light btn-sm" th:href="@{/bikes}" th:text="#{nav.viewBikes}">Voir les vélos</a>
           <a class="btn btn-sm text-white" style="background:#1fa67a;" th:href="@{/login}" th:text="#{nav.login}">Se connecter</a>
           <a class="btn btn-sm btn-outline-light" th:href="@{/register}" th:text="#{nav.register}">S'inscrire</a>
         </th:block>
