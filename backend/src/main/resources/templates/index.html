@@ -26,6 +26,30 @@
   </div>
 </header>
 
+<!-- Comment ça marche -->
+<section class="py-5" style="background:#f8f9fa;">
+  <div class="container">
+    <h2 class="text-center mb-5" th:text="#{home.how.title}">Comment ça marche ?</h2>
+    <div class="row g-4 text-center">
+      <div class="col-md-4">
+        <div style="font-size:2.6rem;">🔍</div>
+        <h5 class="fw-bold mt-2" th:text="#{home.how.s1.t}">Cherchez</h5>
+        <p class="text-muted" th:text="#{home.how.s1.d}">Trouvez le vélo idéal près de chez vous grâce aux filtres.</p>
+      </div>
+      <div class="col-md-4">
+        <div style="font-size:2.6rem;">💳</div>
+        <h5 class="fw-bold mt-2" th:text="#{home.how.s2.t}">Réservez et payez</h5>
+        <p class="text-muted" th:text="#{home.how.s2.d}">Choisissez vos dates et payez en ligne en toute sécurité.</p>
+      </div>
+      <div class="col-md-4">
+        <div style="font-size:2.6rem;">🚲</div>
+        <h5 class="fw-bold mt-2" th:text="#{home.how.s3.t}">Roulez !</h5>
+        <p class="text-muted" th:text="#{home.how.s3.d}">Récupérez le vélo auprès du propriétaire et profitez de votre balade.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="container py-5">
   <h2 class="mb-4" th:text="#{home.featured}">Vélos en vedette</h2>
   <div class="row g-4">
@@ -49,6 +73,49 @@
     <a th:href="@{/bikes}" class="btn btn-lg text-white px-4 py-2" style="background:#1fa67a;">
       <span th:text="#{home.seeAll}">Voir tout le catalogue</span><span th:if="${totalBikes != null}"> (<span th:text="${totalBikes}">98</span>)</span> &rarr;
     </a>
+  </div>
+</section>
+
+<!-- Parcourir par type -->
+<section class="py-5" style="background:#f8f9fa;">
+  <div class="container">
+    <h2 class="text-center mb-4" th:text="#{home.browseType}">Parcourir par type</h2>
+    <div class="row g-3 justify-content-center">
+      <div class="col-6 col-md-2">
+        <a th:href="@{/bikes(bikeType='CITY')}" class="d-block text-decoration-none text-dark text-center card border-0 shadow-sm rounded-4 p-3 h-100">
+          <div style="font-size:2rem;">🏙️</div><div class="small fw-semibold mt-1">Ville</div></a>
+      </div>
+      <div class="col-6 col-md-2">
+        <a th:href="@{/bikes(bikeType='ELECTRIC')}" class="d-block text-decoration-none text-dark text-center card border-0 shadow-sm rounded-4 p-3 h-100">
+          <div style="font-size:2rem;">⚡</div><div class="small fw-semibold mt-1">Électrique</div></a>
+      </div>
+      <div class="col-6 col-md-2">
+        <a th:href="@{/bikes(bikeType='MTB')}" class="d-block text-decoration-none text-dark text-center card border-0 shadow-sm rounded-4 p-3 h-100">
+          <div style="font-size:2rem;">⛰️</div><div class="small fw-semibold mt-1">VTT</div></a>
+      </div>
+      <div class="col-6 col-md-2">
+        <a th:href="@{/bikes(bikeType='ROAD')}" class="d-block text-decoration-none text-dark text-center card border-0 shadow-sm rounded-4 p-3 h-100">
+          <div style="font-size:2rem;">🚴</div><div class="small fw-semibold mt-1">Route</div></a>
+      </div>
+      <div class="col-6 col-md-2">
+        <a th:href="@{/bikes(bikeType='KIDS')}" class="d-block text-decoration-none text-dark text-center card border-0 shadow-sm rounded-4 p-3 h-100">
+          <div style="font-size:2rem;">🧒</div><div class="small fw-semibold mt-1">Enfant</div></a>
+      </div>
+      <div class="col-6 col-md-2">
+        <a th:href="@{/bikes(bikeType='CARGO')}" class="d-block text-decoration-none text-dark text-center card border-0 shadow-sm rounded-4 p-3 h-100">
+          <div style="font-size:2rem;">📦</div><div class="small fw-semibold mt-1">Cargo</div></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Proposez votre vélo (côté propriétaire) -->
+<section class="py-5 text-white" style="background:#13233f;">
+  <div class="container text-center">
+    <h2 class="fw-bold" th:text="#{home.owner.title}">Vous avez un vélo ?</h2>
+    <p class="lead" th:text="#{home.owner.text}">Louez-le facilement et gagnez de l'argent.</p>
+    <a sec:authorize="isAuthenticated()" th:href="@{/account/bikes/create}" class="btn btn-lg text-white px-4 mt-2" style="background:#1fa67a;" th:text="#{home.owner.cta}">Proposer mon vélo</a>
+    <a sec:authorize="!isAuthenticated()" th:href="@{/register}" class="btn btn-lg text-white px-4 mt-2" style="background:#1fa67a;" th:text="#{home.owner.ctaGuest}">Créer un compte</a>
   </div>
 </section>
 <footer th:replace="~{fragments :: footer}"></footer>

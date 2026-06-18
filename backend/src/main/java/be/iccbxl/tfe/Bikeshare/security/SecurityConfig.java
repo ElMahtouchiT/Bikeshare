@@ -43,7 +43,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/bikes", "/bikes/**", "/search", "/register",
                                  "/forgot-password", "/reset-password",
-                                 "/login", "/error", "/contact", "/conditions", "/mentions-legales",
+                                 "/login", "/error", "/a-propos", "/contact", "/conditions", "/mentions-legales",
                                  "/reclamation", "/favicon.ico", "/css/**", "/js/**", "/images/**", "/uploads/**",
                                  "/ws/**", "/v3/api-docs/**", "/swagger-ui/**", "/api/bikes/**").permitAll()
                 .requestMatchers("/admin/**", "/api/admin/**", "/api/dashboard/**").hasAuthority("ROLE_ADMIN")

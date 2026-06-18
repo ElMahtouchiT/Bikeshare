@@ -42,6 +42,9 @@ public class HomeController {
 
     /* ─── Pages d'information (pied de page) ─────────────────── */
 
+    @GetMapping("/a-propos")
+    public String about() { return "pages/a-propos"; }
+
     @GetMapping("/contact")
     public String contact() { return "pages/contact"; }
 
