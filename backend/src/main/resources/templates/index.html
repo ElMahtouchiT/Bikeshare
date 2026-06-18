@@ -27,7 +27,7 @@
 </header>
 
 <section class="container py-5">
-  <h2 class="mb-4" th:text="#{home.available}">Vélos disponibles près de vous</h2>
+  <h2 class="mb-4" th:text="#{home.featured}">Vélos en vedette</h2>
   <div class="row g-4">
     <div class="col-md-4" th:each="bike : ${bikes}">
       <div class="card h-100 shadow-sm border-0 rounded-4">
@@ -44,6 +44,11 @@
         </div>
       </div>
     </div>
+  </div>
+  <div class="text-center mt-4">
+    <a th:href="@{/bikes}" class="btn btn-lg text-white px-4 py-2" style="background:#1fa67a;">
+      <span th:text="#{home.seeAll}">Voir tout le catalogue</span><span th:if="${totalBikes != null}"> (<span th:text="${totalBikes}">98</span>)</span> &rarr;
+    </a>
   </div>
 </section>
 <footer th:replace="~{fragments :: footer}"></footer>

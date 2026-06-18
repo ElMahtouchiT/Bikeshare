@@ -1,5 +1,6 @@
 package be.iccbxl.tfe.Bikeshare.controller;
 
+import be.iccbxl.tfe.Bikeshare.model.Bike;
 import be.iccbxl.tfe.Bikeshare.service.serviceImpl.BikeService;
 import be.iccbxl.tfe.Bikeshare.service.serviceImpl.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,12 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(Model model) {
+        java.util.List<Bike> online = bikeService.getAllOnlineBikes();
+        int featured = 6; // vitrine : un aperçu ; tout le catalogue est sur /bikes
         model.addAttribute("categories", categoryService.getAllCategory());
-        model.addAttribute("bikes", bikeService.getAllOnlineBikes());
+        model.addAttribute("bikes",
+                online.size() > featured ? new java.util.ArrayList<>(online.subList(0, featured)) : online);
+        model.addAttribute("totalBikes", online.size());
         return "index";
     }
 
