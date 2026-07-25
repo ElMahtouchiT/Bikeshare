@@ -21,6 +21,8 @@
     <a th:href="@{/admin}" class="btn btn-outline-secondary btn-sm" th:text="#{common.backDashboard}">&larr; Dashboard</a>
   </div>
 
+  <div th:replace="~{fragments :: adminnav('evaluations')}"></div>
+
   <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
   <div th:if="${evaluations.isEmpty()}" class="alert alert-info" th:text="#{admeval.none}">Aucune évaluation.</div>
 

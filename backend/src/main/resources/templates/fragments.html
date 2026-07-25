@@ -87,6 +87,27 @@
     </div>
   </div>
 </nav>
+
+<!-- Menu de navigation de l'administration : barre d'onglets incluse en haut de chaque page admin
+     (le paramètre 'active' met l'onglet courant en surbrillance). -->
+<div th:fragment="adminnav(active)" class="d-flex flex-wrap gap-2 mb-4 pb-2 border-bottom">
+  <a th:href="@{/admin}" class="btn btn-sm"
+     th:classappend="${active == 'dashboard'} ? 'btn-dark' : 'btn-outline-secondary'"
+     th:text="#{adminnav.dashboard}">Tableau de bord</a>
+  <a th:href="@{/admin/bikes}" class="btn btn-sm"
+     th:classappend="${active == 'bikes'} ? 'btn-dark' : 'btn-outline-secondary'"
+     th:text="#{adminnav.bikes}">Vélos</a>
+  <a th:href="@{/admin/users}" class="btn btn-sm"
+     th:classappend="${active == 'users'} ? 'btn-dark' : 'btn-outline-secondary'"
+     th:text="#{adminnav.users}">Utilisateurs</a>
+  <a th:href="@{/admin/claims}" class="btn btn-sm"
+     th:classappend="${active == 'claims'} ? 'btn-dark' : 'btn-outline-secondary'"
+     th:text="#{admin.nav.claims}">Réclamations</a>
+  <a th:href="@{/admin/evaluations}" class="btn btn-sm"
+     th:classappend="${active == 'evaluations'} ? 'btn-dark' : 'btn-outline-secondary'"
+     th:text="#{admin.nav.evaluations}">Évaluations</a>
+</div>
+
 <footer th:fragment="footer" class="text-white pt-4 pb-3" style="background:#13233f;">
   <div class="container">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
