@@ -61,7 +61,7 @@
             </form>
             <form th:unless="${bike.online == null or !bike.online}"
                   th:action="@{'/admin/bikes/' + ${bike.id} + '/unpublish'}" method="post"
-                  onsubmit="return confirm('Retirer ce vélo du catalogue ?');">
+                  th:attr="data-confirm=#{confirm.unpublish}">
               <button class="btn btn-sm btn-outline-secondary" th:text="#{admbikes.unpublish}">Mettre hors ligne</button>
             </form>
           </td>

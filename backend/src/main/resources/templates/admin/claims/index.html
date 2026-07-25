@@ -51,7 +51,7 @@
         </form>
         <!-- Clôture -->
         <form th:action="@{'/admin/claims/' + ${c.id} + '/resolve'}" method="post"
-              onsubmit="return confirm('Clôturer définitivement cette réclamation ?');">
+              th:attr="data-confirm=#{confirm.resolveClaim}">
           <button class="btn btn-sm btn-success" th:text="#{admclaims.close}">✔ Clôturer</button>
         </form>
       </div>

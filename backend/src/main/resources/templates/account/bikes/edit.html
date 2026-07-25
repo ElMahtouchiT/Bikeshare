@@ -28,7 +28,7 @@
                th:src="@{${photo.url}}"/>
           <form th:action="@{'/account/bikes/' + ${bike.id} + '/photos/' + ${photo.id} + '/delete'}"
                 method="post" class="position-absolute top-0 end-0 m-1"
-                onsubmit="return confirm('Supprimer cette photo ?');">
+                th:attr="data-confirm=#{confirm.deletePhoto}">
             <button type="submit" class="btn btn-sm btn-danger rounded-circle" style="width:28px;height:28px;padding:0;"
                     title="Supprimer">&times;</button>
           </form>

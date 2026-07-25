@@ -50,7 +50,7 @@
               th:text="${e.createdAt != null ? #temporals.format(e.createdAt, 'dd/MM/yyyy') : '—'}"></td>
           <td>
             <form th:action="@{'/admin/evaluations/' + ${e.id} + '/delete'}" method="post"
-                  onsubmit="return confirm('Supprimer cet avis ?')">
+                  th:attr="data-confirm=#{confirm.deleteReview}">
               <button class="btn btn-sm btn-outline-danger">🗑</button>
             </form>
           </td>

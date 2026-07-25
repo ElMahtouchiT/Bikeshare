@@ -44,7 +44,7 @@
             <a class="btn btn-sm text-white" style="background:#13233f;" th:href="@{'/bikes/' + ${bike.id}}" th:text="#{common.view}">Voir</a>
             <a class="btn btn-sm btn-outline-secondary" th:href="@{'/account/bikes/' + ${bike.id} + '/edit'}" th:text="#{common.edit}">Modifier</a>
             <form th:action="@{'/account/bikes/' + ${bike.id} + '/delete'}" method="post"
-                  onsubmit="return confirm('Supprimer définitivement cette annonce et ses photos ?');">
+                  th:attr="data-confirm=#{confirm.deleteBike}">
               <button type="submit" class="btn btn-sm btn-outline-danger" th:text="#{common.delete}">Supprimer</button>
             </form>
           </div>

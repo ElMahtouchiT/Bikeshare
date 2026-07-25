@@ -63,7 +63,7 @@
           </td>
           <td>
             <form th:action="@{'/admin/users/' + ${u.id} + '/delete'}" method="post"
-                  onsubmit="return confirm('Supprimer cet utilisateur ?')">
+                  th:attr="data-confirm=#{confirm.deleteUser}">
               <button class="btn btn-sm btn-outline-danger">🗑</button>
             </form>
           </td>
