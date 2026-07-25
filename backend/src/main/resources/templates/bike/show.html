@@ -27,7 +27,7 @@
 <nav th:replace="~{fragments :: navbar}"></nav>
 
 <div class="container py-5">
-  <a th:href="@{/bikes}" class="text-decoration-none text-muted">&larr; Retour aux vélos</a>
+  <a th:href="@{/bikes}" class="text-decoration-none text-muted" th:text="#{bike.show.back}">&larr; Retour aux vélos</a>
 
   <div class="row mt-3 g-4">
 
@@ -67,57 +67,57 @@
       </p>
 
       <!-- Caractéristiques -->
-      <h5 class="mt-4">Caractéristiques</h5>
+      <h5 class="mt-4" th:text="#{bike.show.specs}">Caractéristiques</h5>
       <div class="row g-2 mb-3">
         <div class="col-6">
           <div class="bg-light rounded-3 p-2 small">
-            <span class="text-muted">Type</span><br/>
+            <span class="text-muted" th:text="#{bike.show.type}">Type</span><br/>
             <strong th:text="${bike.bikeType != null ? bike.bikeType : '—'}"></strong>
           </div>
         </div>
         <div class="col-6">
           <div class="bg-light rounded-3 p-2 small">
-            <span class="text-muted">Cadre</span><br/>
+            <span class="text-muted" th:text="#{bike.show.frame}">Cadre</span><br/>
             <strong th:text="${bike.frameSize != null ? bike.frameSize : '—'}"></strong>
           </div>
         </div>
         <div class="col-6">
           <div class="bg-light rounded-3 p-2 small">
-            <span class="text-muted">Roues</span><br/>
+            <span class="text-muted" th:text="#{bike.show.wheels}">Roues</span><br/>
             <strong th:text="${bike.wheelSize != null ? bike.wheelSize : '—'}"></strong>
           </div>
         </div>
         <div class="col-6">
           <div class="bg-light rounded-3 p-2 small">
-            <span class="text-muted">Vitesses</span><br/>
+            <span class="text-muted" th:text="#{bike.show.gears}">Vitesses</span><br/>
             <strong th:text="${bike.gears != null ? bike.gears : '—'}"></strong>
           </div>
         </div>
         <div class="col-6">
           <div class="bg-light rounded-3 p-2 small">
-            <span class="text-muted">Électrique</span><br/>
-            <strong th:text="${bike.electric} ? 'Oui ⚡' : 'Non'"></strong>
+            <span class="text-muted" th:text="#{bike.show.electric}">Électrique</span><br/>
+            <strong th:text="${bike.electric} ? #{bike.show.electricYes} : #{bike.show.electricNo}"></strong>
           </div>
         </div>
         <div class="col-6">
           <div class="bg-light rounded-3 p-2 small">
-            <span class="text-muted">Mode réservation</span><br/>
+            <span class="text-muted" th:text="#{bike.show.reservationMode}">Mode réservation</span><br/>
             <strong th:text="${bike.reservationMode != null ? bike.reservationMode : '—'}"></strong>
           </div>
         </div>
       </div>
 
       <!-- Équipements -->
-      <h5>Équipements</h5>
+      <h5 th:text="#{bike.show.equipment}">Équipements</h5>
       <div class="mb-3">
-        <span th:if="${bike.equipments.isEmpty()}" class="text-muted small">Aucun équipement renseigné.</span>
+        <span th:if="${bike.equipments.isEmpty()}" class="text-muted small" th:text="#{bike.show.noEquipment}">Aucun équipement renseigné.</span>
         <span class="badge bg-secondary me-1 mb-1"
               th:each="e : ${bike.equipments}"
               th:text="${e.description}"></span>
       </div>
 
       <!-- Carte Google Maps -->
-      <h5 class="mt-4">Localisation</h5>
+      <h5 class="mt-4" th:text="#{bike.show.location}">Localisation</h5>
       <div th:if="${googleMapsApiKey != null and !googleMapsApiKey.isEmpty() and !googleMapsApiKey.equals('your_google_maps_key')}">
 
         <!-- Cas 1 : coordonnées GPS disponibles → carte interactive -->
@@ -164,11 +164,11 @@
       </div>
 
       <!-- Évaluations -->
-      <h5 class="mt-4">Évaluations</h5>
-      <div th:if="${evaluations.isEmpty()}" class="text-muted small">Aucune évaluation pour ce vélo.</div>
+      <h5 class="mt-4" th:text="#{bike.show.reviews}">Évaluations</h5>
+      <div th:if="${evaluations.isEmpty()}" class="text-muted small" th:text="#{bike.show.noReviews}">Aucune évaluation pour ce vélo.</div>
       <div th:each="e : ${evaluations}" class="border-bottom py-2">
         <div class="d-flex justify-content-between">
-          <strong th:text="${e.authorName != null ? e.authorName : 'Anonyme'}"></strong>
+          <strong th:text="${e.authorName != null} ? ${e.authorName} : #{bike.show.anonymous}"></strong>
           <span class="text-warning" th:text="${e.note} + ' ★'"></span>
         </div>
         <p class="mb-0 text-muted small" th:text="${e.comment}"></p>
@@ -179,41 +179,41 @@
     <div class="col-md-5">
       <div class="card shadow-sm border-0 rounded-4 p-4 sticky-top" style="top:20px;">
         <h4 class="fw-bold text-success"
-            th:text="${bike.price != null ? bike.price.middlePrice + ' €/jour' : 'Prix non défini'}"></h4>
+            th:text="${bike.price != null} ? #{bike.show.pricePerDay(${bike.price.middlePrice})} : #{bike.show.noPrice}"></h4>
 
         <div th:if="${bike.price != null and bike.price.promo1 != null}" class="text-muted small mb-2">
-          🎉 <span th:text="'Réduction de ' + ${bike.price.promo1} + '% à partir de 3 jours'"></span>
+          🎉 <span th:text="#{bike.show.promo1(${bike.price.promo1})}"></span>
         </div>
         <div th:if="${bike.price != null and bike.price.promo2 != null}" class="text-muted small mb-2">
-          🎉 <span th:text="'Réduction de ' + ${bike.price.promo2} + '% à partir de 7 jours'"></span>
+          🎉 <span th:text="#{bike.show.promo2(${bike.price.promo2})}"></span>
         </div>
 
         <hr/>
 
         <p class="text-muted small mb-3">
-          Propriétaire :
+          <span th:text="#{bike.show.owner}">Propriétaire :</span>
           <strong th:text="${bike.user != null ? bike.user.firstName + ' ' + bike.user.lastName : '—'}"></strong>
         </p>
 
         <div th:if="${error}" class="alert alert-danger py-2 small" th:text="${error}"></div>
         <form th:action="@{/reservations}" method="post">
           <input type="hidden" name="bikeId" th:value="${bike.id}"/>
-          <label class="form-label fw-semibold">Du</label>
+          <label class="form-label fw-semibold" th:text="#{bike.show.from}">Du</label>
           <input id="startDate" class="form-control mb-2" type="text" name="start"
-                 placeholder="Choisir une date" autocomplete="off" required readonly/>
-          <label class="form-label fw-semibold">Au</label>
+                 placeholder="Choisir une date" th:placeholder="#{bike.show.pickDate}" autocomplete="off" required readonly/>
+          <label class="form-label fw-semibold" th:text="#{bike.show.to}">Au</label>
           <input id="endDate" class="form-control mb-2" type="text" name="end"
-                 placeholder="Choisir une date" autocomplete="off" required readonly/>
+                 placeholder="Choisir une date" th:placeholder="#{bike.show.pickDate}" autocomplete="off" required readonly/>
           <div class="d-flex gap-3 mb-3 small text-muted">
-            <span><span class="legend-swatch legend-free"></span> Disponible</span>
-            <span><span class="legend-swatch legend-booked"></span> Réservé</span>
+            <span><span class="legend-swatch legend-free"></span> <span th:text="#{bike.show.available}">Disponible</span></span>
+            <span><span class="legend-swatch legend-booked"></span> <span th:text="#{bike.show.booked}">Réservé</span></span>
           </div>
           <th:block sec:authorize="isAuthenticated()">
             <button class="btn text-white w-100 py-2 fw-bold"
-                    style="background:#1fa67a;">Réserver ce vélo</button>
+                    style="background:#1fa67a;" th:text="#{bike.show.reserve}">Réserver ce vélo</button>
           </th:block>
           <th:block sec:authorize="!isAuthenticated()">
-            <a th:href="@{/login}" class="btn btn-outline-secondary w-100 py-2">
+            <a th:href="@{/login}" class="btn btn-outline-secondary w-100 py-2" th:text="#{bike.show.loginToReserve}">
               Se connecter pour réserver
             </a>
           </th:block>

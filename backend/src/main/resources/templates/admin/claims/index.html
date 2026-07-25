@@ -11,15 +11,15 @@
 <div class="container py-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-      <h2 class="mb-0">Réclamations</h2>
-      <p class="text-muted mb-0 small">Litiges soumis par les membres</p>
+      <h2 class="mb-0" th:text="#{admin.nav.claims}">Réclamations</h2>
+      <p class="text-muted mb-0 small" th:text="#{admclaims.subtitle}">Litiges soumis par les membres</p>
     </div>
-    <a th:href="@{/admin}" class="btn btn-outline-secondary btn-sm">&larr; Dashboard</a>
+    <a th:href="@{/admin}" class="btn btn-outline-secondary btn-sm" th:text="#{common.backDashboard}">&larr; Dashboard</a>
   </div>
 
   <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
   <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-  <div th:if="${claims.isEmpty()}" class="alert alert-info">Aucune réclamation.</div>
+  <div th:if="${claims.isEmpty()}" class="alert alert-info" th:text="#{admclaims.none}">Aucune réclamation.</div>
 
   <div th:unless="${claims.isEmpty()}" class="d-flex flex-column gap-3">
     <div th:each="c : ${claims}" class="card border-0 shadow-sm rounded-4 p-4">
@@ -29,30 +29,30 @@
                 th:classappend="${c.status == 'FINISHED'} ? 'bg-success' :
                                 (${c.status == 'IN_PROGRESS'} ? 'bg-warning text-dark' : 'bg-danger')"
                 th:text="${c.status}"></span>
-          <span class="fw-bold" th:text="'Réservation #' + ${c.reservation != null ? c.reservation.id : '—'}"></span>
-          <span class="text-muted small ms-2" th:text="'par ' + ${c.claimantRole}"></span>
+          <span class="fw-bold" th:text="#{admclaims.reservation(${c.reservation != null ? c.reservation.id : '—'})}"></span>
+          <span class="text-muted small ms-2" th:text="#{admclaims.by} + ' ' + ${c.claimantRole}"></span>
         </div>
         <span class="text-muted small"
               th:text="${c.createdAt != null ? #temporals.format(c.createdAt, 'dd/MM/yyyy') : ''}"></span>
       </div>
       <p class="mb-2" th:text="${c.message}"></p>
       <div th:if="${c.response}" class="alert alert-secondary py-2 mb-2">
-        <strong>Réponse admin :</strong> <span th:text="${c.response}"></span>
+        <strong th:text="#{admclaims.adminResponse}">Réponse admin :</strong> <span th:text="${c.response}"></span>
       </div>
       <div th:unless="${c.status == 'FINISHED'}">
         <!-- Réponse de l'administrateur -->
         <form th:action="@{'/admin/claims/' + ${c.id} + '/respond'}" method="post" class="mb-2">
-          <label class="form-label small text-muted mb-1">Répondre au membre</label>
+          <label class="form-label small text-muted mb-1" th:text="#{admclaims.replyLabel}">Répondre au membre</label>
           <div class="input-group">
             <textarea class="form-control" name="response" rows="2" required
-                      placeholder="Écrivez votre réponse…"></textarea>
-            <button class="btn btn-outline-primary" type="submit">Répondre</button>
+                      th:placeholder="#{admclaims.replyPlaceholder}" placeholder="Écrivez votre réponse…"></textarea>
+            <button class="btn btn-outline-primary" type="submit" th:text="#{admclaims.reply}">Répondre</button>
           </div>
         </form>
         <!-- Clôture -->
         <form th:action="@{'/admin/claims/' + ${c.id} + '/resolve'}" method="post"
               onsubmit="return confirm('Clôturer définitivement cette réclamation ?');">
-          <button class="btn btn-sm btn-success">✔ Clôturer</button>
+          <button class="btn btn-sm btn-success" th:text="#{admclaims.close}">✔ Clôturer</button>
         </form>
       </div>
     </div>

@@ -9,11 +9,11 @@
 <nav th:replace="~{fragments :: navbar}"></nav>
 <div class="container py-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Mes gains</h2>
-    <a th:href="@{/account}" class="btn btn-outline-secondary btn-sm">&larr; Mon compte</a>
+    <h2 th:text="#{gains.title}">Mes gains</h2>
+    <a th:href="@{/account}" class="btn btn-outline-secondary btn-sm" th:text="#{common.backAccount}">&larr; Mon compte</a>
   </div>
 
-  <div th:if="${gains.isEmpty()}" class="alert alert-info">
+  <div th:if="${gains.isEmpty()}" class="alert alert-info" th:text="#{gains.empty}">
     Aucun gain enregistré pour le moment.
   </div>
 
@@ -21,7 +21,7 @@
     <div class="card border-0 shadow-sm rounded-4 mb-4 p-3">
       <div class="h4 text-success mb-0"
            th:text="${#aggregates.sum(gains.![amountEarned]) + ' €'}">0 €</div>
-      <div class="text-muted">Total des gains</div>
+      <div class="text-muted" th:text="#{gains.total}">Total des gains</div>
     </div>
 
     <div class="table-responsive">
@@ -29,10 +29,10 @@
         <thead class="table-dark">
           <tr>
             <th>#</th>
-            <th>Description</th>
-            <th>Montant</th>
-            <th>Statut</th>
-            <th>Date</th>
+            <th th:text="#{common.description}">Description</th>
+            <th th:text="#{common.amount}">Montant</th>
+            <th th:text="#{common.status}">Statut</th>
+            <th th:text="#{common.date}">Date</th>
           </tr>
         </thead>
         <tbody>

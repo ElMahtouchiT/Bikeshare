@@ -11,8 +11,8 @@
 <div class="container py-5" style="max-width:680px;">
 
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Mon profil</h2>
-    <a th:href="@{/account}" class="btn btn-outline-secondary btn-sm">&larr; Mon compte</a>
+    <h2 th:text="#{profile.title}">Mon profil</h2>
+    <a th:href="@{/account}" class="btn btn-outline-secondary btn-sm" th:text="#{common.backAccount}">&larr; Mon compte</a>
   </div>
 
   <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
@@ -32,56 +32,56 @@
         <div class="fw-bold fs-5" th:text="${user.firstName + ' ' + user.lastName}"></div>
         <div class="text-muted small" th:text="${user.email}"></div>
         <div class="text-muted small">
-          Membre depuis <span th:text="${#temporals.format(user.createdAt, 'MMMM yyyy')}"></span>
+          <span th:text="#{profile.memberSince}">Membre depuis</span> <span th:text="${#temporals.format(user.createdAt, 'MMMM yyyy')}"></span>
         </div>
       </div>
     </div>
 
     <form th:action="@{/account/profile}" method="post" enctype="multipart/form-data">
 
-      <h6 class="text-muted text-uppercase mb-3" style="font-size:.75rem;letter-spacing:.08em;">Photo de profil</h6>
+      <h6 class="text-muted text-uppercase mb-3" style="font-size:.75rem;letter-spacing:.08em;" th:text="#{profile.section.photo}">Photo de profil</h6>
       <div class="mb-4">
         <input class="form-control" type="file" name="photo" accept="image/*"/>
-        <div class="form-text">JPG, PNG… Laissez vide pour conserver la photo actuelle.</div>
+        <div class="form-text" th:text="#{profile.photoHelp}">JPG, PNG… Laissez vide pour conserver la photo actuelle.</div>
       </div>
 
-      <h6 class="text-muted text-uppercase mb-3" style="font-size:.75rem;letter-spacing:.08em;">Informations personnelles</h6>
+      <h6 class="text-muted text-uppercase mb-3" style="font-size:.75rem;letter-spacing:.08em;" th:text="#{profile.section.personal}">Informations personnelles</h6>
       <div class="row g-3 mb-3">
         <div class="col-md-6">
-          <label class="form-label">Prénom <span class="text-danger">*</span></label>
+          <label class="form-label"><span th:text="#{register.firstName}">Prénom</span> <span class="text-danger">*</span></label>
           <input class="form-control" name="firstName" th:value="${user.firstName}" required/>
         </div>
         <div class="col-md-6">
-          <label class="form-label">Nom <span class="text-danger">*</span></label>
+          <label class="form-label"><span th:text="#{register.lastName}">Nom</span> <span class="text-danger">*</span></label>
           <input class="form-control" name="lastName" th:value="${user.lastName}" required/>
         </div>
         <div class="col-md-6">
-          <label class="form-label">Téléphone</label>
+          <label class="form-label" th:text="#{profile.phone}">Téléphone</label>
           <input class="form-control" name="phone" th:value="${user.phone}" placeholder="+32 ..."/>
         </div>
         <div class="col-md-6">
-          <label class="form-label">Email</label>
-          <input class="form-control bg-light" th:value="${user.email}" disabled title="L'email ne peut pas être modifié ici"/>
+          <label class="form-label" th:text="#{login.email}">Email</label>
+          <input class="form-control bg-light" th:value="${user.email}" disabled th:title="#{profile.emailLocked}" title="L'email ne peut pas être modifié ici"/>
         </div>
       </div>
 
-      <h6 class="text-muted text-uppercase mb-3 mt-4" style="font-size:.75rem;letter-spacing:.08em;">Adresse</h6>
+      <h6 class="text-muted text-uppercase mb-3 mt-4" style="font-size:.75rem;letter-spacing:.08em;" th:text="#{profile.section.address}">Adresse</h6>
       <div class="row g-3 mb-3">
         <div class="col-12">
-          <label class="form-label">Rue et numéro</label>
-          <input class="form-control" name="adresse" th:value="${user.adresse}" placeholder="Rue de la Loi 1"/>
+          <label class="form-label" th:text="#{bikeform.street}">Rue et numéro</label>
+          <input class="form-control" name="adresse" th:value="${user.adresse}" th:placeholder="#{bikeform.streetPlaceholder}" placeholder="Rue de la Loi 1"/>
         </div>
         <div class="col-md-4">
-          <label class="form-label">Code postal</label>
+          <label class="form-label" th:text="#{bikeform.postalCode}">Code postal</label>
           <input class="form-control" name="postalCode" th:value="${user.postalCode}" placeholder="1000"/>
         </div>
         <div class="col-md-8">
-          <label class="form-label">Localité</label>
-          <input class="form-control" name="locality" th:value="${user.locality}" placeholder="Bruxelles"/>
+          <label class="form-label" th:text="#{bikeform.locality}">Localité</label>
+          <input class="form-control" name="locality" th:value="${user.locality}" th:placeholder="#{bikeform.localityPlaceholder}" placeholder="Bruxelles"/>
         </div>
       </div>
 
-      <h6 class="text-muted text-uppercase mb-3 mt-4" style="font-size:.75rem;letter-spacing:.08em;">Coordonnées bancaires</h6>
+      <h6 class="text-muted text-uppercase mb-3 mt-4" style="font-size:.75rem;letter-spacing:.08em;" th:text="#{profile.section.bank}">Coordonnées bancaires</h6>
       <div class="row g-3 mb-4">
         <div class="col-md-8">
           <label class="form-label">IBAN</label>
@@ -94,8 +94,8 @@
       </div>
 
       <div class="d-flex gap-2">
-        <button class="btn text-white px-4" style="background:#1fa67a;">Enregistrer</button>
-        <a th:href="@{/account}" class="btn btn-outline-secondary">Annuler</a>
+        <button class="btn text-white px-4" style="background:#1fa67a;" th:text="#{common.save}">Enregistrer</button>
+        <a th:href="@{/account}" class="btn btn-outline-secondary" th:text="#{common.cancel}">Annuler</a>
       </div>
 
     </form>
@@ -103,9 +103,9 @@
 
   <!-- Zone danger -->
   <div class="card border-danger border-0 rounded-4 mt-4 p-4" style="border:1px solid #f8d7da !important;">
-    <h6 class="text-danger mb-2">Zone de danger</h6>
-    <p class="text-muted small mb-3">La suppression de votre compte est définitive. Toutes vos données seront effacées sous 30 jours après validation par un administrateur.</p>
-    <a th:href="@{/account/delete-request}" class="btn btn-outline-danger btn-sm">Demander la suppression de mon compte</a>
+    <h6 class="text-danger mb-2" th:text="#{profile.dangerZone}">Zone de danger</h6>
+    <p class="text-muted small mb-3" th:text="#{profile.dangerText}">La suppression de votre compte est définitive. Toutes vos données seront effacées sous 30 jours après validation par un administrateur.</p>
+    <a th:href="@{/account/delete-request}" class="btn btn-outline-danger btn-sm" th:text="#{profile.requestDeletion}">Demander la suppression de mon compte</a>
   </div>
 
 </div>

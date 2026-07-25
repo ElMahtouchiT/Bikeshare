@@ -11,19 +11,19 @@
 <div class="container py-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-      <h2 class="mb-0">Validation des vélos</h2>
-      <p class="text-muted mb-0 small">Publier ou retirer les annonces du catalogue public</p>
+      <h2 class="mb-0" th:text="#{admin.nav.bikes}">Validation des vélos</h2>
+      <p class="text-muted mb-0 small" th:text="#{admbikes.subtitle}">Publier ou retirer les annonces du catalogue public</p>
     </div>
-    <a th:href="@{/admin}" class="btn btn-outline-secondary btn-sm">&larr; Dashboard</a>
+    <a th:href="@{/admin}" class="btn btn-outline-secondary btn-sm" th:text="#{common.backDashboard}">&larr; Dashboard</a>
   </div>
 
   <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
   <div th:if="${error}"   class="alert alert-danger"  th:text="${error}"></div>
 
   <div th:if="${pendingBikes > 0}" class="alert alert-warning">
-    <strong th:text="${pendingBikes}">0</strong> vélo(s) en attente de validation.
+    <strong th:text="${pendingBikes}">0</strong> <span th:text="#{admbikes.pending}">vélo(s) en attente de validation.</span>
   </div>
-  <div th:if="${pendingBikes == 0}" class="alert alert-info">
+  <div th:if="${pendingBikes == 0}" class="alert alert-info" th:text="#{admbikes.none}">
     Aucun vélo en attente. Toutes les annonces sont traitées.
   </div>
 
@@ -32,12 +32,12 @@
       <thead style="background:#13233f;" class="text-white">
         <tr>
           <th class="px-3">#</th>
-          <th>Vélo</th>
-          <th>Propriétaire</th>
-          <th>Localité</th>
-          <th>Prix</th>
-          <th>Statut</th>
-          <th>Action</th>
+          <th th:text="#{common.bike}">Vélo</th>
+          <th th:text="#{common.owner}">Propriétaire</th>
+          <th th:text="#{bikeform.locality}">Localité</th>
+          <th th:text="#{common.price}">Prix</th>
+          <th th:text="#{common.status}">Statut</th>
+          <th th:text="#{common.action}">Action</th>
         </tr>
       </thead>
       <tbody>
@@ -51,18 +51,18 @@
           <td class="small" th:text="${bike.locality}"></td>
           <td class="small" th:text="${bike.price != null ? bike.price.middlePrice + ' €/jour' : '—'}"></td>
           <td>
-            <span th:if="${bike.online}" class="badge bg-success">En ligne</span>
-            <span th:unless="${bike.online}" class="badge bg-secondary">Hors ligne</span>
+            <span th:if="${bike.online}" class="badge bg-success" th:text="#{common.online}">En ligne</span>
+            <span th:unless="${bike.online}" class="badge bg-secondary" th:text="#{common.offline}">Hors ligne</span>
           </td>
           <td>
             <form th:if="${bike.online == null or !bike.online}"
                   th:action="@{'/admin/bikes/' + ${bike.id} + '/publish'}" method="post">
-              <button class="btn btn-sm btn-success">Publier</button>
+              <button class="btn btn-sm btn-success" th:text="#{admbikes.publish}">Publier</button>
             </form>
             <form th:unless="${bike.online == null or !bike.online}"
                   th:action="@{'/admin/bikes/' + ${bike.id} + '/unpublish'}" method="post"
                   onsubmit="return confirm('Retirer ce vélo du catalogue ?');">
-              <button class="btn btn-sm btn-outline-secondary">Mettre hors ligne</button>
+              <button class="btn btn-sm btn-outline-secondary" th:text="#{admbikes.unpublish}">Mettre hors ligne</button>
             </form>
           </td>
         </tr>

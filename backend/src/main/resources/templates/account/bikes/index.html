@@ -9,17 +9,17 @@
 <nav th:replace="~{fragments :: navbar}"></nav>
 <div class="container py-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Mes vélos</h2>
+    <h2 th:text="#{mybikes.title}">Mes vélos</h2>
     <div class="d-flex gap-2">
-      <a th:href="@{/account/bikes/create}" class="btn btn-sm text-white" style="background:#1fa67a;">+ Proposer un vélo</a>
-      <a th:href="@{/account}" class="btn btn-outline-secondary btn-sm">&larr; Mon compte</a>
+      <a th:href="@{/account/bikes/create}" class="btn btn-sm text-white" style="background:#1fa67a;" th:text="#{mybikes.add}">+ Proposer un vélo</a>
+      <a th:href="@{/account}" class="btn btn-outline-secondary btn-sm" th:text="#{common.backAccount}">&larr; Mon compte</a>
     </div>
   </div>
 
   <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
   <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-  <div th:if="${bikes.isEmpty()}" class="alert alert-info">
+  <div th:if="${bikes.isEmpty()}" class="alert alert-info" th:utext="#{mybikes.empty}">
     Vous n'avez pas encore de vélo enregistré.
     <a th:href="@{/account/bikes/create}" class="alert-link ms-1">Proposez votre premier vélo</a>.
   </div>
@@ -37,15 +37,15 @@
           <p class="text-muted mb-1" th:text="${bike.locality}"></p>
           <p class="mb-1">
             <span class="badge" th:classappend="${bike.online} ? 'bg-success' : 'bg-secondary'"
-                  th:text="${bike.online} ? 'En ligne' : 'Hors ligne'"></span>
+                  th:text="${bike.online} ? #{common.online} : #{common.offline}"></span>
           </p>
-          <p class="fw-bold" th:text="${bike.price != null ? bike.price.middlePrice + ' €/jour' : 'Prix non défini'}"></p>
+          <p class="fw-bold" th:text="${bike.price != null} ? #{bike.show.pricePerDay(${bike.price.middlePrice})} : #{bike.show.noPrice}"></p>
           <div class="d-flex gap-2 flex-wrap">
-            <a class="btn btn-sm text-white" style="background:#13233f;" th:href="@{'/bikes/' + ${bike.id}}">Voir</a>
-            <a class="btn btn-sm btn-outline-secondary" th:href="@{'/account/bikes/' + ${bike.id} + '/edit'}">Modifier</a>
+            <a class="btn btn-sm text-white" style="background:#13233f;" th:href="@{'/bikes/' + ${bike.id}}" th:text="#{common.view}">Voir</a>
+            <a class="btn btn-sm btn-outline-secondary" th:href="@{'/account/bikes/' + ${bike.id} + '/edit'}" th:text="#{common.edit}">Modifier</a>
             <form th:action="@{'/account/bikes/' + ${bike.id} + '/delete'}" method="post"
                   onsubmit="return confirm('Supprimer définitivement cette annonce et ses photos ?');">
-              <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
+              <button type="submit" class="btn btn-sm btn-outline-danger" th:text="#{common.delete}">Supprimer</button>
             </form>
           </div>
         </div>

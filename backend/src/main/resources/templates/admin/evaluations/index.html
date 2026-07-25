@@ -11,28 +11,28 @@
 <div class="container py-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-      <h2 class="mb-0">Évaluations</h2>
+      <h2 class="mb-0" th:text="#{admin.nav.evaluations}">Évaluations</h2>
       <p class="text-muted mb-0 small">
-        <span th:text="${dashboard.totalEvaluations}">0</span> avis —
-        Moyenne globale :
+        <span th:text="${dashboard.totalEvaluations}">0</span> <span th:text="#{admeval.reviews}">avis</span> —
+        <span th:text="#{admeval.average}">Moyenne globale :</span>
         <strong th:text="${#numbers.formatDecimal(dashboard.averageNote, 1, 1)} + '/5'">0/5</strong>
       </p>
     </div>
-    <a th:href="@{/admin}" class="btn btn-outline-secondary btn-sm">&larr; Dashboard</a>
+    <a th:href="@{/admin}" class="btn btn-outline-secondary btn-sm" th:text="#{common.backDashboard}">&larr; Dashboard</a>
   </div>
 
   <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-  <div th:if="${evaluations.isEmpty()}" class="alert alert-info">Aucune évaluation.</div>
+  <div th:if="${evaluations.isEmpty()}" class="alert alert-info" th:text="#{admeval.none}">Aucune évaluation.</div>
 
   <div class="card border-0 shadow-sm rounded-4 overflow-hidden" th:unless="${evaluations.isEmpty()}">
     <table class="table table-hover align-middle mb-0">
       <thead style="background:#13233f;" class="text-white">
         <tr>
-          <th class="px-3">Vélo</th>
-          <th>Auteur</th>
-          <th>Note</th>
-          <th>Commentaire</th>
-          <th>Date</th>
+          <th class="px-3" th:text="#{common.bike}">Vélo</th>
+          <th th:text="#{admeval.author}">Auteur</th>
+          <th th:text="#{eval.note}">Note</th>
+          <th th:text="#{eval.comment}">Commentaire</th>
+          <th th:text="#{common.date}">Date</th>
           <th></th>
         </tr>
       </thead>

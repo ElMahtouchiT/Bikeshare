@@ -11,20 +11,20 @@
 <div class="container py-5" style="max-width:720px;">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-      <h2 class="mb-0">Messagerie</h2>
+      <h2 class="mb-0" th:text="#{chat.title}">Messagerie</h2>
       <p class="text-muted mb-0 small">
         <span th:text="${reservation.bike != null ? reservation.bike.brand + ' ' + reservation.bike.model : 'Vélo'}"></span>
-        · avec <strong th:text="${otherName}"></strong>
+        · <span th:text="#{chat.with}">avec</span> <strong th:text="${otherName}"></strong>
       </p>
     </div>
-    <a th:href="@{/account/reservations}" class="btn btn-outline-secondary btn-sm">&larr; Retour</a>
+    <a th:href="@{/account/reservations}" class="btn btn-outline-secondary btn-sm" th:text="#{common.back}">&larr; Retour</a>
   </div>
 
   <div class="card shadow-sm border-0 rounded-4">
     <div id="messages" class="p-3" style="height:420px;overflow-y:auto;background:#f8f9fa;"></div>
     <div class="p-2 border-top d-flex gap-2">
-      <input id="msgInput" class="form-control" type="text" placeholder="Écrivez un message…" autocomplete="off"/>
-      <button id="sendBtn" class="btn text-white px-4" style="background:#1fa67a;">Envoyer</button>
+      <input id="msgInput" class="form-control" type="text" th:placeholder="#{chat.placeholder}" placeholder="Écrivez un message…" autocomplete="off"/>
+      <button id="sendBtn" class="btn text-white px-4" style="background:#1fa67a;" th:text="#{chat.send}">Envoyer</button>
     </div>
   </div>
 </div>

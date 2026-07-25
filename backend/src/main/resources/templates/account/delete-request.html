@@ -12,11 +12,11 @@
   <div class="card border-0 rounded-4 shadow-sm p-5 text-center">
 
     <div class="mb-3" style="font-size:3rem;">⚠️</div>
-    <h3 class="text-danger mb-2">Supprimer mon compte</h3>
-    <p class="text-muted mb-1">
+    <h3 class="text-danger mb-2" th:text="#{delete.title}">Supprimer mon compte</h3>
+    <p class="text-muted mb-1" th:utext="#{delete.greeting(${user.firstName})}">
       Bonjour <strong th:text="${user.firstName}"></strong>,
     </p>
-    <p class="text-muted mb-4">
+    <p class="text-muted mb-4" th:utext="#{delete.warning}">
       Cette action est <strong>irréversible</strong>. En confirmant, vous demandez la suppression
       définitive de votre compte, de vos vélos et de toutes vos données personnelles.<br/>
       <span class="text-muted small">Un administrateur traitera votre demande sous <strong>30 jours</strong>.</span>
@@ -24,11 +24,11 @@
 
     <div class="d-grid gap-2">
       <form th:action="@{/account/delete-request}" method="post">
-        <button type="submit" class="btn btn-danger w-100 py-2">
+        <button type="submit" class="btn btn-danger w-100 py-2" th:text="#{delete.confirm}">
           Oui, je confirme la suppression de mon compte
         </button>
       </form>
-      <a th:href="@{/account/profile}" class="btn btn-outline-secondary py-2">
+      <a th:href="@{/account/profile}" class="btn btn-outline-secondary py-2" th:text="#{delete.cancel}">
         Non, annuler et retourner à mon profil
       </a>
     </div>
