@@ -63,3 +63,6 @@ cd backend && mvn spring-boot:run                    # 2. backend (port 8080)
 ```
 Swagger UI : http://localhost:8080/swagger-ui.html
 Prototype sans installation : ouvrir `prototype/index.html`.
+
+## Auteur
+Tarik EL MAHTOUCHI — Épreuve Intégrée, Bachelier en informatique de gestion (ICC Bruxelles).
