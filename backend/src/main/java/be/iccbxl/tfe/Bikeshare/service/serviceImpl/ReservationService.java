@@ -2,6 +2,7 @@ package be.iccbxl.tfe.Bikeshare.service.serviceImpl;
 
 import be.iccbxl.tfe.Bikeshare.DTO.MapperDTO;
 import be.iccbxl.tfe.Bikeshare.DTO.ReservationDTO;
+import be.iccbxl.tfe.Bikeshare.model.Bike;
 import be.iccbxl.tfe.Bikeshare.model.Reservation;
 import be.iccbxl.tfe.Bikeshare.model.User;
 import be.iccbxl.tfe.Bikeshare.repository.ReservationRepository;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,6 +37,24 @@ public class ReservationService implements ReservationServiceI {
     @Override public Reservation getReservationById(Long id) { return reservationRepository.findById(id).orElse(null); }
     @Override public Reservation addReservation(Reservation r) { return reservationRepository.save(r); }
     @Override public Reservation saveReservation(Reservation r) { return reservationRepository.save(r); }
+
+    /**
+     * Crée une réservation : construit l'objet, calcule la durée en jours et fixe le statut
+     * initial (AUTOMATIC = confirmée d'office, sinon PENDING en attente du propriétaire),
+     * puis l'enregistre. Règles centralisées, appelées par le site ET l'API.
+     */
+    @Override
+    public Reservation createReservation(User user, Bike bike, LocalDate start, LocalDate end, String assurance) {
+        Reservation r = new Reservation();
+        r.setBike(bike);
+        r.setUser(user);
+        r.setStartLocation(start);
+        r.setEndLocation(end);
+        r.setDuration((int) ChronoUnit.DAYS.between(start, end));
+        r.setAssurance(assurance);
+        r.setStatut("AUTOMATIC".equalsIgnoreCase(bike.getReservationMode()) ? "CONFIRMED" : "PENDING");
+        return reservationRepository.save(r);
+    }
 
     @Override
     public Reservation updateReservation(Long id, Reservation r) {

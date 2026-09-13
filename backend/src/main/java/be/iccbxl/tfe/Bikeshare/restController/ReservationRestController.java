@@ -12,12 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @RestController
@@ -43,16 +43,13 @@ public class ReservationRestController {
         Bike bike = bikeService.getBikeById(bikeId);
         if (bike == null) return ResponseEntity.notFound().build();
 
-        Reservation r = new Reservation();
-        r.setBike(bike);
-        r.setUser(userDetails.getUser());
-        r.setStartLocation(start);
-        r.setEndLocation(end);
-        r.setDuration((int) ChronoUnit.DAYS.between(start, end));
-        r.setAssurance(assurance);
-        r.setStatut("AUTOMATIC".equalsIgnoreCase(bike.getReservationMode()) ? "CONFIRMED" : "PENDING");
-        reservationService.addReservation(r);
+        // Même vérification anti-chevauchement que le site (cohérence : évite la double réservation).
+        if (reservationService.hasBookingOverlap(bikeId, start, end)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();   // 409 Conflict
+        }
 
+        // Règles centralisées dans le service (durée + statut + enregistrement).
+        Reservation r = reservationService.createReservation(userDetails.getUser(), bike, start, end, assurance);
         return ResponseEntity.ok(MapperDTO.toReservationDTO(r));
     }
 

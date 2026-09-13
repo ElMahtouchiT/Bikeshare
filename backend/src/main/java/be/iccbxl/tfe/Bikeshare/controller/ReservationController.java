@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 @Controller
 public class ReservationController {
@@ -53,15 +52,8 @@ public class ReservationController {
             return "redirect:/bikes/" + bikeId;
         }
 
-        Reservation r = new Reservation();
-        r.setBike(bike);
-        r.setUser(userDetails.getUser());
-        r.setStartLocation(start);
-        r.setEndLocation(end);
-        r.setDuration((int) ChronoUnit.DAYS.between(start, end));
-        r.setAssurance(assurance);
-        r.setStatut("AUTOMATIC".equalsIgnoreCase(bike.getReservationMode()) ? "CONFIRMED" : "PENDING");
-        reservationService.addReservation(r);
+        // Règles centralisées dans le service (durée + statut + enregistrement).
+        Reservation r = reservationService.createReservation(userDetails.getUser(), bike, start, end, assurance);
 
         // Notifier le propriétaire du vélo de la nouvelle réservation (cloche)
         try {

@@ -1,6 +1,7 @@
 package be.iccbxl.tfe.Bikeshare.service;
 
 import be.iccbxl.tfe.Bikeshare.DTO.ReservationDTO;
+import be.iccbxl.tfe.Bikeshare.model.Bike;
 import be.iccbxl.tfe.Bikeshare.model.Reservation;
 import be.iccbxl.tfe.Bikeshare.model.User;
 import java.time.LocalDate;
@@ -29,4 +30,7 @@ public interface ReservationServiceI {
 
     /** Vrai si la période [start, end] chevauche une réservation confirmée du vélo. */
     boolean hasBookingOverlap(Long bikeId, LocalDate start, LocalDate end);
+
+    /** Crée une réservation (durée + statut initial) et l'enregistre. Règles partagées par le site et l'API. */
+    Reservation createReservation(User user, Bike bike, LocalDate start, LocalDate end, String assurance);
 }
