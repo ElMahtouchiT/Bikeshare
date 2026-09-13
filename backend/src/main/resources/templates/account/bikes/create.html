@@ -114,6 +114,23 @@
             <option value="AUTOMATIC" th:text="#{bikeform.modeAuto}">Automatique</option>
           </select>
         </div>
+        <div class="col-12">
+          <small class="text-muted" th:text="#{bikeform.promoHelp}">Optionnel : laissez vide pour aucune réduction (ex. 10 = -10 %).</small>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" th:text="#{bikeform.promo1Label}">Réduction dès 3 jours (%)</label>
+          <div class="input-group">
+            <input class="form-control" type="number" name="promo1" min="0" max="100" step="1" placeholder="ex : 10"/>
+            <span class="input-group-text">%</span>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" th:text="#{bikeform.promo2Label}">Réduction dès 7 jours (%)</label>
+          <div class="input-group">
+            <input class="form-control" type="number" name="promo2" min="0" max="100" step="1" placeholder="ex : 20"/>
+            <span class="input-group-text">%</span>
+          </div>
+        </div>
       </div>
 
       <!-- Photos -->

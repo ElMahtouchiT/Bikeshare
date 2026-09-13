@@ -240,6 +240,8 @@ public class AccountController {
             @RequestParam String locality,
             @RequestParam(required = false, defaultValue = "MANUAL") String reservationMode,
             @RequestParam Double middlePrice,
+            @RequestParam(required = false) Double promo1,
+            @RequestParam(required = false) Double promo2,
             @RequestParam(value = "photos", required = false) MultipartFile[] photos,
             RedirectAttributes redirectAttributes) {
 
@@ -247,6 +249,8 @@ public class AccountController {
 
         Price price = new Price();
         price.setMiddlePrice(middlePrice);
+        price.setPromo1(promo1);   // reduction (%) des 3 jours
+        price.setPromo2(promo2);   // reduction (%) des 7 jours
 
         Bike bike = new Bike();
         bike.setBrand(brand);
@@ -309,6 +313,8 @@ public class AccountController {
             @RequestParam String locality,
             @RequestParam(required = false, defaultValue = "MANUAL") String reservationMode,
             @RequestParam Double middlePrice,
+            @RequestParam(required = false) Double promo1,
+            @RequestParam(required = false) Double promo2,
             @RequestParam(value = "photos", required = false) MultipartFile[] photos,
             RedirectAttributes redirectAttributes) {
 
@@ -333,9 +339,13 @@ public class AccountController {
 
         if (bike.getPrice() != null) {
             bike.getPrice().setMiddlePrice(middlePrice);
+            bike.getPrice().setPromo1(promo1);
+            bike.getPrice().setPromo2(promo2);
         } else {
             Price price = new Price();
             price.setMiddlePrice(middlePrice);
+            price.setPromo1(promo1);
+            price.setPromo2(promo2);
             bike.setPrice(price);
         }
 

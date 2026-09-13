@@ -181,10 +181,10 @@
         <h4 class="fw-bold text-success"
             th:text="${bike.price != null} ? #{bike.show.pricePerDay(${bike.price.middlePrice})} : #{bike.show.noPrice}"></h4>
 
-        <div th:if="${bike.price != null and bike.price.promo1 != null}" class="text-muted small mb-2">
+        <div th:if="${bike.price != null and bike.price.promo1 != null and bike.price.promo1 > 0}" class="text-muted small mb-2">
           🎉 <span th:text="#{bike.show.promo1(${bike.price.promo1})}"></span>
         </div>
-        <div th:if="${bike.price != null and bike.price.promo2 != null}" class="text-muted small mb-2">
+        <div th:if="${bike.price != null and bike.price.promo2 != null and bike.price.promo2 > 0}" class="text-muted small mb-2">
           🎉 <span th:text="#{bike.show.promo2(${bike.price.promo2})}"></span>
         </div>
 
