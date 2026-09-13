@@ -1,11 +1,8 @@
 package be.iccbxl.tfe.Bikeshare.controller;
 
-import be.iccbxl.tfe.Bikeshare.model.Gain;
-import be.iccbxl.tfe.Bikeshare.model.Payment;
 import be.iccbxl.tfe.Bikeshare.model.Reservation;
 import be.iccbxl.tfe.Bikeshare.security.CustomUserDetail;
 import be.iccbxl.tfe.Bikeshare.service.serviceImpl.BikeService;
-import be.iccbxl.tfe.Bikeshare.service.serviceImpl.GainService;
 import be.iccbxl.tfe.Bikeshare.service.serviceImpl.PaymentService;
 import be.iccbxl.tfe.Bikeshare.service.serviceImpl.ReservationService;
 import com.stripe.Stripe;
@@ -30,12 +27,10 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class PaymentController {
 
     private static final Logger logger = LoggerFactory.getLogger(PaymentController.class);
-    private static final double COMMISSION_RATE = 0.15; // commission BikeShare : 15 %
 
     @Autowired private ReservationService reservationService;
     @Autowired private BikeService bikeService;
     @Autowired private PaymentService paymentService;
-    @Autowired private GainService gainService;
 
     @Value("${stripe.api.key}") private String stripeApiKey;
 
@@ -70,6 +65,7 @@ public class PaymentController {
         try {
             SessionCreateParams params = SessionCreateParams.builder()
                     .setMode(SessionCreateParams.Mode.PAYMENT)
+                    .setClientReferenceId(String.valueOf(id))   // lie la session Stripe à CETTE réservation
                     .setSuccessUrl(base + "/payment/success?session_id={CHECKOUT_SESSION_ID}&reservationId=" + id)
                     .setCancelUrl(base + "/payment/cancel")
                     .addLineItem(SessionCreateParams.LineItem.builder()
@@ -114,28 +110,18 @@ public class PaymentController {
                 redirectAttributes.addFlashAttribute("error", "Le paiement n'a pas été confirmé.");
                 return "redirect:/account/reservations";
             }
+            // Vérifie que CETTE session Stripe correspond bien à CETTE réservation
+            // (empêche de confirmer une réservation en payant la session d'une autre).
+            if (!String.valueOf(reservationId).equals(session.getClientReferenceId())) {
+                redirectAttributes.addFlashAttribute("error", "Session de paiement invalide pour cette réservation.");
+                return "redirect:/account/reservations";
+            }
             double amount = (session.getAmountTotal() != null) ? session.getAmountTotal() / 100.0
                     : bikeService.computeTotal(r.getBike(), r.getDuration() != null ? r.getDuration() : 1);
-            double commission = Math.round(amount * COMMISSION_RATE * 100.0) / 100.0;
 
-            Payment payment = new Payment();
-            payment.setReservation(r);
-            payment.setStatut("PAID");
-            payment.setPaymentMode("STRIPE");
-            payment.setTotalPrice(amount);
-            payment.setPartBikeshare(commission);
-            paymentService.save(payment);
-
-            Gain gain = new Gain();
-            gain.setPayment(payment);
-            gain.setAmountEarned(amount - commission);
-            gain.setStatus("PENDING");
-            gain.setDescription("Gain location — " +
-                    (r.getBike() != null ? r.getBike().getBrand() + " " + r.getBike().getModel() : ""));
-            gainService.save(gain);
-
-            r.setStatut("CONFIRMED");
-            reservationService.saveReservation(r);
+            // Enregistrement ATOMIQUE (tout ou rien) : le service calcule la commission,
+            // enregistre paiement + gain et confirme la réservation.
+            paymentService.confirmPayment(r, amount);
 
             redirectAttributes.addFlashAttribute("success", "Paiement réussi ! Votre réservation est confirmée.");
         } catch (Exception e) {
