@@ -3,7 +3,9 @@ package be.iccbxl.tfe.Bikeshare.controller;
 import be.iccbxl.tfe.Bikeshare.model.Bike;
 import be.iccbxl.tfe.Bikeshare.service.serviceImpl.BikeService;
 import be.iccbxl.tfe.Bikeshare.service.serviceImpl.CategoryService;
+import be.iccbxl.tfe.Bikeshare.service.serviceImpl.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +18,11 @@ public class HomeController {
 
     @Autowired private BikeService bikeService;
     @Autowired private CategoryService categoryService;
+    @Autowired private EmailService emailService;
+
+    /** Adresse qui reçoit les réclamations du formulaire public (par défaut, l'adresse d'envoi). */
+    @Value("${app.mail.support:${app.mail.from:no-reply@bikeshare.be}}")
+    private String supportEmail;
 
     @GetMapping("/")
     public String home(Model model) {
@@ -62,7 +69,14 @@ public class HomeController {
                                     @RequestParam String email,
                                     @RequestParam String message,
                                     RedirectAttributes redirectAttributes) {
-        // Accusé de réception (l'envoi par e-mail / le stockage pourront être branchés ultérieurement)
+        // Envoi de la réclamation à l'équipe support (asynchrone : n'échoue jamais la requête).
+        String body = "Nouvelle réclamation depuis le site BikeShare\n\n"
+                + "De : " + email + "\n"
+                + "Objet : " + objet + "\n\n"
+                + "Message :\n" + message + "\n";
+        emailService.sendEmail(supportEmail, "[Réclamation] " + objet, body);
+
+        // Accusé de réception affiché à l'utilisateur.
         redirectAttributes.addFlashAttribute("success",
                 "Votre réclamation a bien été envoyée. Notre équipe vous répondra dans les meilleurs délais.");
         return "redirect:/reclamation";
