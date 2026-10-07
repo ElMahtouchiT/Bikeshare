@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
 
@@ -49,6 +50,11 @@ public class ChatController {
 
         Long renterId = reservation.getUser().getId();
         Long ownerId = reservation.getBike().getUser().getId();
+
+        // Contrôle d'accès : seul le locataire ou le propriétaire peut écrire dans cette conversation.
+        if (!currentUserId.equals(renterId) && !currentUserId.equals(ownerId)) {
+            throw new AccessDeniedException("Vous ne participez pas à cette réservation");
+        }
 
         if (currentUserId.equals(renterId)) {
             dto.setFromUserId(renterId);
