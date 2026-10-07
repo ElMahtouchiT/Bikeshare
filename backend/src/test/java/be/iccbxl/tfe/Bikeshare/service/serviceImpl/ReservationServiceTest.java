@@ -1,6 +1,8 @@
 package be.iccbxl.tfe.Bikeshare.service.serviceImpl;
 
+import be.iccbxl.tfe.Bikeshare.model.Bike;
 import be.iccbxl.tfe.Bikeshare.model.Reservation;
+import be.iccbxl.tfe.Bikeshare.model.User;
 import be.iccbxl.tfe.Bikeshare.repository.ReservationRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -70,5 +72,44 @@ class ReservationServiceTest {
     @Test
     void hasBookingOverlap_renvoieFaux_quandDatesNulles() {
         assertThat(reservationService.hasBookingOverlap(1L, null, null)).isFalse();
+    }
+
+    /* ─── Participation : locataire ou propriétaire uniquement (annulation, chat) ─── */
+
+    private User user(Long id) {
+        User u = new User();
+        u.setId(id);
+        return u;
+    }
+
+    /** Réservation d'un vélo appartenant à {@code owner}, louée par {@code renter}. */
+    private Reservation reservationBetween(User renter, User owner) {
+        Bike bike = new Bike();
+        bike.setUser(owner);
+        Reservation r = new Reservation();
+        r.setUser(renter);
+        r.setBike(bike);
+        return r;
+    }
+
+    @Test
+    void isParticipant_vrai_pourLeLocataire() {
+        assertThat(reservationService.isParticipant(reservationBetween(user(1L), user(2L)), user(1L))).isTrue();
+    }
+
+    @Test
+    void isParticipant_vrai_pourLePropriétaireDuVelo() {
+        assertThat(reservationService.isParticipant(reservationBetween(user(1L), user(2L)), user(2L))).isTrue();
+    }
+
+    @Test
+    void isParticipant_faux_pourUnTiers() {
+        assertThat(reservationService.isParticipant(reservationBetween(user(1L), user(2L)), user(3L))).isFalse();
+    }
+
+    @Test
+    void isParticipant_faux_siReservationOuUtilisateurAbsent() {
+        assertThat(reservationService.isParticipant(null, user(1L))).isFalse();
+        assertThat(reservationService.isParticipant(reservationBetween(user(1L), user(2L)), null)).isFalse();
     }
 }

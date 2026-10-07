@@ -59,11 +59,17 @@ public class ReservationRestController {
         return reservationService.getReservationsByUser(userDetails.getUser());
     }
 
-    @Operation(summary = "Annuler une réservation")
+    @Operation(summary = "Annuler une réservation (locataire ou propriétaire uniquement)")
     @PostMapping("/{id}/cancel")
-    public ResponseEntity<String> cancel(@PathVariable Long id) {
+    public ResponseEntity<String> cancel(@PathVariable Long id,
+                                         @AuthenticationPrincipal CustomUserDetail userDetails) {
+        if (userDetails == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         Reservation r = reservationService.getReservationById(id);
         if (r == null) return ResponseEntity.notFound().build();
+        // Contrôle de propriété : seul le locataire ou le propriétaire du vélo peut annuler.
+        if (!reservationService.isParticipant(r, userDetails.getUser())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         r.setStatut("CANCELLED");
         reservationService.saveReservation(r);
         return ResponseEntity.ok("Réservation annulée");

@@ -56,6 +56,16 @@ public class ReservationService implements ReservationServiceI {
         return reservationRepository.save(r);
     }
 
+    /** Vrai si l'utilisateur est le locataire OU le propriétaire du vélo de cette réservation. */
+    @Override
+    public boolean isParticipant(Reservation r, User user) {
+        if (r == null || user == null || user.getId() == null) return false;
+        boolean isRenter = r.getUser() != null && user.getId().equals(r.getUser().getId());
+        boolean isOwner = r.getBike() != null && r.getBike().getUser() != null
+                && user.getId().equals(r.getBike().getUser().getId());
+        return isRenter || isOwner;
+    }
+
     @Override
     public Reservation updateReservation(Long id, Reservation r) {
         r.setId(id);

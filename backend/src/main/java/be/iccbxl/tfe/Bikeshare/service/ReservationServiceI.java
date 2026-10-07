@@ -33,4 +33,7 @@ public interface ReservationServiceI {
 
     /** Crée une réservation (durée + statut initial) et l'enregistre. Règles partagées par le site et l'API. */
     Reservation createReservation(User user, Bike bike, LocalDate start, LocalDate end, String assurance);
+
+    /** Vrai si l'utilisateur est le locataire OU le propriétaire du vélo de cette réservation. */
+    boolean isParticipant(Reservation r, User user);
 }
