@@ -66,6 +66,12 @@ public class ReservationService implements ReservationServiceI {
         return isRenter || isOwner;
     }
 
+    /** Une réservation ne se paie que si elle est confirmée et pas encore payée (refusée ou annulée : jamais). */
+    @Override
+    public boolean isPayable(Reservation r) {
+        return r != null && "CONFIRMED".equalsIgnoreCase(r.getStatut()) && r.getPayment() == null;
+    }
+
     @Override
     public Reservation updateReservation(Long id, Reservation r) {
         r.setId(id);

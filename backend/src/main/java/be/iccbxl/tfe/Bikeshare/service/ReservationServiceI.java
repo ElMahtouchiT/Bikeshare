@@ -36,4 +36,7 @@ public interface ReservationServiceI {
 
     /** Vrai si l'utilisateur est le locataire OU le propriétaire du vélo de cette réservation. */
     boolean isParticipant(Reservation r, User user);
+
+    /** Vrai si la réservation peut être payée : confirmée (automatiquement ou par le propriétaire) et pas encore payée. */
+    boolean isPayable(Reservation r);
 }

@@ -1,6 +1,7 @@
 package be.iccbxl.tfe.Bikeshare.service.serviceImpl;
 
 import be.iccbxl.tfe.Bikeshare.model.Bike;
+import be.iccbxl.tfe.Bikeshare.model.Payment;
 import be.iccbxl.tfe.Bikeshare.model.Reservation;
 import be.iccbxl.tfe.Bikeshare.model.User;
 import be.iccbxl.tfe.Bikeshare.repository.ReservationRepository;
@@ -111,5 +112,32 @@ class ReservationServiceTest {
     void isParticipant_faux_siReservationOuUtilisateurAbsent() {
         assertThat(reservationService.isParticipant(null, user(1L))).isFalse();
         assertThat(reservationService.isParticipant(reservationBetween(user(1L), user(2L)), null)).isFalse();
+    }
+
+    /* ─── Paiement : seule une réservation confirmée et non payée peut être payée ─── */
+
+    private Reservation reservationAvecStatut(String statut) {
+        Reservation r = new Reservation();
+        r.setStatut(statut);
+        return r;
+    }
+
+    @Test
+    void isPayable_vrai_pourUneReservationConfirmeeNonPayee() {
+        assertThat(reservationService.isPayable(reservationAvecStatut("CONFIRMED"))).isTrue();
+    }
+
+    @Test
+    void isPayable_faux_pourUneReservationEnAttenteRefuseeOuAnnulee() {
+        assertThat(reservationService.isPayable(reservationAvecStatut("PENDING"))).isFalse();
+        assertThat(reservationService.isPayable(reservationAvecStatut("REFUSED"))).isFalse();
+        assertThat(reservationService.isPayable(reservationAvecStatut("CANCELLED"))).isFalse();
+    }
+
+    @Test
+    void isPayable_faux_pourUneReservationDejaPayee() {
+        Reservation r = reservationAvecStatut("CONFIRMED");
+        r.setPayment(new Payment());
+        assertThat(reservationService.isPayable(r)).isFalse();
     }
 }

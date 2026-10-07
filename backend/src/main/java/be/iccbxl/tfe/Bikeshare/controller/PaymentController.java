@@ -52,6 +52,12 @@ public class PaymentController {
             redirectAttributes.addFlashAttribute("info", "Cette réservation est déjà payée.");
             return "redirect:/account/reservations";
         }
+        // Une réservation ne se paie qu'une fois confirmée (automatiquement, ou acceptée par le propriétaire).
+        if (!reservationService.isPayable(r)) {
+            redirectAttributes.addFlashAttribute("error",
+                    "Cette réservation n'est pas confirmée : elle ne peut pas être payée.");
+            return "redirect:/account/reservations";
+        }
 
         int days = (r.getDuration() != null && r.getDuration() > 0) ? r.getDuration() : 1;
         double amount = bikeService.computeTotal(r.getBike(), days);

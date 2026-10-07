@@ -56,7 +56,7 @@
             <a class="btn btn-sm btn-outline-secondary"
                th:href="@{'/account/reservations/' + ${r.id} + '/chat'}">💬</a>
             <!-- Paiement Stripe : bouton si réservation active non payée, sinon badge « payé » -->
-            <form th:if="${!r.paid and (r.statut == 'CONFIRMED' or r.statut == 'PENDING' or r.statut == 'NOW')}"
+            <form th:if="${!r.paid and r.statut == 'CONFIRMED'}"
                   th:action="@{'/account/reservations/' + ${r.id} + '/pay'}" method="post" class="d-inline">
               <button type="submit" class="btn btn-sm text-white" style="background:#635bff;">💳 Payer</button>
             </form>
