@@ -106,8 +106,10 @@ public class AdminController {
     public String deleteUser(@PathVariable Long id, RedirectAttributes ra) {
         User user = userService.getUserById(id);
         if (user == null) { ra.addFlashAttribute("error", "Utilisateur introuvable."); return "redirect:/admin/users"; }
-        userService.deleteUser(id);
-        ra.addFlashAttribute("success", "Utilisateur supprimé.");
+        boolean supprime = userService.deleteUser(id);
+        ra.addFlashAttribute("success", supprime
+                ? "Utilisateur supprimé."
+                : "Utilisateur anonymisé et désactivé : ses vélos, réservations et paiements sont conservés.");
         return "redirect:/admin/users";
     }
 

@@ -12,7 +12,7 @@ public interface BikeServiceI {
     Bike getBikeById(Long id);
     Bike saveBike(Bike bike);
     Bike updateBike(Long id, Bike bike);
-    void deleteBike(Long id);
+    boolean deleteBike(Long id);
     List<Bike> getBikesByUser(User user);
     List<Bike> search(String locality, Long categoryId, String bikeType,
                       Boolean electric, Double priceMin, Double priceMax);
