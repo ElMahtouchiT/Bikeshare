@@ -123,6 +123,38 @@
     </table>
   </div>
 
+  <!-- Demandes d'annulation de locations payées -->
+  <h4 class="mt-5">Demandes d'annulation</h4>
+  <div class="table-responsive">
+    <table class="table table-sm align-middle">
+      <thead>
+        <tr><th>Réservation</th><th>Locataire</th><th>Vélo</th><th>Période</th><th class="text-end">Total payé</th><th>Décision</th></tr>
+      </thead>
+      <tbody>
+        <tr th:each="d : ${demandesAnnulation}">
+          <td th:text="${d.id}"></td>
+          <td th:text="${d.user != null ? d.user.firstName + ' ' + d.user.lastName : '—'}"></td>
+          <td th:text="${d.bike != null ? d.bike.brand + ' ' + d.bike.model : '—'}"></td>
+          <td th:text="${d.startLocation} + ' au ' + ${d.endLocation}"></td>
+          <td class="text-end" th:text="${d.payment != null ? #numbers.formatDecimal(d.payment.totalPrice, 1, 'POINT', 2, 'COMMA') + ' €' : '—'}"></td>
+          <td>
+            <form th:action="@{'/admin/finances/reservations/' + ${d.id} + '/cancel'}" method="post" class="d-flex gap-1 flex-wrap">
+              <select name="pourcentage" class="form-select form-select-sm" style="width:auto">
+                <option value="100">Remboursement intégral (100 %)</option>
+                <option value="0">Sans remboursement (0 %)</option>
+              </select>
+              <button type="submit" class="btn btn-sm btn-danger">Annuler la location</button>
+            </form>
+            <div class="small text-muted mt-1">Le remboursement doit aussi être effectué sur Stripe.</div>
+          </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(demandesAnnulation)}">
+          <td colspan="6" class="text-muted text-center">Aucune demande d'annulation.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
   <!-- Remboursements -->
   <h4 class="mt-5">Remboursements</h4>
   <div class="table-responsive">

@@ -125,6 +125,58 @@ public class AccountController {
         return "redirect:/account/received-reservations";
     }
 
+    /* ─── Annulation par le locataire ───────────────────────── */
+
+    @PostMapping("/account/reservations/{id}/cancel")
+    public String annulerParLocataire(@PathVariable Long id,
+                                      @AuthenticationPrincipal CustomUserDetail userDetails,
+                                      RedirectAttributes redirectAttributes) {
+        if (userDetails == null) return "redirect:/login";
+        Reservation r = reservationService.getReservationById(id);
+        if (r == null || r.getUser() == null || !r.getUser().getId().equals(userDetails.getUser().getId())) {
+            redirectAttributes.addFlashAttribute("error", "Réservation introuvable ou accès refusé.");
+        } else if (!r.peutEtreAnnuleeDirectement()) {
+            redirectAttributes.addFlashAttribute("error",
+                    "Cette réservation ne peut pas être annulée directement. Si elle est payée, demandez son annulation.");
+        } else {
+            r.setStatut("CANCELLED");
+            reservationService.saveReservation(r);
+            notifierProprietaire(r, "Réservation annulée par le locataire.");
+            redirectAttributes.addFlashAttribute("success", "Réservation annulée.");
+        }
+        return "redirect:/account/reservations";
+    }
+
+    @PostMapping("/account/reservations/{id}/request-cancel")
+    public String demanderAnnulation(@PathVariable Long id,
+                                     @AuthenticationPrincipal CustomUserDetail userDetails,
+                                     RedirectAttributes redirectAttributes) {
+        if (userDetails == null) return "redirect:/login";
+        Reservation r = reservationService.getReservationById(id);
+        if (r == null || r.getUser() == null || !r.getUser().getId().equals(userDetails.getUser().getId())) {
+            redirectAttributes.addFlashAttribute("error", "Réservation introuvable ou accès refusé.");
+        } else if (!r.peutDemanderAnnulation()) {
+            redirectAttributes.addFlashAttribute("error",
+                    "Cette réservation ne peut pas faire l'objet d'une demande d'annulation.");
+        } else {
+            r.setCancellationRequested(true);
+            reservationService.saveReservation(r);
+            redirectAttributes.addFlashAttribute("success",
+                    "Demande d'annulation envoyée. L'administrateur la traitera.");
+        }
+        return "redirect:/account/reservations";
+    }
+
+    /** Prévient le propriétaire qu'une réservation de son vélo est annulée (cloche). */
+    private void notifierProprietaire(Reservation r, String message) {
+        try {
+            notificationService.notify(r.getBike().getUser(), r.getUser(), r.getBike(),
+                    "RESERVATION", message, "/account/received-reservations");
+        } catch (Exception e) {
+            logger.warn("Notification d'annulation non créée : {}", e.getMessage());
+        }
+    }
+
     /* ─── Fin de location et évaluation du locataire (par le propriétaire) ─── */
 
     @PostMapping("/account/reservations/{id}/complete")

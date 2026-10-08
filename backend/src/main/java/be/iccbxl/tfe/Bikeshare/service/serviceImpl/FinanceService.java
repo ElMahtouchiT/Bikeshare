@@ -9,6 +9,7 @@ import be.iccbxl.tfe.Bikeshare.model.User;
 import be.iccbxl.tfe.Bikeshare.repository.GainRepository;
 import be.iccbxl.tfe.Bikeshare.repository.PaymentRepository;
 import be.iccbxl.tfe.Bikeshare.repository.RefundRepository;
+import be.iccbxl.tfe.Bikeshare.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,49 @@ public class FinanceService {
     @Autowired private PaymentRepository paymentRepository;
     @Autowired private GainRepository gainRepository;
     @Autowired private RefundRepository refundRepository;
+    @Autowired private ReservationRepository reservationRepository;
+
+    /** Réservations dont le locataire a demandé l'annulation (location payée). */
+    public List<Reservation> getDemandesAnnulation() {
+        return reservationRepository.findAll().stream()
+                .filter(Reservation::isCancellationRequested)
+                .toList();
+    }
+
+    /**
+     * Annulation décidée par l'administrateur. 100 % : remboursement intégral (paiement REFUNDED,
+     * gain du propriétaire annulé). 0 % : sans remboursement (le propriétaire garde son gain).
+     * Retourne false si la réservation n'est pas payée, si elle est déjà annulée, ou si le pourcentage
+     * n'est ni 0 ni 100. Le remboursement réel doit aussi être fait sur Stripe.
+     */
+    @Transactional
+    public boolean annulerAvecRemboursement(Long reservationId, int pourcentage) {
+        if (pourcentage != 0 && pourcentage != 100) return false;
+        Reservation r = reservationRepository.findById(reservationId).orElse(null);
+        if (r == null || r.getPayment() == null || !"PAID".equals(r.getPayment().getStatut())) return false;
+        if ("CANCELLED".equals(r.getStatut())) return false;
+
+        Payment p = r.getPayment();
+        if (pourcentage == 100) {
+            Refund refund = new Refund();
+            refund.setPayment(p);
+            refund.setAmount(p.getTotalPrice());
+            refund.setRefundPercentage(100);
+            refund.setCreatedAt(LocalDateTime.now());
+            refundRepository.save(refund);
+            p.setStatut("REFUNDED");
+            paymentRepository.save(p);
+            Gain gain = p.getGain();
+            if (gain != null) {
+                gain.setStatus("ANNULE");
+                gainRepository.save(gain);
+            }
+        }
+        r.setStatut("CANCELLED");
+        r.setCancellationRequested(false);
+        reservationRepository.save(r);
+        return true;
+    }
 
     /** Paiements, du plus récent au plus ancien. */
     public List<Payment> getPaiements() {

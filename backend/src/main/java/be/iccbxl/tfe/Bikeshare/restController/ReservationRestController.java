@@ -70,6 +70,11 @@ public class ReservationRestController {
         if (!reservationService.isParticipant(r, userDetails.getUser())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
+        // Une location payée ne s'annule pas directement : elle passe par l'administrateur (remboursement).
+        if (r.getPayment() != null && "PAID".equalsIgnoreCase(r.getPayment().getStatut())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Une location payée ne peut être annulée que par l'administrateur.");
+        }
         r.setStatut("CANCELLED");
         reservationService.saveReservation(r);
         return ResponseEntity.ok("Réservation annulée");
