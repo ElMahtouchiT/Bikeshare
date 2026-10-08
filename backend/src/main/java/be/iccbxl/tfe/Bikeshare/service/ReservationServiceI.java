@@ -39,4 +39,7 @@ public interface ReservationServiceI {
 
     /** Vrai si la réservation peut être payée : confirmée (automatiquement ou par le propriétaire) et pas encore payée. */
     boolean isPayable(Reservation r);
+
+    /** Passe en COMPLETED les locations payées dont la date de fin est passée. Retourne leur nombre. */
+    int terminerLocationsPassees(LocalDate aujourdhui);
 }

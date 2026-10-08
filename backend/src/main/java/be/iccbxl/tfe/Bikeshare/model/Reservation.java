@@ -44,6 +44,22 @@ public class Reservation {
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Claim> claims = new ArrayList<>();
 
+    /** Le propriétaire peut marquer le vélo comme rendu : location payée, commencée, pas encore terminée. */
+    public boolean peutEtreMarqueeRendue(LocalDate aujourdhui) {
+        return ("CONFIRMED".equals(statut) || "NOW".equals(statut)) && estPayee()
+                && startLocation != null && !startLocation.isAfter(aujourdhui);
+    }
+
+    /** Une location confirmée et payée dont la date de fin est passée est terminée. */
+    public boolean doitEtreTerminee(LocalDate aujourdhui) {
+        return "CONFIRMED".equals(statut) && estPayee()
+                && endLocation != null && endLocation.isBefore(aujourdhui);
+    }
+
+    private boolean estPayee() {
+        return payment != null && "PAID".equals(payment.getStatut());
+    }
+
     @PrePersist
     public void prePersist() { if (createdAt == null) createdAt = LocalDateTime.now(); }
 }

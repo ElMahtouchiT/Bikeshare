@@ -38,6 +38,19 @@ public class ReservationService implements ReservationServiceI {
     @Override public Reservation addReservation(Reservation r) { return reservationRepository.save(r); }
     @Override public Reservation saveReservation(Reservation r) { return reservationRepository.save(r); }
 
+    @Override
+    public int terminerLocationsPassees(LocalDate aujourdhui) {
+        int terminees = 0;
+        for (Reservation r : reservationRepository.findAll()) {
+            if (r.doitEtreTerminee(aujourdhui)) {
+                r.setStatut("COMPLETED");
+                reservationRepository.save(r);
+                terminees++;
+            }
+        }
+        return terminees;
+    }
+
     /**
      * Crée une réservation : construit l'objet, calcule la durée en jours et fixe le statut
      * initial (AUTOMATIC = confirmée d'office, sinon PENDING en attente du propriétaire),
