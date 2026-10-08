@@ -69,7 +69,9 @@ public class SecurityConfig {
     public FilterRegistrationBean<MultipartFilter> multipartFilterRegistration() {
         FilterRegistrationBean<MultipartFilter> registration =
                 new FilterRegistrationBean<>(new MultipartFilter());
-        registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        // Juste APRÈS le filtre d'encodage UTF-8 de Spring Boot (HIGHEST_PRECEDENCE) : sinon, à priorité égale,
+        // le multipart est lu en ISO-8859-1 et les accents sont doublement encodés (ex. "é" -> "Ã©").
+        registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
         return registration;
     }
 }
