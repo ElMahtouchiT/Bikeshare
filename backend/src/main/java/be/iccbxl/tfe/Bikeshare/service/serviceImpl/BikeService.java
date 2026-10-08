@@ -53,6 +53,7 @@ public class BikeService implements BikeServiceI {
                 || !notificationRepository.findByBikeId(id).isEmpty();
         if (aDesTraces) {
             bike.setOnline(false);
+            bike.setArchived(true);
             bikeRepository.save(bike);
             return false;
         }

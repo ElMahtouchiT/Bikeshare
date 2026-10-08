@@ -32,6 +32,9 @@ class SuppressionVeloTest {
         u.setFirstName("Test");
         u.setLastName("Membre");
         u.setPassword("motdepasse1");
+        u.setAdresse("Rue du Test 1");
+        u.setLocality("Bruxelles");
+        u.setPostalCode("1000");
         em.persist(u);
         return u;
     }
@@ -116,6 +119,7 @@ class SuppressionVeloTest {
         Bike apres = em.find(Bike.class, b.getId());
         assertThat(apres).isNotNull();
         assertThat(apres.getOnline()).isFalse();
+        assertThat(apres.isArchived()).isTrue();
         assertThat(count("select count(r) from Reservation r")).isEqualTo(1);
         assertThat(count("select count(n) from Notification n")).isEqualTo(1);
     }

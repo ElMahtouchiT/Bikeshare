@@ -1,8 +1,11 @@
 package be.iccbxl.tfe.Bikeshare.service.serviceImpl;
 
 import be.iccbxl.tfe.Bikeshare.model.Bike;
+import be.iccbxl.tfe.Bikeshare.model.ChatMessage;
+import be.iccbxl.tfe.Bikeshare.model.Notification;
 import be.iccbxl.tfe.Bikeshare.model.Role;
 import be.iccbxl.tfe.Bikeshare.model.User;
+import be.iccbxl.tfe.Bikeshare.repository.ChatMessageRepository;
 import be.iccbxl.tfe.Bikeshare.repository.NotificationRepository;
 import be.iccbxl.tfe.Bikeshare.repository.RoleRepository;
 import be.iccbxl.tfe.Bikeshare.repository.UserRepository;
@@ -22,7 +25,11 @@ public class UserService implements UserServiceI {
     @Autowired private UserRepository userRepository;
     @Autowired private RoleRepository roleRepository;
     @Autowired private NotificationRepository notificationRepository;
+    @Autowired private ChatMessageRepository chatMessageRepository;
+    @Autowired private FileStorageService fileStorageService;
     @Autowired private BCryptPasswordEncoder passwordEncoder;
+
+    private static final String TEXTE_SUPPRIME = "[supprimé]";
 
     @Override public List<User> getAllUsers() { return userRepository.findAll(); }
     @Override public User getUserById(Long id) { return userRepository.findById(id).orElse(null); }
@@ -54,8 +61,16 @@ public class UserService implements UserServiceI {
 
     /** Retire les données personnelles et désactive le compte. Ne touche ni aux réservations ni aux paiements. */
     private void anonymise(User user) {
+        fileStorageService.delete(user.getPhotoUrl());
+        for (ChatMessage message : chatMessageRepository.findByFromUserId(user.getId())) {
+            message.setContent(TEXTE_SUPPRIME);
+        }
+        for (Notification notification : notificationRepository.findByFromUser(user)) {
+            notification.setMessage(TEXTE_SUPPRIME);
+        }
         for (Bike bike : user.getOwnedBikes()) {
             bike.setOnline(false);
+            bike.setArchived(true);
             bike.setAdresse(null);
             bike.setLatitude(null);
             bike.setLongitude(null);
@@ -64,9 +79,10 @@ public class UserService implements UserServiceI {
         user.setFirstName("Ancien");
         user.setLastName("membre");
         user.setEmail("anonyme-" + user.getId() + "@supprime.invalid");
-        user.setAdresse(null);
-        user.setLocality(null);
-        user.setPostalCode(null);
+        // Colonnes NOT NULL dans la base existante : on ne met pas null, on met une valeur neutre
+        user.setAdresse("Anonyme");
+        user.setLocality("Anonyme");
+        user.setPostalCode("0000");
         user.setPhone(null);
         user.setIban(null);
         user.setBic(null);

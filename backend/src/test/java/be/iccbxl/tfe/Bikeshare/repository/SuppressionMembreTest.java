@@ -1,25 +1,30 @@
 package be.iccbxl.tfe.Bikeshare.repository;
 
 import be.iccbxl.tfe.Bikeshare.model.Bike;
+import be.iccbxl.tfe.Bikeshare.model.ChatMessage;
 import be.iccbxl.tfe.Bikeshare.model.Gain;
 import be.iccbxl.tfe.Bikeshare.model.Notification;
 import be.iccbxl.tfe.Bikeshare.model.Payment;
 import be.iccbxl.tfe.Bikeshare.model.Reservation;
 import be.iccbxl.tfe.Bikeshare.model.Role;
 import be.iccbxl.tfe.Bikeshare.model.User;
+import be.iccbxl.tfe.Bikeshare.service.serviceImpl.FileStorageService;
 import be.iccbxl.tfe.Bikeshare.service.serviceImpl.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 
 /** Suppression d'un membre : physique s'il n'a aucune trace, sinon anonymisé et désactivé. */
 @DataJpaTest
@@ -33,6 +38,7 @@ class SuppressionMembreTest {
 
     @Autowired private UserService userService;
     @Autowired private TestEntityManager em;
+    @MockBean private FileStorageService fileStorageService;
 
     private Role role() {
         Role r = new Role();
@@ -49,6 +55,8 @@ class SuppressionMembreTest {
         u.setPassword("motdepasse1");
         u.setPhone("0470000000");
         u.setAdresse("Rue du Test 1");
+        u.setLocality("Bruxelles");
+        u.setPostalCode("1000");
         u.setIban("BE68539007547034");
         u.setVerified(true);
         u.getRoles().add(role);
@@ -96,7 +104,7 @@ class SuppressionMembreTest {
         em.persist(g);
     }
 
-    private void notification(Bike bike, User from, User to) {
+    private Notification notification(Bike bike, User from, User to) {
         Notification n = new Notification();
         n.setType("RESERVATION");
         n.setMessage("Votre réservation a été confirmée");
@@ -104,6 +112,7 @@ class SuppressionMembreTest {
         n.setFromUser(from);
         n.setToUser(to);
         em.persist(n);
+        return n;
     }
 
     private long count(String jpql) {
@@ -144,6 +153,10 @@ class SuppressionMembreTest {
         assertThat(apres.getFirstName()).isEqualTo("Ancien");
         assertThat(apres.getPhone()).isNull();
         assertThat(apres.getIban()).isNull();
+        // Ces colonnes sont NOT NULL dans la base : une valeur neutre, jamais null
+        assertThat(apres.getAdresse()).isNotBlank();
+        assertThat(apres.getLocality()).isNotBlank();
+        assertThat(apres.getPostalCode()).isNotBlank();
         assertThat(apres.getRoles()).isEmpty();
         assertThat(em.find(Bike.class, b.getId()).getOnline()).isFalse();
         assertThat(em.find(Bike.class, b.getId()).getAdresse()).isNull();
@@ -170,5 +183,35 @@ class SuppressionMembreTest {
         assertThat(em.find(Reservation.class, r.getId()).getUser().getEmail())
                 .startsWith("anonyme-");
         assertThat(em.find(User.class, proprio.getId()).getEmail()).isEqualTo("proprio2@test.be");
+    }
+
+    @Test
+    void anonymisation_effaceMessagesNotificationsEtPhoto_etArchiveLesVelos() {
+        Role role = role();
+        User proprio = membre("proprio3@test.be", role);
+        proprio.setPhotoUrl("/uploads/profiles/moi.jpg");
+        User loc = membre("loc3@test.be", role);
+        Bike b = velo(proprio);
+        Reservation r = reservation(b, loc);
+        ChatMessage message = new ChatMessage();
+        message.setReservation(r);
+        message.setContent("Mon numéro est le 0470000000");
+        message.setSentAt(LocalDateTime.now());
+        message.setFromUserId(proprio.getId());
+        message.setToUserId(loc.getId());
+        em.persist(message);
+        Notification n = notification(b, proprio, loc);
+        em.flush(); em.clear();
+
+        boolean supprime = userService.deleteUser(proprio.getId());
+        em.flush(); em.clear();
+
+        assertThat(supprime).isFalse();
+        verify(fileStorageService).delete("/uploads/profiles/moi.jpg");
+        assertThat(em.find(ChatMessage.class, message.getId()).getContent()).isEqualTo("[supprimé]");
+        assertThat(em.find(Notification.class, n.getId()).getMessage()).isEqualTo("[supprimé]");
+        Bike apres = em.find(Bike.class, b.getId());
+        assertThat(apres.getOnline()).isFalse();
+        assertThat(apres.isArchived()).isTrue();
     }
 }

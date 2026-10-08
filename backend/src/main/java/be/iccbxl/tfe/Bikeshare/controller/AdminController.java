@@ -43,7 +43,7 @@ public class AdminController {
                         .filter(c -> "PENDING".equals(c.getStatus())).count());
         model.addAttribute("pendingBikes",
                 bikeService.getAllBikes().stream()
-                        .filter(b -> b.getOnline() == null || !b.getOnline()).count());
+                        .filter(b -> !b.isArchived() && (b.getOnline() == null || !b.getOnline())).count());
         return "admin/index";
     }
 
@@ -53,7 +53,7 @@ public class AdminController {
         List<Bike> bikes = bikeService.getAllBikes();
         // Vélos à valider (hors ligne) en premier
         bikes.sort(Comparator.comparing(b -> b.getOnline() != null && b.getOnline()));
-        long pending = bikes.stream().filter(b -> b.getOnline() == null || !b.getOnline()).count();
+        long pending = bikes.stream().filter(b -> !b.isArchived() && (b.getOnline() == null || !b.getOnline())).count();
         model.addAttribute("bikes", bikes);
         model.addAttribute("pendingBikes", pending);
         return "admin/bikes/index";
@@ -64,6 +64,7 @@ public class AdminController {
         Bike bike = bikeService.getBikeById(id);
         if (bike == null) { ra.addFlashAttribute("error", "Vélo introuvable."); return "redirect:/admin/bikes"; }
         bike.setOnline(true);
+        bike.setArchived(false);
         bikeService.saveBike(bike);
         ra.addFlashAttribute("success", "Vélo « " + bike.getBrand() + " " + bike.getModel() + " » publié dans le catalogue.");
         return "redirect:/admin/bikes";
