@@ -18,4 +18,7 @@ public class ReservationDTO {
     private Double totalPrice;
     private Integer evaluationNote; // note de l'évaluation si la location a été évaluée, sinon null
     private boolean paid;           // vrai si un paiement PAID existe pour cette réservation
+    private boolean cancellationRequested;      // le locataire a demandé l'annulation (location payée)
+    private boolean annulableDirectement;       // le locataire peut annuler sans l'administrateur (non payée)
+    private boolean demandeAnnulationPossible;  // le locataire peut demander l'annulation à l'administrateur
 }

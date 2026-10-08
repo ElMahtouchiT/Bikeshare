@@ -60,6 +60,16 @@
                   th:action="@{'/account/reservations/' + ${r.id} + '/pay'}" method="post" class="d-inline">
               <button type="submit" class="btn btn-sm text-white" style="background:#635bff;">💳 Payer</button>
             </form>
+            <!-- Annulation : directe si la réservation n'est pas payée, sinon demande à l'administrateur -->
+            <form th:if="${r.annulableDirectement}"
+                  th:action="@{'/account/reservations/' + ${r.id} + '/cancel'}" method="post" class="d-inline">
+              <button type="submit" class="btn btn-sm btn-outline-danger">Annuler</button>
+            </form>
+            <form th:if="${r.demandeAnnulationPossible}"
+                  th:action="@{'/account/reservations/' + ${r.id} + '/request-cancel'}" method="post" class="d-inline">
+              <button type="submit" class="btn btn-sm btn-outline-danger">Demander l'annulation</button>
+            </form>
+            <span th:if="${r.cancellationRequested}" class="badge bg-warning text-dark">Annulation demandée</span>
             <!-- Facture PDF : disponible dès que la réservation est payée -->
             <a th:if="${r.paid}" class="btn btn-sm btn-outline-secondary"
                th:href="@{'/account/reservations/' + ${r.id} + '/facture.pdf'}">📄 Facture</a>

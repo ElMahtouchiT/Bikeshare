@@ -24,6 +24,10 @@ public class Reservation {
     private String statut;     // PENDING, CONFIRMED, NOW, CANCELLED, FINISHED
     private String assurance;
 
+    // Demande d'annulation d'une location payée, à traiter par l'administrateur.
+    @Column(columnDefinition = "boolean not null default false")
+    private boolean cancellationRequested;
+
     @ManyToOne
     @JoinColumn(name = "bike_id", nullable = false)
     private Bike bike;
@@ -43,6 +47,16 @@ public class Reservation {
 
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Claim> claims = new ArrayList<>();
+
+    /** Le locataire peut annuler directement une réservation non payée (en attente ou confirmée). */
+    public boolean peutEtreAnnuleeDirectement() {
+        return ("PENDING".equals(statut) || "CONFIRMED".equals(statut)) && !estPayee();
+    }
+
+    /** Une location payée (confirmée ou en cours) ne s'annule que sur demande à l'administrateur. */
+    public boolean peutDemanderAnnulation() {
+        return ("CONFIRMED".equals(statut) || "NOW".equals(statut)) && estPayee() && !cancellationRequested;
+    }
 
     /** Le propriétaire peut marquer le vélo comme rendu : location payée, commencée, pas encore terminée. */
     public boolean peutEtreMarqueeRendue(LocalDate aujourdhui) {
