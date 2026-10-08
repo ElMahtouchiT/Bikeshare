@@ -106,6 +106,8 @@
   <a th:href="@{/admin/evaluations}" class="btn btn-sm"
      th:classappend="${active == 'evaluations'} ? 'btn-dark' : 'btn-outline-secondary'"
      th:text="#{admin.nav.evaluations}">Évaluations</a>
+  <a th:href="@{/admin/finances}" class="btn btn-sm"
+     th:classappend="${active == 'finances'} ? 'btn-dark' : 'btn-outline-secondary'">Finances</a>
 </div>
 
 <footer th:fragment="footer" class="text-white pt-4 pb-3" style="background:#13233f;">

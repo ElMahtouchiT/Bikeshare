@@ -60,6 +60,9 @@
                   th:action="@{'/account/reservations/' + ${r.id} + '/pay'}" method="post" class="d-inline">
               <button type="submit" class="btn btn-sm text-white" style="background:#635bff;">💳 Payer</button>
             </form>
+            <!-- Facture PDF : disponible dès que la réservation est payée -->
+            <a th:if="${r.paid}" class="btn btn-sm btn-outline-secondary"
+               th:href="@{'/account/reservations/' + ${r.id} + '/facture.pdf'}">📄 Facture</a>
             <!-- Évaluation : bouton si location terminée non évaluée, sinon la note déjà donnée -->
             <a th:if="${r.statut == 'COMPLETED' and r.evaluationNote == null}"
                class="btn btn-sm btn-warning"
