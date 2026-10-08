@@ -99,4 +99,16 @@ public class Bike {
 
     public void addReservation(Reservation r) { reservations.add(r); r.setBike(this); }
     public void addPhoto(Photo p) { photos.add(p); p.setBike(this); }
+
+    /** Image de secours fixe par type de vélo (bundlée dans le jar). k = rang de la photo, 0 = principale. */
+    public String imageDeSecours(int k) {
+        String type = bikeType != null ? bikeType.toLowerCase() : "city";
+        int n = (int) ((id + k) % 10) + 1;
+        return "/images/bikes/" + type + n + ".avif";
+    }
+
+    /** Image des cartes et de la fiche : première photo enregistrée, sinon image de secours. */
+    public String getImagePrincipale() {
+        return (photos != null && !photos.isEmpty()) ? photos.get(0).getUrl() : imageDeSecours(0);
+    }
 }

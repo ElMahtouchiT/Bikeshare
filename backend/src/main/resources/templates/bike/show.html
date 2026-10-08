@@ -37,7 +37,8 @@
       <div class="position-relative">
         <img id="galleryMain" class="img-fluid rounded-4 shadow-sm w-100" style="height:360px;object-fit:cover;" alt="photo du vélo"
              th:src="@{${galleryUrls[0]}}"
-             onerror="this.onerror=null;this.src='https://placehold.co/600x400?text=Velo';"/>
+             th:attr="data-fallback=@{${bike.imageDeSecours(0)}}"
+             onerror="if(this.dataset.fb){this.onerror=null;this.src='https://placehold.co/600x400?text=Velo';}else{this.dataset.fb=1;this.src=this.getAttribute('data-fallback');}"/>
         <th:block th:if="${galleryUrls.size() > 1}">
           <button type="button" class="btn btn-light rounded-circle shadow position-absolute top-50 start-0 translate-middle-y ms-2 fw-bold px-3"
                   onclick="galleryStep(-1)" aria-label="Photo précédente">&lsaquo;</button>

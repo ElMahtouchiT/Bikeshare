@@ -90,14 +90,16 @@ public class BikeController {
             }
         }
 
-        // Galerie photos : images par type (bundlées dans le jar) — fiables même si les
-        // fichiers uploadés sont absents (disque éphémère en production).
-        String type = bike.getBikeType() != null ? bike.getBikeType().toLowerCase() : "city";
-        int slots = (bike.getPhotos() != null && !bike.getPhotos().isEmpty()) ? bike.getPhotos().size() : 4;
+        // Galerie : photos enregistrées si elles existent, sinon images de secours.
+        // Même règle que les cartes (Bike.getImagePrincipale). Si un fichier uploadé manque,
+        // l'image s'affiche avec son secours (onerror dans la vue).
         List<String> galleryUrls = new ArrayList<>();
-        for (int k = 0; k < slots; k++) {
-            int n = (int) ((bike.getId() + k) % 10) + 1; // 1..10, distinct par photo
-            galleryUrls.add("/images/bikes/" + type + n + ".avif");
+        if (bike.getPhotos() != null && !bike.getPhotos().isEmpty()) {
+            bike.getPhotos().forEach(p -> galleryUrls.add(p.getUrl()));
+        } else {
+            for (int k = 0; k < 4; k++) {
+                galleryUrls.add(bike.imageDeSecours(k));
+            }
         }
 
         model.addAttribute("bike", bike);
