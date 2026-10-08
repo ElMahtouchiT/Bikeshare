@@ -26,7 +26,6 @@ public class UserService implements UserServiceI {
     @Autowired private RoleRepository roleRepository;
     @Autowired private NotificationRepository notificationRepository;
     @Autowired private ChatMessageRepository chatMessageRepository;
-    @Autowired private FileStorageService fileStorageService;
     @Autowired private BCryptPasswordEncoder passwordEncoder;
 
     private static final String TEXTE_SUPPRIME = "[supprimé]";
@@ -61,7 +60,6 @@ public class UserService implements UserServiceI {
 
     /** Retire les données personnelles et désactive le compte. Ne touche ni aux réservations ni aux paiements. */
     private void anonymise(User user) {
-        fileStorageService.delete(user.getPhotoUrl());
         for (ChatMessage message : chatMessageRepository.findByFromUserId(user.getId())) {
             message.setContent(TEXTE_SUPPRIME);
         }

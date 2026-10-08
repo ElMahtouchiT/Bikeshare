@@ -8,14 +8,12 @@ import be.iccbxl.tfe.Bikeshare.model.Payment;
 import be.iccbxl.tfe.Bikeshare.model.Reservation;
 import be.iccbxl.tfe.Bikeshare.model.Role;
 import be.iccbxl.tfe.Bikeshare.model.User;
-import be.iccbxl.tfe.Bikeshare.service.serviceImpl.FileStorageService;
 import be.iccbxl.tfe.Bikeshare.service.serviceImpl.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -24,7 +22,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
 
 /** Suppression d'un membre : physique s'il n'a aucune trace, sinon anonymisé et désactivé. */
 @DataJpaTest
@@ -38,7 +35,6 @@ class SuppressionMembreTest {
 
     @Autowired private UserService userService;
     @Autowired private TestEntityManager em;
-    @MockBean private FileStorageService fileStorageService;
 
     private Role role() {
         Role r = new Role();
@@ -186,10 +182,9 @@ class SuppressionMembreTest {
     }
 
     @Test
-    void anonymisation_effaceMessagesNotificationsEtPhoto_etArchiveLesVelos() {
+    void anonymisation_effaceMessagesEtNotifications_etArchiveLesVelos() {
         Role role = role();
         User proprio = membre("proprio3@test.be", role);
-        proprio.setPhotoUrl("/uploads/profiles/moi.jpg");
         User loc = membre("loc3@test.be", role);
         Bike b = velo(proprio);
         Reservation r = reservation(b, loc);
@@ -207,7 +202,6 @@ class SuppressionMembreTest {
         em.flush(); em.clear();
 
         assertThat(supprime).isFalse();
-        verify(fileStorageService).delete("/uploads/profiles/moi.jpg");
         assertThat(em.find(ChatMessage.class, message.getId()).getContent()).isEqualTo("[supprimé]");
         assertThat(em.find(Notification.class, n.getId()).getMessage()).isEqualTo("[supprimé]");
         Bike apres = em.find(Bike.class, b.getId());

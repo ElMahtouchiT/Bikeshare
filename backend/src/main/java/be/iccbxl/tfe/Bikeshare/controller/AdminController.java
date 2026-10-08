@@ -23,6 +23,7 @@ import java.util.List;
 public class AdminController {
 
     @Autowired private UserService       userService;
+    @Autowired private FileStorageService fileStorageService;
     @Autowired private BikeService       bikeService;
     @Autowired private ReservationService reservationService;
     @Autowired private ClaimService      claimService;
@@ -107,7 +108,10 @@ public class AdminController {
     public String deleteUser(@PathVariable Long id, RedirectAttributes ra) {
         User user = userService.getUserById(id);
         if (user == null) { ra.addFlashAttribute("error", "Utilisateur introuvable."); return "redirect:/admin/users"; }
+        String photo = user.getPhotoUrl();
         boolean supprime = userService.deleteUser(id);
+        // Après la transaction : le fichier n'est effacé que si la base a bien été mise à jour
+        fileStorageService.delete(photo);
         ra.addFlashAttribute("success", supprime
                 ? "Utilisateur supprimé."
                 : "Utilisateur anonymisé et désactivé : ses vélos, réservations et paiements sont conservés.");

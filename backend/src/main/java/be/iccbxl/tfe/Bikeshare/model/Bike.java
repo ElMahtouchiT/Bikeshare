@@ -57,6 +57,7 @@ public class Bike {
     // Vélo retiré de la location après une location : hors validation admin, historique conservé.
     @Column(columnDefinition = "boolean not null default false")
     private boolean archived;
+
     private Double latitude;
     private Double longitude;
 
