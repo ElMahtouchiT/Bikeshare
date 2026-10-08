@@ -35,7 +35,7 @@
     </div>
     <div class="col-md-3">
       <div class="card border-0 shadow-sm rounded-4 p-3 h-100">
-        <div class="text-muted small">Commissions BikeShare</div>
+        <div class="text-muted small">Commissions BikeShare (TVA comprise)</div>
         <div class="h4 fw-bold" style="color:#1fa67a;" th:text="${#numbers.formatDecimal(totalBenefit, 1, 'POINT', 2, 'COMMA')} + ' €'">0 €</div>
       </div>
     </div>
@@ -60,7 +60,7 @@
       <thead>
         <tr>
           <th>N°</th><th>Date</th><th>Locataire</th><th>Propriétaire</th><th>Vélo</th>
-          <th class="text-end">Total</th><th class="text-end">Commission</th><th class="text-end">Part propriétaire</th>
+          <th class="text-end">Total</th><th class="text-end">Commission (TVA comprise)</th><th class="text-end">Part propriétaire</th>
           <th>Statut</th><th>Facture</th>
         </tr>
       </thead>

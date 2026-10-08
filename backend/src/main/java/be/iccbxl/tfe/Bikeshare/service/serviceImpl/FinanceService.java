@@ -75,7 +75,7 @@ public class FinanceService {
     public String exporterCsv(List<Payment> paiements) {
         StringBuilder csv = new StringBuilder("﻿");
         csv.append(ligneCsv("Paiement", "Réservation", "Date", "Locataire", "Propriétaire", "Vélo",
-                "Total payé", "Commission", "Part propriétaire", "Statut paiement", "Statut versement"))
+                "Total payé", "Commission (TVA comprise)", "Part propriétaire", "Statut paiement", "Statut versement"))
            .append('\n');
         for (Payment p : paiements) {
             Reservation r = p.getReservation();
