@@ -56,6 +56,7 @@ class InvoiceServiceTest {
         PdfDocument doc = new PdfDocument(new PdfReader(new ByteArrayInputStream(pdf)));
         String texte = PdfTextExtractor.getTextFromPage(doc.getPage(1));
         doc.close();
-        assertThat(texte).contains("FAC-42").contains("Trek fx44").contains("Total payé");
+        assertThat(texte).contains("FAC-42").contains("Trek fx44").contains("Total payé")
+                .contains("Plateforme de location");
     }
 }

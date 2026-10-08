@@ -1,0 +1,53 @@
+package be.iccbxl.tfe.Bikeshare.model;
+
+import org.junit.jupiter.api.Test;
+
+import java.time.LocalDate;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+/** Règles de fin de location : marquage « rendu » par le propriétaire, et fin automatique. */
+class ReservationRulesTest {
+
+    private static final LocalDate AUJOURDHUI = LocalDate.of(2026, 10, 8);
+
+    private static Reservation reservation(String statut, String statutPaiement,
+                                           LocalDate debut, LocalDate fin) {
+        Reservation r = new Reservation();
+        r.setStatut(statut);
+        r.setStartLocation(debut);
+        r.setEndLocation(fin);
+        if (statutPaiement != null) {
+            Payment p = new Payment();
+            p.setStatut(statutPaiement);
+            r.setPayment(p);
+        }
+        return r;
+    }
+
+    @Test
+    void peutEtreMarqueeRendue_seulementSiPayeeEtCommencee() {
+        assertThat(reservation("CONFIRMED", "PAID", AUJOURDHUI.minusDays(1), AUJOURDHUI.plusDays(2))
+                .peutEtreMarqueeRendue(AUJOURDHUI)).isTrue();
+        assertThat(reservation("CONFIRMED", "PAID", AUJOURDHUI, AUJOURDHUI.plusDays(2))
+                .peutEtreMarqueeRendue(AUJOURDHUI)).isTrue();
+        assertThat(reservation("CONFIRMED", null, AUJOURDHUI.minusDays(1), AUJOURDHUI)
+                .peutEtreMarqueeRendue(AUJOURDHUI)).isFalse();
+        assertThat(reservation("CONFIRMED", "PAID", AUJOURDHUI.plusDays(1), AUJOURDHUI.plusDays(3))
+                .peutEtreMarqueeRendue(AUJOURDHUI)).isFalse();
+        assertThat(reservation("COMPLETED", "PAID", AUJOURDHUI.minusDays(3), AUJOURDHUI.minusDays(1))
+                .peutEtreMarqueeRendue(AUJOURDHUI)).isFalse();
+    }
+
+    @Test
+    void doitEtreTerminee_seulementSiPayeeEtFinieAvantAujourdhui() {
+        assertThat(reservation("CONFIRMED", "PAID", AUJOURDHUI.minusDays(3), AUJOURDHUI.minusDays(1))
+                .doitEtreTerminee(AUJOURDHUI)).isTrue();
+        assertThat(reservation("CONFIRMED", "PAID", AUJOURDHUI.minusDays(3), AUJOURDHUI)
+                .doitEtreTerminee(AUJOURDHUI)).isFalse();
+        assertThat(reservation("CONFIRMED", null, AUJOURDHUI.minusDays(3), AUJOURDHUI.minusDays(1))
+                .doitEtreTerminee(AUJOURDHUI)).isFalse();
+        assertThat(reservation("PENDING", "PAID", AUJOURDHUI.minusDays(3), AUJOURDHUI.minusDays(1))
+                .doitEtreTerminee(AUJOURDHUI)).isFalse();
+    }
+}

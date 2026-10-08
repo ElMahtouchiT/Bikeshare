@@ -21,7 +21,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 /** Espace membre : profil, mes vélos, mes réservations, mes gains. */
 @Controller
@@ -36,6 +38,7 @@ public class AccountController {
     @Autowired private GainService gainService;
     @Autowired private NotificationService notificationService;
     @Autowired private EvaluationService evaluationService;
+    @Autowired private EvaluationLocataireService evaluationLocataireService;
     @Autowired private FileStorageService fileStorageService;
 
     @GetMapping("/account")
@@ -72,6 +75,7 @@ public class AccountController {
     public String myReservations(@AuthenticationPrincipal CustomUserDetail userDetails, Model model) {
         if (userDetails == null) return "redirect:/login";
         User user = userDetails.getUser();
+        reservationService.terminerLocationsPassees(LocalDate.now());
         model.addAttribute("reservations", reservationService.getReservationsByUser(user));
         return "account/reservations/index";
     }
@@ -81,8 +85,11 @@ public class AccountController {
     @GetMapping("/account/received-reservations")
     public String receivedReservations(@AuthenticationPrincipal CustomUserDetail userDetails, Model model) {
         if (userDetails == null) return "redirect:/login";
+        reservationService.terminerLocationsPassees(LocalDate.now());
         model.addAttribute("reservations",
                 reservationService.getReservationsOnOwnerBikes(userDetails.getUser()));
+        model.addAttribute("aujourdhui", LocalDate.now());
+        model.addAttribute("evaluees", evaluationLocataireService.idsReservationsEvaluees());
         return "account/reservations/received";
     }
 
@@ -116,6 +123,92 @@ public class AccountController {
         reservationService.saveReservation(r);
         redirectAttributes.addFlashAttribute("success", successMsg);
         return "redirect:/account/received-reservations";
+    }
+
+    /* ─── Fin de location et évaluation du locataire (par le propriétaire) ─── */
+
+    @PostMapping("/account/reservations/{id}/complete")
+    public String marquerRendu(@PathVariable Long id,
+                               @AuthenticationPrincipal CustomUserDetail userDetails,
+                               RedirectAttributes redirectAttributes) {
+        if (userDetails == null) return "redirect:/login";
+        Reservation r = reservationService.getReservationById(id);
+        if (!estProprietaire(r, userDetails.getUser())) {
+            redirectAttributes.addFlashAttribute("error", "Réservation introuvable ou accès refusé.");
+        } else if (!r.peutEtreMarqueeRendue(LocalDate.now())) {
+            redirectAttributes.addFlashAttribute("error",
+                    "Cette location ne peut pas être marquée comme rendue : elle doit être payée et commencée.");
+        } else {
+            r.setStatut("COMPLETED");
+            reservationService.saveReservation(r);
+            redirectAttributes.addFlashAttribute("success",
+                    "Location terminée. Vous pouvez maintenant évaluer le locataire.");
+        }
+        return "redirect:/account/received-reservations";
+    }
+
+    @GetMapping("/account/reservations/{id}/evaluate-locataire")
+    public String evaluerLocataireForm(@PathVariable Long id,
+                                       @AuthenticationPrincipal CustomUserDetail userDetails,
+                                       Model model, RedirectAttributes redirectAttributes) {
+        if (userDetails == null) return "redirect:/login";
+        Reservation r = reservationService.getReservationById(id);
+        String erreur = evaluationLocataireBloquee(r, userDetails.getUser());
+        if (erreur != null) {
+            redirectAttributes.addFlashAttribute("error", erreur);
+            return "redirect:/account/received-reservations";
+        }
+        model.addAttribute("reservation", r);
+        return "account/reservations/evaluate-locataire";
+    }
+
+    @PostMapping("/account/reservations/{id}/evaluate-locataire")
+    public String evaluerLocataireSubmit(@PathVariable Long id,
+                                         @AuthenticationPrincipal CustomUserDetail userDetails,
+                                         @RequestParam int note,
+                                         @RequestParam(required = false) String comment,
+                                         RedirectAttributes redirectAttributes) {
+        if (userDetails == null) return "redirect:/login";
+        Reservation r = reservationService.getReservationById(id);
+        String erreur = evaluationLocataireBloquee(r, userDetails.getUser());
+        if (erreur != null) {
+            redirectAttributes.addFlashAttribute("error", erreur);
+            return "redirect:/account/received-reservations";
+        }
+        if (note < 1 || note > 5) {
+            redirectAttributes.addFlashAttribute("error", "La note doit être comprise entre 1 et 5.");
+            return "redirect:/account/reservations/" + id + "/evaluate-locataire";
+        }
+
+        evaluationLocataireService.creer(r, note, comment);
+
+        // Notifier le locataire de l'évaluation reçue (cloche)
+        try {
+            String preview = (comment != null && !comment.isBlank())
+                    ? (comment.length() > 80 ? comment.substring(0, 80) + "…" : comment)
+                    : (note + "/5");
+            notificationService.notify(r.getUser(), r.getBike().getUser(), r.getBike(),
+                    "EVALUATION", preview, "/account/reservations");
+        } catch (Exception e) {
+            logger.warn("Notification d'évaluation du locataire non créée : {}", e.getMessage());
+        }
+
+        redirectAttributes.addFlashAttribute("success", "Merci ! Votre évaluation du locataire a été enregistrée.");
+        return "redirect:/account/received-reservations";
+    }
+
+    /** Raison pour laquelle le propriétaire ne peut pas évaluer ce locataire, sinon null. */
+    private String evaluationLocataireBloquee(Reservation r, User user) {
+        if (!estProprietaire(r, user)) return "Réservation introuvable ou accès refusé.";
+        if (!"COMPLETED".equalsIgnoreCase(r.getStatut()))
+            return "Vous ne pouvez évaluer le locataire qu'une fois la location terminée.";
+        if (evaluationLocataireService.existePour(r.getId())) return "Vous avez déjà évalué ce locataire.";
+        return null;
+    }
+
+    private boolean estProprietaire(Reservation r, User user) {
+        return r != null && r.getBike() != null && r.getBike().getUser() != null
+                && r.getBike().getUser().getId().equals(user.getId());
     }
 
     /* ─── Messagerie d'une réservation ──────────────────────── */
