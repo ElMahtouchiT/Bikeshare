@@ -21,9 +21,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import be.iccbxl.tfe.Bikeshare.model.Equipment;
+
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /** Espace membre : profil, mes vélos, mes réservations, mes gains. */
 @Controller
@@ -40,6 +44,7 @@ public class AccountController {
     @Autowired private EvaluationService evaluationService;
     @Autowired private EvaluationLocataireService evaluationLocataireService;
     @Autowired private FileStorageService fileStorageService;
+    @Autowired private EquipmentService equipmentService;
 
     @GetMapping("/account")
     public String account(@AuthenticationPrincipal CustomUserDetail userDetails, Model model) {
@@ -366,11 +371,13 @@ public class AccountController {
     public String createBikeForm(@AuthenticationPrincipal CustomUserDetail userDetails, Model model) {
         if (userDetails == null) return "redirect:/login";
         model.addAttribute("categories", categoryService.getAllCategory());
+        model.addAttribute("equipements", equipmentService.getAll());
         return "account/bikes/create";
     }
 
     @PostMapping("/account/bikes/create")
     public String createBikeSave(
+            @RequestParam(value = "equipmentIds", required = false) List<Long> equipmentIds,
             @AuthenticationPrincipal CustomUserDetail userDetails,
             @RequestParam String brand,
             @RequestParam String bikeModel,
@@ -417,6 +424,7 @@ public class AccountController {
             bike.setCategory(categoryService.getCategoryById(categoryId));
         }
 
+        bike.setEquipments(equipementsChoisis(equipmentIds));
         storePhotos(bike, photos);
 
         bikeService.saveBike(bike);
@@ -438,11 +446,15 @@ public class AccountController {
         }
         model.addAttribute("bike", bike);
         model.addAttribute("categories", categoryService.getAllCategory());
+        model.addAttribute("equipements", equipmentService.getAll());
+        model.addAttribute("selectedEquipmentIds", bike.getEquipments().stream()
+                .map(Equipment::getId).collect(Collectors.toSet()));
         return "account/bikes/edit";
     }
 
     @PostMapping("/account/bikes/{id}/edit")
     public String editBikeSave(
+            @RequestParam(value = "equipmentIds", required = false) List<Long> equipmentIds,
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetail userDetails,
             @RequestParam String brand,
@@ -496,6 +508,7 @@ public class AccountController {
 
         bike.setCategory(categoryId != null ? categoryService.getCategoryById(categoryId) : null);
 
+        bike.setEquipments(equipementsChoisis(equipmentIds));
         storePhotos(bike, photos);
 
         bikeService.saveBike(bike);
@@ -572,6 +585,14 @@ public class AccountController {
     }
 
     /** Retourne le vélo s'il existe et appartient à l'utilisateur, sinon null. */
+    /** Équipements cochés dans le formulaire (ids inconnus ignorés). */
+    private List<Equipment> equipementsChoisis(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) return new ArrayList<>();
+        return equipmentService.getAll().stream()
+                .filter(e -> ids.contains(e.getId()))
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
     private Bike getOwnedBikeOrNull(Long bikeId, User user) {
         Bike bike = bikeService.getBikeById(bikeId);
         if (bike == null || bike.getUser() == null || user == null

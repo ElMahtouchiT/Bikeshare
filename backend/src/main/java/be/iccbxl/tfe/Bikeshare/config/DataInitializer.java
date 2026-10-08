@@ -1,7 +1,9 @@
 package be.iccbxl.tfe.Bikeshare.config;
 
+import be.iccbxl.tfe.Bikeshare.model.Equipment;
 import be.iccbxl.tfe.Bikeshare.model.Role;
 import be.iccbxl.tfe.Bikeshare.model.User;
+import be.iccbxl.tfe.Bikeshare.repository.EquipmentRepository;
 import be.iccbxl.tfe.Bikeshare.repository.RoleRepository;
 import be.iccbxl.tfe.Bikeshare.repository.UserRepository;
 import org.slf4j.Logger;
@@ -26,13 +28,16 @@ public class DataInitializer implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final EquipmentRepository equipmentRepository;
 
     public DataInitializer(RoleRepository roleRepository,
                            UserRepository userRepository,
-                           BCryptPasswordEncoder passwordEncoder) {
+                           BCryptPasswordEncoder passwordEncoder,
+                           EquipmentRepository equipmentRepository) {
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.equipmentRepository = equipmentRepository;
     }
 
     @Override
@@ -61,7 +66,28 @@ public class DataInitializer implements CommandLineRunner {
             log.info("Compte admin créé : admin@bikeshare.be / Admin1234!");
         }
 
+        // ── 3. Catalogue d'équipements (seulement si la table est vide) ──
+        if (equipmentRepository.count() == 0) {
+            equipmentRepository.saveAll(List.of(
+                    equipement("Antivol", "🔒"),
+                    equipement("Casque", "⛑️"),
+                    equipement("Panier", "🧺"),
+                    equipement("Éclairage", "💡"),
+                    equipement("Porte-bagages", "🎒"),
+                    equipement("Garde-boue", "🌧️"),
+                    equipement("Siège enfant", "👶"),
+                    equipement("Sacoche", "👜")));
+            log.info("Catalogue d'équipements initialisé (8 équipements)");
+        }
+
         log.info("Rôles disponibles : ROLE_VISITOR, ROLE_MEMBER, ROLE_ADMIN");
+    }
+
+    private Equipment equipement(String description, String icon) {
+        Equipment e = new Equipment();
+        e.setDescription(description);
+        e.setIcon(icon);
+        return e;
     }
 
     private Role createRoleIfAbsent(String name) {

@@ -141,6 +141,21 @@
         <div class="form-text" th:text="#{createbike.photosHelp}">Vous pouvez sélectionner plusieurs images (JPG, PNG…). 10 Mo maximum par fichier.</div>
       </div>
 
+      <!-- Équipements -->
+      <div class="mb-4">
+        <label class="form-label fw-semibold">Équipements</label>
+        <div class="row g-2">
+          <div class="col-6 col-md-4" th:each="e : ${equipements}">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="equipmentIds"
+                     th:id="'equip' + ${e.id}" th:value="${e.id}"/>
+              <label class="form-check-label" th:for="'equip' + ${e.id}" th:text="${(e.icon != null ? e.icon + ' ' : '') + e.description}">Antivol</label>
+            </div>
+          </div>
+        </div>
+        <div class="form-text" th:if="${#lists.isEmpty(equipements)}">Aucun équipement disponible pour le moment.</div>
+      </div>
+
       <div class="alert alert-info small mb-4" th:text="#{createbike.reviewNote}">
         Votre vélo sera visible dans le catalogue après vérification par notre équipe.
       </div>

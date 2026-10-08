@@ -163,6 +163,22 @@
         </div>
       </div>
 
+      <!-- Équipements -->
+      <div class="mb-4">
+        <label class="form-label fw-semibold">Équipements</label>
+        <div class="row g-2">
+          <div class="col-6 col-md-4" th:each="e : ${equipements}">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="equipmentIds"
+                     th:id="'equip' + ${e.id}" th:value="${e.id}"
+                     th:checked="${selectedEquipmentIds.contains(e.id)}"/>
+              <label class="form-check-label" th:for="'equip' + ${e.id}" th:text="${(e.icon != null ? e.icon + ' ' : '') + e.description}">Antivol</label>
+            </div>
+          </div>
+        </div>
+        <div class="form-text" th:if="${#lists.isEmpty(equipements)}">Aucun équipement disponible pour le moment.</div>
+      </div>
+
       <!-- Ajouter des photos -->
       <h6 class="text-muted text-uppercase mb-3 mt-4" style="font-size:.75rem;letter-spacing:.08em;" th:text="#{createbike.addPhotos}">Ajouter des photos</h6>
       <div class="mb-4">
