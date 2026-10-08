@@ -103,7 +103,13 @@ public class BikeController {
         }
 
         model.addAttribute("bike", bike);
+        // Image de secours de chaque position : utilisée si la photo enregistrée ne s'affiche pas
+        List<String> galleryFallbacks = new ArrayList<>();
+        for (int k = 0; k < galleryUrls.size(); k++) {
+            galleryFallbacks.add(bike.imageDeSecours(k));
+        }
         model.addAttribute("galleryUrls", galleryUrls);
+        model.addAttribute("galleryFallbacks", galleryFallbacks);
         model.addAttribute("averageRating", bikeService.calculateAverageRating(bike));
         model.addAttribute("evaluations", evaluationService.getEvaluationsByBikeId(id));
         model.addAttribute("googleMapsApiKey", googleMapsApiKey);
