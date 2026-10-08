@@ -53,6 +53,11 @@ public class Bike {
     private String registrationPath;     // preuve d'achat / gravure
 
     private Boolean online;
+
+    // Vélo retiré de la location après une location : hors validation admin, historique conservé.
+    @Column(columnDefinition = "boolean not null default false")
+    private boolean archived;
+
     private Double latitude;
     private Double longitude;
 

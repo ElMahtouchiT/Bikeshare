@@ -43,7 +43,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr th:each="bike : ${bikes}" th:classappend="${bike.online == null or !bike.online} ? 'table-warning' : ''">
+        <tr th:each="bike : ${bikes}" th:classappend="${!bike.archived and (bike.online == null or !bike.online)} ? 'table-warning' : ''">
           <td class="px-3 text-muted small" th:text="${bike.id}"></td>
           <td>
             <div class="fw-semibold" th:text="${bike.brand + ' ' + bike.model}"></div>

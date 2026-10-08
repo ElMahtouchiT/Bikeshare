@@ -4,6 +4,7 @@ import be.iccbxl.tfe.Bikeshare.model.Bike;
 import be.iccbxl.tfe.Bikeshare.model.Evaluation;
 import be.iccbxl.tfe.Bikeshare.model.User;
 import be.iccbxl.tfe.Bikeshare.repository.BikeRepository;
+import be.iccbxl.tfe.Bikeshare.repository.NotificationRepository;
 import be.iccbxl.tfe.Bikeshare.repository.UserRepository;
 import be.iccbxl.tfe.Bikeshare.service.BikeServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class BikeService implements BikeServiceI {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private NotificationRepository notificationRepository;
+
     @Override public List<Bike> getAllBikes() { return bikeRepository.findAll(); }
     @Override public List<Bike> getAllOnlineBikes() { return bikeRepository.findByOnlineTrue(); }
     @Override public Bike getBikeById(Long id) { return bikeRepository.findById(id).orElse(null); }
@@ -33,16 +37,26 @@ public class BikeService implements BikeServiceI {
     }
 
     /**
-     * Suppression d'un vélo. Comme {@code User.ownedBikes} est en cascade ALL + orphanRemoval,
-     * un simple {@code deleteById} est annulé par la re-cascade du propriétaire. On retire donc
-     * le vélo de la collection du propriétaire : l'orphanRemoval supprime alors réellement le
-     * vélo et ses entités liées (photos, prix, réservations).
+     * Suppression d'un vélo. Un vélo déjà loué (réservations ou notifications) n'est jamais supprimé :
+     * il est seulement retiré de la location, pour garder réservations, paiements et gains.
+     * Un vélo sans historique est supprimé. Comme {@code User.ownedBikes} est en cascade ALL + orphanRemoval,
+     * on le retire de la collection du propriétaire : un simple {@code deleteById} serait annulé
+     * par la re-cascade du propriétaire.
+     * @return true si le vélo a été supprimé, false s'il a seulement été retiré de la location
      */
     @Override
     @Transactional
-    public void deleteBike(Long id) {
+    public boolean deleteBike(Long id) {
         Bike bike = bikeRepository.findById(id).orElse(null);
-        if (bike == null) return;
+        if (bike == null) return false;
+        boolean aDesTraces = !bike.getReservations().isEmpty()
+                || !notificationRepository.findByBikeId(id).isEmpty();
+        if (aDesTraces) {
+            bike.setOnline(false);
+            bike.setArchived(true);
+            bikeRepository.save(bike);
+            return false;
+        }
         User owner = bike.getUser();
         if (owner != null && owner.getOwnedBikes() != null
                 && owner.getOwnedBikes().removeIf(b -> b.getId().equals(id))) {
@@ -50,6 +64,7 @@ public class BikeService implements BikeServiceI {
         } else {
             bikeRepository.delete(bike);
         }
+        return true;
     }
     @Override public List<Bike> getBikesByUser(User user) { return bikeRepository.findByUser(user); }
 

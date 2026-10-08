@@ -377,11 +377,14 @@ public class AccountController {
                     "terminées ou annulées avant de supprimer l'annonce.");
             return "redirect:/account/bikes";
         }
-        for (Photo photo : bike.getPhotos()) {
-            fileStorageService.delete(photo.getUrl());
+        List<String> photoUrls = bike.getPhotos().stream().map(Photo::getUrl).toList();
+        if (bikeService.deleteBike(id)) {
+            photoUrls.forEach(fileStorageService::delete);
+            redirectAttributes.addFlashAttribute("success", "Votre annonce a été supprimée.");
+        } else {
+            redirectAttributes.addFlashAttribute("success",
+                    "Votre annonce a été retirée de la location. Son historique de réservations et de paiements est conservé.");
         }
-        bikeService.deleteBike(id);
-        redirectAttributes.addFlashAttribute("success", "Votre annonce a été supprimée.");
         return "redirect:/account/bikes";
     }
 
