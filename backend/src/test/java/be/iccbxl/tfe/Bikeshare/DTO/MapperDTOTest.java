@@ -10,12 +10,15 @@ import org.junit.jupiter.api.Test;
 class MapperDTOTest {
 
     @Test
-    void lesCoordonneesBancairesDuProprietaireNeSortentPasDansLeJson() throws Exception {
+    void lesCoordonneesDuProprietaireNeSortentPasDansLeJson() throws Exception {
         User proprietaire = new User();
         proprietaire.setId(1L);
         proprietaire.setFirstName("Test");
         proprietaire.setLastName("Proprietaire");
-        proprietaire.setEmail("test@example.com");
+        proprietaire.setEmail("proprio@exemple.test");
+        proprietaire.setPhone("0470123456");
+        proprietaire.setAdresse("Rue Secrete 12");
+        proprietaire.setPostalCode("1000");
         proprietaire.setIban("BE00000000000000");
         proprietaire.setBic("TESTBEBB");
 
@@ -25,8 +28,9 @@ class MapperDTOTest {
 
         String json = new ObjectMapper().writeValueAsString(MapperDTO.toBikeDTO(velo));
 
-        assertThat(json).contains("\"owner\"");
-        assertThat(json).doesNotContain("iban").doesNotContain("bic");
-        assertThat(json).doesNotContain("BE00000000000000").doesNotContain("TESTBEBB");
+        assertThat(json).contains("\"owner\"").contains("\"firstName\":\"Test\"");
+        assertThat(json).doesNotContain("iban").doesNotContain("bic").doesNotContain("email").doesNotContain("phone");
+        assertThat(json).doesNotContain("proprio@exemple.test").doesNotContain("0470123456");
+        assertThat(json).doesNotContain("Rue Secrete 12").doesNotContain("BE00000000000000").doesNotContain("TESTBEBB");
     }
 }

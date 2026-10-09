@@ -26,6 +26,18 @@ public class MapperDTO {
         return dto;
     }
 
+    /** Version publique : aucune coordonnée personnelle ni bancaire. */
+    public static UserPublicDTO toUserPublicDTO(User user) {
+        if (user == null) return null;
+        UserPublicDTO dto = new UserPublicDTO();
+        dto.setId(user.getId());
+        dto.setFirstName(user.getFirstName());
+        dto.setLastName(user.getLastName());
+        dto.setPhotoUrl(user.getPhotoUrl());
+        dto.setVerified(user.isVerified());
+        return dto;
+    }
+
     public static RoleDTO toRoleDTO(Role role) {
         return role == null ? null : new RoleDTO(role.getId(), role.getRole());
     }
@@ -66,7 +78,7 @@ public class MapperDTO {
         dto.setLongitude(bike.getLongitude());
         dto.setCategory(toCategoryDTO(bike.getCategory()));
         dto.setPrice(toPriceDTO(bike.getPrice()));
-        dto.setOwner(toUserDTO(bike.getUser()));
+        dto.setOwner(toUserPublicDTO(bike.getUser()));
         if (bike.getPhotos() != null)
             dto.setPhotos(bike.getPhotos().stream()
                     .map(p -> new PhotoDTO(p.getId(), p.getUrl()))
@@ -99,7 +111,7 @@ public class MapperDTO {
         dto.setAssurance(r.getAssurance());
         dto.setCreatedAt(r.getCreatedAt());
         dto.setBike(toBikeDTO(r.getBike()));
-        dto.setUser(toUserDTO(r.getUser()));
+        dto.setUser(toUserPublicDTO(r.getUser()));
         if (r.getPayment() != null) dto.setTotalPrice(r.getPayment().getTotalPrice());
         if (r.getEvaluation() != null) dto.setEvaluationNote(r.getEvaluation().getNote());
         dto.setPaid(r.getPayment() != null && "PAID".equalsIgnoreCase(r.getPayment().getStatut()));

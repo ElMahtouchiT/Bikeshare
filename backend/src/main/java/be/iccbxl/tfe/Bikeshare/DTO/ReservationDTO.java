@@ -14,7 +14,7 @@ public class ReservationDTO {
     private String assurance;
     private LocalDateTime createdAt;
     private BikeDTO bike;
-    private UserDTO user;
+    private UserPublicDTO user;
     private Double totalPrice;
     private Integer evaluationNote; // note de l'évaluation si la location a été évaluée, sinon null
     private boolean paid;           // vrai si un paiement PAID existe pour cette réservation

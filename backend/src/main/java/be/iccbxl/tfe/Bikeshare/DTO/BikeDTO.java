@@ -24,6 +24,6 @@ public class BikeDTO {
     private Integer reviewCount;
     private CategoryDTO category;
     private PriceDTO price;
-    private UserDTO owner;
+    private UserPublicDTO owner;
     private List<PhotoDTO> photos;
 }
