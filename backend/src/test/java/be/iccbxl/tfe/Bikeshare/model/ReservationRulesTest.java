@@ -26,12 +26,19 @@ class ReservationRulesTest {
     }
 
     @Test
-    void peutEtreMarqueeRendue_seulementSiPayeeEtCommencee() {
+    void peutEtreMarqueeRendue_seulementSiPayeeEtTerminee() {
+        // période encore en cours : pas encore rendue
         assertThat(reservation("CONFIRMED", "PAID", AUJOURDHUI.minusDays(1), AUJOURDHUI.plusDays(2))
-                .peutEtreMarqueeRendue(AUJOURDHUI)).isTrue();
+                .peutEtreMarqueeRendue(AUJOURDHUI)).isFalse();
         assertThat(reservation("CONFIRMED", "PAID", AUJOURDHUI, AUJOURDHUI.plusDays(2))
+                .peutEtreMarqueeRendue(AUJOURDHUI)).isFalse();
+        // terminée le jour même ou avant : rendue possible
+        assertThat(reservation("CONFIRMED", "PAID", AUJOURDHUI.minusDays(3), AUJOURDHUI)
                 .peutEtreMarqueeRendue(AUJOURDHUI)).isTrue();
-        assertThat(reservation("CONFIRMED", null, AUJOURDHUI.minusDays(1), AUJOURDHUI)
+        assertThat(reservation("CONFIRMED", "PAID", AUJOURDHUI.minusDays(3), AUJOURDHUI.minusDays(1))
+                .peutEtreMarqueeRendue(AUJOURDHUI)).isTrue();
+        // non payée, pas encore commencée, ou déjà terminée
+        assertThat(reservation("CONFIRMED", null, AUJOURDHUI.minusDays(1), AUJOURDHUI.minusDays(1))
                 .peutEtreMarqueeRendue(AUJOURDHUI)).isFalse();
         assertThat(reservation("CONFIRMED", "PAID", AUJOURDHUI.plusDays(1), AUJOURDHUI.plusDays(3))
                 .peutEtreMarqueeRendue(AUJOURDHUI)).isFalse();

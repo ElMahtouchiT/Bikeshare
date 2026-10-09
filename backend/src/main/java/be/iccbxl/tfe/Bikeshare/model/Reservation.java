@@ -61,7 +61,7 @@ public class Reservation {
     /** Le propriétaire peut marquer le vélo comme rendu : location payée, commencée, pas encore terminée. */
     public boolean peutEtreMarqueeRendue(LocalDate aujourdhui) {
         return ("CONFIRMED".equals(statut) || "NOW".equals(statut)) && estPayee()
-                && startLocation != null && !startLocation.isAfter(aujourdhui);
+                && endLocation != null && !endLocation.isAfter(aujourdhui);
     }
 
     /** Une location confirmée et payée dont la date de fin est passée est terminée. */

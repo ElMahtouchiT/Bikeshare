@@ -212,7 +212,7 @@ public class AccountController {
             redirectAttributes.addFlashAttribute("error", "Réservation introuvable ou accès refusé.");
         } else if (!r.peutEtreMarqueeRendue(LocalDate.now())) {
             redirectAttributes.addFlashAttribute("error",
-                    "Cette location ne peut pas être marquée comme rendue : elle doit être payée et commencée.");
+                    "Cette location ne peut pas être marquée comme rendue : elle doit être payée et terminée.");
         } else {
             r.setStatut("COMPLETED");
             reservationService.saveReservation(r);
