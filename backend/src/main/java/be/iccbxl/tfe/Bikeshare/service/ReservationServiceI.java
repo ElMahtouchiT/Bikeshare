@@ -28,8 +28,11 @@ public interface ReservationServiceI {
     /** Réservations qui bloquent le calendrier d'un vélo (CONFIRMED, NOW). */
     List<Reservation> getBookedReservationsForBike(Long bikeId);
 
-    /** Vrai si la période [start, end] chevauche une réservation confirmée du vélo. */
+    /** Vrai si la période [start, end] chevauche une réservation bloquante du vélo (en attente, confirmée ou en cours). */
     boolean hasBookingOverlap(Long bikeId, LocalDate start, LocalDate end);
+
+    /** Comme hasBookingOverlap, sans tenir compte de la réservation excluedReservationId (ex. celle que le propriétaire accepte). */
+    boolean hasOverlapWithOthers(Long bikeId, LocalDate start, LocalDate end, Long excludedReservationId);
 
     /** Crée une réservation (durée + statut initial) et l'enregistre. Règles partagées par le site et l'API. */
     Reservation createReservation(User user, Bike bike, LocalDate start, LocalDate end, String assurance);

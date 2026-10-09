@@ -21,8 +21,8 @@ public class ReservationService implements ReservationServiceI {
     /** Statuts considérés comme « en cours » : bloquent la suppression du vélo. */
     private static final List<String> ACTIVE_STATUSES = List.of("PENDING", "CONFIRMED", "NOW");
 
-    /** Statuts qui bloquent le calendrier (réservation confirmée / en cours). */
-    private static final List<String> BOOKED_STATUSES = List.of("CONFIRMED", "NOW");
+    /** Statuts qui bloquent le calendrier : une demande en attente réserve déjà les dates. */
+    private static final List<String> BOOKED_STATUSES = List.of("PENDING", "CONFIRMED", "NOW");
 
     @Autowired private ReservationRepository reservationRepository;
 
@@ -126,9 +126,15 @@ public class ReservationService implements ReservationServiceI {
 
     @Override
     public boolean hasBookingOverlap(Long bikeId, LocalDate start, LocalDate end) {
+        return hasOverlapWithOthers(bikeId, start, end, null);
+    }
+
+    @Override
+    public boolean hasOverlapWithOthers(Long bikeId, LocalDate start, LocalDate end, Long excludedReservationId) {
         if (start == null || end == null) return false;
-        return getBookedReservationsForBike(bikeId).stream().anyMatch(r ->
-                r.getStartLocation() != null && r.getEndLocation() != null
+        return getBookedReservationsForBike(bikeId).stream()
+                .filter(r -> excludedReservationId == null || !excludedReservationId.equals(r.getId()))
+                .anyMatch(r -> r.getStartLocation() != null && r.getEndLocation() != null
                         && !r.getStartLocation().isAfter(end)
                         && !r.getEndLocation().isBefore(start));
     }

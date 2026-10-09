@@ -124,6 +124,12 @@ public class AccountController {
             redirectAttributes.addFlashAttribute("error", "Réservation introuvable ou accès refusé.");
             return "redirect:/account/received-reservations";
         }
+        if ("CONFIRMED".equals(status) && reservationService.hasOverlapWithOthers(
+                r.getBike().getId(), r.getStartLocation(), r.getEndLocation(), r.getId())) {
+            redirectAttributes.addFlashAttribute("error",
+                    "Impossible de confirmer : ces dates chevauchent une autre réservation de ce vélo.");
+            return "redirect:/account/received-reservations";
+        }
         r.setStatut(status);
         reservationService.saveReservation(r);
         redirectAttributes.addFlashAttribute("success", successMsg);
