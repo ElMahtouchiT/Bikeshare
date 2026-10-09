@@ -132,6 +132,9 @@ public class AccountController {
         }
         r.setStatut(status);
         reservationService.saveReservation(r);
+        if ("CONFIRMED".equals(status)) {
+            notifierLocataire(r, "Votre demande de réservation est confirmée. Votre réservation est en attente de paiement.");
+        }
         redirectAttributes.addFlashAttribute("success", successMsg);
         return "redirect:/account/received-reservations";
     }
@@ -185,6 +188,15 @@ public class AccountController {
                     "RESERVATION", message, "/account/received-reservations");
         } catch (Exception e) {
             logger.warn("Notification d'annulation non créée : {}", e.getMessage());
+        }
+    }
+
+    private void notifierLocataire(Reservation r, String message) {
+        try {
+            notificationService.notify(r.getUser(), r.getBike().getUser(), r.getBike(),
+                    "RESERVATION", message, "/account/reservations");
+        } catch (Exception e) {
+            logger.warn("Notification de confirmation non créée : {}", e.getMessage());
         }
     }
 
