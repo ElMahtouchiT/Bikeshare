@@ -18,8 +18,7 @@ public class MapperDTO {
         dto.setPostalCode(user.getPostalCode());
         dto.setPhone(user.getPhone());
         dto.setPhotoUrl(user.getPhotoUrl());
-        dto.setIban(user.getIban());
-        dto.setBic(user.getBic());
+        // IBAN et BIC volontairement absents : coordonnées bancaires jamais exposées par l'API
         dto.setCreatedAt(user.getCreatedAt());
         dto.setVerified(user.isVerified());
         if (user.getRoles() != null)

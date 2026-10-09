@@ -15,8 +15,6 @@ public class UserDTO {
     private String postalCode;
     private String phone;
     private String photoUrl;
-    private String iban;
-    private String bic;
     private LocalDateTime createdAt;
     private boolean isVerified;
     private List<RoleDTO> roles;
