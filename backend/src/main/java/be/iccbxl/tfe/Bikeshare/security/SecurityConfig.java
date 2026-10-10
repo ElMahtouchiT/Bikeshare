@@ -45,7 +45,7 @@ public class SecurityConfig {
                                  "/forgot-password", "/reset-password",
                                  "/login", "/error", "/a-propos", "/contact", "/conditions", "/mentions-legales",
                                  "/reclamation", "/favicon.ico", "/css/**", "/js/**", "/images/**", "/uploads/**",
-                                 "/ws/**", "/v3/api-docs/**", "/swagger-ui/**", "/api/bikes/**").permitAll()
+                                 "/ws/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/api/bikes/**").permitAll()
                 .requestMatchers("/admin/**", "/api/admin/**", "/api/dashboard/**").hasAuthority("ROLE_ADMIN")
                 .requestMatchers("/account/**", "/reservations",
                                  "/api/reservations/**", "/api/messages/**")
