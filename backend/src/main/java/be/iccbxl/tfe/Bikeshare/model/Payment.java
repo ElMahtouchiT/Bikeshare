@@ -15,7 +15,8 @@ public class Payment {
     @Column(name = "created_at")    private LocalDateTime createdAt;
     @Column(name = "payment_mode")  private String paymentMode;
     @Column(name = "total_price")   private double totalPrice;
-    private String statut;          // PAID, REFUNDED, FAILED
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus statut;
     @Column(name = "part_bikeshare") private double partBikeshare; // commission
 
     @OneToOne

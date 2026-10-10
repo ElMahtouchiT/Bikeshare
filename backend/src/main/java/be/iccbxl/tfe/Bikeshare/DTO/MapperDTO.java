@@ -107,14 +107,16 @@ public class MapperDTO {
         dto.setStartLocation(r.getStartLocation());
         dto.setEndLocation(r.getEndLocation());
         dto.setDuration(r.getDuration());
-        dto.setStatut(r.getStatut());
+        dto.setStatut(r.getStatut().name());
+        dto.setStatutLibelle(r.getLibelleStatut());
+        dto.setPaiementLibelle(r.getLibellePaiement());
         dto.setAssurance(r.getAssurance());
         dto.setCreatedAt(r.getCreatedAt());
         dto.setBike(toBikeDTO(r.getBike()));
         dto.setUser(toUserPublicDTO(r.getUser()));
         if (r.getPayment() != null) dto.setTotalPrice(r.getPayment().getTotalPrice());
         if (r.getEvaluation() != null) dto.setEvaluationNote(r.getEvaluation().getNote());
-        dto.setPaid(r.getPayment() != null && "PAID".equalsIgnoreCase(r.getPayment().getStatut()));
+        dto.setPaid(r.getPayment() != null && r.getPayment().getStatut() == PaymentStatus.PAID);
         dto.setCancellationRequested(r.isCancellationRequested());
         dto.setAnnulableDirectement(r.peutEtreAnnuleeDirectement());
         dto.setDemandeAnnulationPossible(r.peutDemanderAnnulation());

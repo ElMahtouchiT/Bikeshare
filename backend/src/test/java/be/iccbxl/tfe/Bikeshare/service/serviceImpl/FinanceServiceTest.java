@@ -1,5 +1,7 @@
 package be.iccbxl.tfe.Bikeshare.service.serviceImpl;
 
+import be.iccbxl.tfe.Bikeshare.model.GainStatus;
+
 import be.iccbxl.tfe.Bikeshare.model.Gain;
 import be.iccbxl.tfe.Bikeshare.repository.GainRepository;
 import be.iccbxl.tfe.Bikeshare.repository.PaymentRepository;
@@ -34,21 +36,21 @@ class FinanceServiceTest {
     void marquerVerse_passeEnVerseSeulementSiLeGainEstEnAttente() {
         Gain gain = new Gain();
         gain.setId(5L);
-        gain.setStatus("PENDING");
+        gain.setStatus(GainStatus.PENDING);
         when(gainRepository.findById(5L)).thenReturn(Optional.of(gain));
 
         assertThat(financeService.marquerVerse(5L)).isTrue();
-        assertThat(gain.getStatus()).isEqualTo("TRANSFERRED");
+        assertThat(gain.getStatus()).isEqualTo(GainStatus.TRANSFERRED);
         assertThat(financeService.marquerVerse(5L)).isFalse();
     }
 
     @Test
     void montantDu_neCompteQueLesGainsNonVerses() {
         Gain enAttente = new Gain();
-        enAttente.setStatus("PENDING");
+        enAttente.setStatus(GainStatus.PENDING);
         enAttente.setAmountEarned(34.0);
         Gain verse = new Gain();
-        verse.setStatus("TRANSFERRED");
+        verse.setStatus(GainStatus.TRANSFERRED);
         verse.setAmountEarned(50.0);
         when(gainRepository.findAll()).thenReturn(List.of(enAttente, verse));
 

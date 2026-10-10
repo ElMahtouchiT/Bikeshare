@@ -15,7 +15,8 @@ public class Gain {
     @Column(name = "created_at")    private LocalDateTime createdAt;
     private String description;
     @Column(name = "amount_earned") private double amountEarned;
-    private String status;          // PENDING, TRANSFERRED
+    @Enumerated(EnumType.STRING)
+    private GainStatus status;
 
     @OneToOne
     @JoinColumn(name = "payment_id")

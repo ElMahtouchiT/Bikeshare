@@ -1,5 +1,7 @@
 package be.iccbxl.tfe.Bikeshare.service.serviceImpl;
 
+import be.iccbxl.tfe.Bikeshare.model.ReservationStatus;
+
 import be.iccbxl.tfe.Bikeshare.DTO.MapperDTO;
 import be.iccbxl.tfe.Bikeshare.DTO.ReservationDTO;
 import be.iccbxl.tfe.Bikeshare.model.Bike;
@@ -19,10 +21,12 @@ import java.util.stream.Collectors;
 public class ReservationService implements ReservationServiceI {
 
     /** Statuts considérés comme « en cours » : bloquent la suppression du vélo. */
-    private static final List<String> ACTIVE_STATUSES = List.of("PENDING", "CONFIRMED", "NOW");
+    private static final List<ReservationStatus> ACTIVE_STATUSES =
+            List.of(ReservationStatus.PENDING, ReservationStatus.CONFIRMED);
 
     /** Statuts qui bloquent le calendrier : une demande en attente réserve déjà les dates. */
-    private static final List<String> BOOKED_STATUSES = List.of("PENDING", "CONFIRMED", "NOW");
+    private static final List<ReservationStatus> BOOKED_STATUSES =
+            List.of(ReservationStatus.PENDING, ReservationStatus.CONFIRMED);
 
     @Autowired private ReservationRepository reservationRepository;
 
@@ -43,7 +47,7 @@ public class ReservationService implements ReservationServiceI {
         int terminees = 0;
         for (Reservation r : reservationRepository.findAll()) {
             if (r.doitEtreTerminee(aujourdhui)) {
-                r.setStatut("COMPLETED");
+                r.setStatut(ReservationStatus.COMPLETED);
                 reservationRepository.save(r);
                 terminees++;
             }
@@ -65,7 +69,7 @@ public class ReservationService implements ReservationServiceI {
         r.setEndLocation(end);
         r.setDuration((int) ChronoUnit.DAYS.between(start, end));
         r.setAssurance(assurance);
-        r.setStatut("AUTOMATIC".equalsIgnoreCase(bike.getReservationMode()) ? "CONFIRMED" : "PENDING");
+        r.setStatut("AUTOMATIC".equalsIgnoreCase(bike.getReservationMode()) ? ReservationStatus.CONFIRMED : ReservationStatus.PENDING);
         return reservationRepository.save(r);
     }
 
@@ -82,7 +86,7 @@ public class ReservationService implements ReservationServiceI {
     /** Une réservation ne se paie que si elle est confirmée et pas encore payée (refusée ou annulée : jamais). */
     @Override
     public boolean isPayable(Reservation r) {
-        return r != null && "CONFIRMED".equalsIgnoreCase(r.getStatut()) && r.getPayment() == null;
+        return r != null && ReservationStatus.CONFIRMED == r.getStatut() && r.getPayment() == null;
     }
 
     @Override
@@ -100,13 +104,13 @@ public class ReservationService implements ReservationServiceI {
     }
 
     @Override
-    public List<Reservation> getReservationsByStatusesAndUser(List<String> statuses, User user) {
+    public List<Reservation> getReservationsByStatusesAndUser(List<ReservationStatus> statuses, User user) {
         return reservationRepository.findByStatutInAndUser(statuses, user);
     }
 
     @Override
     public long getTotalConfirmedReservations() {
-        return reservationRepository.countByStatut("CONFIRMED");
+        return reservationRepository.countByStatut(ReservationStatus.CONFIRMED);
     }
 
     @Override

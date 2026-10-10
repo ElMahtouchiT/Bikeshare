@@ -1,5 +1,9 @@
 package be.iccbxl.tfe.Bikeshare.service.serviceImpl;
 
+import be.iccbxl.tfe.Bikeshare.model.PaymentStatus;
+import be.iccbxl.tfe.Bikeshare.model.GainStatus;
+import be.iccbxl.tfe.Bikeshare.model.ReservationStatus;
+
 import be.iccbxl.tfe.Bikeshare.model.Gain;
 import be.iccbxl.tfe.Bikeshare.model.Payment;
 import be.iccbxl.tfe.Bikeshare.model.Reservation;
@@ -39,7 +43,7 @@ public class PaymentService implements PaymentServiceI {
         double commission = Math.round(amount * COMMISSION_RATE * 100.0) / 100.0;
         Payment payment = new Payment();
         payment.setReservation(r);
-        payment.setStatut("PAID");
+        payment.setStatut(PaymentStatus.PAID);
         payment.setPaymentMode("STRIPE");
         payment.setTotalPrice(amount);
         payment.setPartBikeshare(commission);
@@ -48,12 +52,12 @@ public class PaymentService implements PaymentServiceI {
         Gain gain = new Gain();
         gain.setPayment(payment);
         gain.setAmountEarned(amount - commission);
-        gain.setStatus("PENDING");
+        gain.setStatus(GainStatus.PENDING);
         gain.setDescription("Gain location — " +
                 (r.getBike() != null ? r.getBike().getBrand() + " " + r.getBike().getModel() : ""));
         gainRepository.save(gain);
 
-        r.setStatut("CONFIRMED");
+        r.setStatut(ReservationStatus.CONFIRMED);
         reservationRepository.save(r);
     }
 
@@ -69,7 +73,7 @@ public class PaymentService implements PaymentServiceI {
     /** Revenu total = somme des montants payés. */
     public BigDecimal getTotalRevenue() {
         double total = paymentRepository.findAll().stream()
-                .filter(p -> "PAID".equalsIgnoreCase(p.getStatut()))
+                .filter(p -> p.getStatut() == PaymentStatus.PAID)
                 .mapToDouble(Payment::getTotalPrice).sum();
         return BigDecimal.valueOf(total);
     }
@@ -77,7 +81,7 @@ public class PaymentService implements PaymentServiceI {
     /** Bénéfice total = somme des commissions BikeShare. */
     public BigDecimal getTotalBenefit() {
         double total = paymentRepository.findAll().stream()
-                .filter(p -> "PAID".equalsIgnoreCase(p.getStatut()))
+                .filter(p -> p.getStatut() == PaymentStatus.PAID)
                 .mapToDouble(Payment::getPartBikeshare).sum();
         return BigDecimal.valueOf(total);
     }

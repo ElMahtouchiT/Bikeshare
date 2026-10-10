@@ -1,5 +1,7 @@
 package be.iccbxl.tfe.Bikeshare.service.serviceImpl;
 
+import be.iccbxl.tfe.Bikeshare.model.ReservationStatus;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -41,7 +43,7 @@ class ReservationChevauchementTest {
         when(reservationRepository.findByBikeIdAndStatutIn(anyLong(), anyList())).thenReturn(List.of(attente));
 
         assertThat(reservationService.hasBookingOverlap(10L, LocalDate.of(2026, 10, 9), LocalDate.of(2026, 10, 11))).isTrue();
-        verify(reservationRepository).findByBikeIdAndStatutIn(eq(10L), eq(List.of("PENDING", "CONFIRMED", "NOW")));
+        verify(reservationRepository).findByBikeIdAndStatutIn(eq(10L), eq(List.of(ReservationStatus.PENDING, ReservationStatus.CONFIRMED)));
     }
 
     @Test

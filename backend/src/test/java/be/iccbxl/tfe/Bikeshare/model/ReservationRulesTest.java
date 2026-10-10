@@ -1,5 +1,8 @@
 package be.iccbxl.tfe.Bikeshare.model;
 
+import be.iccbxl.tfe.Bikeshare.model.PaymentStatus;
+import be.iccbxl.tfe.Bikeshare.model.ReservationStatus;
+
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -14,12 +17,12 @@ class ReservationRulesTest {
     private static Reservation reservation(String statut, String statutPaiement,
                                            LocalDate debut, LocalDate fin) {
         Reservation r = new Reservation();
-        r.setStatut(statut);
+        r.setStatut(ReservationStatus.valueOf(statut));
         r.setStartLocation(debut);
         r.setEndLocation(fin);
         if (statutPaiement != null) {
             Payment p = new Payment();
-            p.setStatut(statutPaiement);
+            p.setStatut(PaymentStatus.valueOf(statutPaiement));
             r.setPayment(p);
         }
         return r;

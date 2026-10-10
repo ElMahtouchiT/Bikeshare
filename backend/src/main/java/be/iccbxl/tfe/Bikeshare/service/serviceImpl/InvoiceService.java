@@ -66,7 +66,7 @@ public class InvoiceService {
         infos.addCell(new Cell()
                 .add(new Paragraph("Date : " + (p.getCreatedAt() != null ? p.getCreatedAt().format(DATE) : "—"))
                         .setMargin(0))
-                .add(new Paragraph(libelleStatut(p.getStatut())).setBold().setFontColor(GREEN).setMargin(0))
+                .add(new Paragraph(p.getStatut().getLibelle()).setBold().setFontColor(GREEN).setMargin(0))
                 .setTextAlignment(TextAlignment.RIGHT));
         doc.add(infos);
 
@@ -162,10 +162,4 @@ public class InvoiceService {
         return "STRIPE".equals(mode) ? "Carte bancaire (Stripe)" : texte(mode);
     }
 
-    private static String libelleStatut(String statut) {
-        if ("PAID".equals(statut)) return "Payée";
-        if ("REFUNDED".equals(statut)) return "Remboursée";
-        if ("FAILED".equals(statut)) return "Échouée";
-        return texte(statut);
-    }
 }

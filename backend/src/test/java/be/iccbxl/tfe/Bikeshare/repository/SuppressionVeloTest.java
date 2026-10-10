@@ -1,5 +1,9 @@
 package be.iccbxl.tfe.Bikeshare.repository;
 
+import be.iccbxl.tfe.Bikeshare.model.ReservationStatus;
+import be.iccbxl.tfe.Bikeshare.model.PaymentStatus;
+import be.iccbxl.tfe.Bikeshare.model.GainStatus;
+
 import be.iccbxl.tfe.Bikeshare.model.Bike;
 import be.iccbxl.tfe.Bikeshare.model.Gain;
 import be.iccbxl.tfe.Bikeshare.model.Notification;
@@ -55,7 +59,7 @@ class SuppressionVeloTest {
         r.setStartLocation(LocalDate.of(2026, 7, 1));
         r.setEndLocation(LocalDate.of(2026, 7, 5));
         r.setDuration(4);
-        r.setStatut(statut);
+        r.setStatut(ReservationStatus.valueOf(statut));
         em.persist(r);
         return r;
     }
@@ -63,7 +67,7 @@ class SuppressionVeloTest {
     private void paiement(Reservation r) {
         Payment p = new Payment();
         p.setReservation(r);
-        p.setStatut("PAID");
+        p.setStatut(PaymentStatus.PAID);
         p.setPaymentMode("STRIPE");
         p.setTotalPrice(40.0);
         p.setPartBikeshare(6.0);
@@ -72,7 +76,7 @@ class SuppressionVeloTest {
         Gain g = new Gain();
         g.setPayment(p);
         g.setAmountEarned(34.0);
-        g.setStatus("PENDING");
+        g.setStatus(GainStatus.PENDING);
         em.persist(g);
     }
 

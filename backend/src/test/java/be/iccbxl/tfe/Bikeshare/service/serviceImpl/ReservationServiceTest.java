@@ -1,5 +1,7 @@
 package be.iccbxl.tfe.Bikeshare.service.serviceImpl;
 
+import be.iccbxl.tfe.Bikeshare.model.ReservationStatus;
+
 import be.iccbxl.tfe.Bikeshare.model.Bike;
 import be.iccbxl.tfe.Bikeshare.model.Payment;
 import be.iccbxl.tfe.Bikeshare.model.Reservation;
@@ -118,7 +120,7 @@ class ReservationServiceTest {
 
     private Reservation reservationAvecStatut(String statut) {
         Reservation r = new Reservation();
-        r.setStatut(statut);
+        r.setStatut(ReservationStatus.valueOf(statut));
         return r;
     }
 

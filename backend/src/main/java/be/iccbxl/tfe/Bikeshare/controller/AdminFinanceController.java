@@ -14,7 +14,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import be.iccbxl.tfe.Bikeshare.model.Gain;
 import be.iccbxl.tfe.Bikeshare.model.Reservation;
+import be.iccbxl.tfe.Bikeshare.model.User;
+import be.iccbxl.tfe.Bikeshare.security.CustomUserDetail;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import be.iccbxl.tfe.Bikeshare.service.ReservationServiceI;
 import be.iccbxl.tfe.Bikeshare.service.serviceImpl.NotificationService;
 import org.slf4j.Logger;
@@ -80,11 +84,30 @@ public class AdminFinanceController {
     }
 
     @PostMapping("/gains/{id}/transfer")
-    public String marquerVerse(@PathVariable Long id, RedirectAttributes ra) {
+    public String marquerVerse(@PathVariable Long id,
+                               @AuthenticationPrincipal CustomUserDetail admin,
+                               RedirectAttributes ra) {
+        Gain gain = financeService.getGains().stream()
+                .filter(g -> id.equals(g.getId())).findFirst().orElse(null);
         boolean ok = financeService.marquerVerse(id);
+        if (ok && gain != null && admin != null) {
+            notifierVersement(gain, admin.getUser());
+        }
         ra.addFlashAttribute(ok ? "success" : "error",
                 ok ? "Gain marqué comme versé au propriétaire." : "Gain introuvable ou déjà versé.");
         return "redirect:/admin/finances";
+    }
+
+    /** Prévient le propriétaire que son gain a été versé. */
+    private void notifierVersement(Gain gain, User admin) {
+        try {
+            Reservation r = gain.getPayment().getReservation();
+            String montant = String.format("%.2f", gain.getAmountEarned()).replace('.', ',');
+            notificationService.notify(r.getBike().getUser(), admin, r.getBike(), "RESERVATION",
+                    "Votre gain de " + montant + " € a été versé.", "/account/gains");
+        } catch (Exception e) {
+            logger.warn("Notification de versement non créée : {}", e.getMessage());
+        }
     }
 
     @GetMapping("/export.csv")

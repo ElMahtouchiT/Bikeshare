@@ -11,6 +11,8 @@ public class ReservationDTO {
     private LocalDate endLocation;
     private Integer duration;
     private String statut;
+    private String statutLibelle;
+    private String paiementLibelle;
     private String assurance;
     private LocalDateTime createdAt;
     private BikeDTO bike;

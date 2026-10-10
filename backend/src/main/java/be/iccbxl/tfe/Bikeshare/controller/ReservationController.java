@@ -68,7 +68,7 @@ public class ReservationController {
             // Ne pas bloquer la réservation si la notification échoue.
         }
 
-        redirectAttributes.addFlashAttribute("success", "Réservation créée avec le statut : " + r.getStatut());
+        redirectAttributes.addFlashAttribute("success", "Réservation créée avec le statut : " + r.getLibelleStatut());
         return "redirect:/account/reservations";
     }
 }

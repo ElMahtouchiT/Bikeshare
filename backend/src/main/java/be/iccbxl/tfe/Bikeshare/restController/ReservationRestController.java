@@ -1,5 +1,8 @@
 package be.iccbxl.tfe.Bikeshare.restController;
 
+import be.iccbxl.tfe.Bikeshare.model.PaymentStatus;
+import be.iccbxl.tfe.Bikeshare.model.ReservationStatus;
+
 import be.iccbxl.tfe.Bikeshare.DTO.MapperDTO;
 import be.iccbxl.tfe.Bikeshare.DTO.ReservationDTO;
 import be.iccbxl.tfe.Bikeshare.model.Bike;
@@ -71,11 +74,11 @@ public class ReservationRestController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         // Une location payée ne s'annule pas directement : elle passe par l'administrateur (remboursement).
-        if (r.getPayment() != null && "PAID".equalsIgnoreCase(r.getPayment().getStatut())) {
+        if (r.getPayment() != null && r.getPayment().getStatut() == PaymentStatus.PAID) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("Une location payée ne peut être annulée que par l'administrateur.");
         }
-        r.setStatut("CANCELLED");
+        r.setStatut(ReservationStatus.CANCELLED);
         reservationService.saveReservation(r);
         return ResponseEntity.ok("Réservation annulée");
     }

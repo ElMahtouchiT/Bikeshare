@@ -44,19 +44,16 @@
           <td th:text="${r.startLocation}"></td>
           <td th:text="${r.endLocation}"></td>
           <td>
-            <span class="badge"
-                  th:classappend="${r.statut == 'CONFIRMED' or r.statut == 'NOW'} ? 'bg-success' :
-                                  (${r.statut == 'PENDING'} ? 'bg-warning text-dark' :
-                                  (${r.statut == 'CANCELLED' or r.statut == 'REFUSED'} ? 'bg-danger' : 'bg-secondary'))"
-                  th:text="${r.statut}"></span>
+            <span class="badge" th:classappend="${r.statut.name() == 'CONFIRMED'} ? 'bg-success' : (${r.statut.name() == 'PENDING'} ? 'bg-warning text-dark' : (${r.statut.name() == 'COMPLETED'} ? 'bg-secondary' : 'bg-danger'))" th:text="${r.libelleStatut}"></span>
+                  <span class="badge" th:classappend="${r.payment != null and r.payment.statut.name() == 'PAID'} ? 'bg-success' : 'bg-warning text-dark'" th:text="${r.libellePaiement}"></span>
           </td>
           <td>
             <div class="d-flex gap-1 flex-wrap">
-              <form th:if="${r.statut == 'PENDING'}"
+              <form th:if="${r.statut.name() == 'PENDING'}"
                     th:action="@{'/account/reservations/' + ${r.id} + '/confirm'}" method="post">
                 <button class="btn btn-sm btn-success" th:text="#{received.confirm}">Confirmer</button>
               </form>
-              <form th:if="${r.statut == 'PENDING'}"
+              <form th:if="${r.statut.name() == 'PENDING'}"
                     th:action="@{'/account/reservations/' + ${r.id} + '/refuse'}" method="post"
                     th:attr="data-confirm=#{confirm.refuse}">
                 <button class="btn btn-sm btn-outline-danger" th:text="#{received.refuse}">Refuser</button>
@@ -65,9 +62,9 @@
                     th:action="@{'/account/reservations/' + ${r.id} + '/complete'}" method="post">
                 <button class="btn btn-sm btn-success">✔ Vélo rendu</button>
               </form>
-              <a th:if="${r.statut == 'COMPLETED' and !evaluees.contains(r.id)}" class="btn btn-sm btn-warning"
+              <a th:if="${r.statut.name() == 'COMPLETED' and !evaluees.contains(r.id)}" class="btn btn-sm btn-warning"
                  th:href="@{'/account/reservations/' + ${r.id} + '/evaluate-locataire'}">⭐ Évaluer le locataire</a>
-              <span th:if="${r.statut == 'COMPLETED' and evaluees.contains(r.id)}"
+              <span th:if="${r.statut.name() == 'COMPLETED' and evaluees.contains(r.id)}"
                     class="badge bg-success align-self-center">Locataire évalué</span>
               <a class="btn btn-sm btn-outline-secondary"
                  th:href="@{'/account/reservations/' + ${r.id} + '/chat'}" th:text="#{common.messaging}">💬 Messagerie</a>

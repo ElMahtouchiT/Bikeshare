@@ -84,8 +84,8 @@
           <td class="text-end" th:text="${p.gain != null ? #numbers.formatDecimal(p.gain.amountEarned, 1, 'POINT', 2, 'COMMA') + ' €' : '—'}"></td>
           <td>
             <span class="badge"
-                  th:classappend="${p.statut == 'PAID'} ? 'bg-success' : (${p.statut == 'REFUNDED'} ? 'bg-secondary' : 'bg-danger')"
-                  th:text="${p.statut}"></span>
+                  th:classappend="${p.statut.name() == 'PAID'} ? 'bg-success' : (${p.statut.name() == 'REFUNDED'} ? 'bg-secondary' : 'bg-danger')"
+                  th:text="${p.statut.libelle}"></span>
           </td>
           <td>
             <a th:if="${p.reservation != null}" class="btn btn-sm btn-outline-secondary"
@@ -114,11 +114,11 @@
           <td class="text-end" th:text="${#numbers.formatDecimal(g.amountEarned, 1, 'POINT', 2, 'COMMA')} + ' €'"></td>
           <td>
             <span class="badge"
-                  th:classappend="${g.status == 'TRANSFERRED'} ? 'bg-success' : 'bg-warning text-dark'"
-                  th:text="${g.status == 'TRANSFERRED'} ? 'Versé' : 'En attente de versement'"></span>
+                  th:classappend="${g.status.name() == 'TRANSFERRED'} ? 'bg-success' : 'bg-warning text-dark'"
+                  th:text="${g.status.libelle}"></span>
           </td>
           <td>
-            <form th:if="${g.status == 'PENDING'}"
+            <form th:if="${g.status.name() == 'PENDING'}"
                   th:action="@{'/admin/finances/gains/' + ${g.id} + '/transfer'}" method="post">
               <button type="submit" class="btn btn-sm btn-success">Marquer comme versé</button>
             </form>

@@ -43,14 +43,8 @@
           <td th:text="${r.endLocation}"></td>
           <td th:text="${r.duration != null ? r.duration + ' j' : '—'}"></td>
           <td>
-            <span th:if="${r.statut == 'CANCELLED'}" class="badge bg-danger">Annulée</span>
-            <span th:if="${r.statut == 'REFUSED'}"   class="badge bg-danger">Refusée</span>
-            <span th:if="${r.statut == 'COMPLETED'}" class="badge bg-secondary">Terminée</span>
-            <th:block th:if="${r.statut == 'PENDING' or r.statut == 'CONFIRMED' or r.statut == 'NOW'}">
-              <span th:if="${r.paid}" class="badge bg-success">Confirmée et payée</span>
-              <span th:if="${r.statut == 'PENDING'}" class="badge bg-warning text-dark">En attente de l'accord du propriétaire</span>
-              <span th:unless="${r.paid or r.statut == 'PENDING'}" class="badge bg-warning text-dark">En attente de paiement</span>
-            </th:block>
+            <span class="badge" th:classappend="${r.statut == 'CONFIRMED'} ? 'bg-success' : (${r.statut == 'PENDING'} ? 'bg-warning text-dark' : (${r.statut == 'COMPLETED'} ? 'bg-secondary' : 'bg-danger'))" th:text="${r.statutLibelle}"></span>
+            <span class="badge" th:classappend="${r.paid} ? 'bg-success' : 'bg-warning text-dark'" th:text="${r.paiementLibelle}"></span>
           </td>
           <td th:text="${r.totalPrice != null ? r.totalPrice + ' €' : '—'}"></td>
           <td class="text-nowrap">

@@ -1,5 +1,6 @@
 package be.iccbxl.tfe.Bikeshare.model;
 
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +22,8 @@ public class Reservation {
     @Column(name = "start_location") private LocalDate startLocation;
     @Column(name = "end_location")   private LocalDate endLocation;
     private Integer duration;
-    private String statut;     // PENDING, CONFIRMED, NOW, CANCELLED, FINISHED
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus statut;
     private String assurance;
 
     // Demande d'annulation d'une location payée, à traiter par l'administrateur.
@@ -50,28 +52,38 @@ public class Reservation {
 
     /** Le locataire peut annuler directement une réservation non payée (en attente ou confirmée). */
     public boolean peutEtreAnnuleeDirectement() {
-        return ("PENDING".equals(statut) || "CONFIRMED".equals(statut)) && !estPayee();
+        return (statut == ReservationStatus.PENDING || statut == ReservationStatus.CONFIRMED) && !estPayee();
     }
 
     /** Une location payée (confirmée ou en cours) ne s'annule que sur demande à l'administrateur. */
     public boolean peutDemanderAnnulation() {
-        return ("CONFIRMED".equals(statut) || "NOW".equals(statut)) && estPayee() && !cancellationRequested;
+        return statut == ReservationStatus.CONFIRMED && estPayee() && !cancellationRequested;
     }
 
     /** Le propriétaire peut marquer le vélo comme rendu : location payée, commencée, pas encore terminée. */
     public boolean peutEtreMarqueeRendue(LocalDate aujourdhui) {
-        return ("CONFIRMED".equals(statut) || "NOW".equals(statut)) && estPayee()
+        return statut == ReservationStatus.CONFIRMED && estPayee()
                 && endLocation != null && !endLocation.isAfter(aujourdhui);
     }
 
     /** Une location confirmée et payée dont la date de fin est passée est terminée. */
     public boolean doitEtreTerminee(LocalDate aujourdhui) {
-        return "CONFIRMED".equals(statut) && estPayee()
+        return statut == ReservationStatus.CONFIRMED && estPayee()
                 && endLocation != null && endLocation.isBefore(aujourdhui);
     }
 
+    /** Libellé affiché pour le statut de la réservation. */
+    public String getLibelleStatut() {
+        return statut != null ? statut.getLibelle() : "";
+    }
+
+    /** Libellé affiché pour le paiement du locataire (BikeShare). */
+    public String getLibellePaiement() {
+        return payment != null ? payment.getStatut().getLibelle() : "Non payée";
+    }
+
     private boolean estPayee() {
-        return payment != null && "PAID".equals(payment.getStatut());
+        return payment != null && payment.getStatut() == PaymentStatus.PAID;
     }
 
     @PrePersist

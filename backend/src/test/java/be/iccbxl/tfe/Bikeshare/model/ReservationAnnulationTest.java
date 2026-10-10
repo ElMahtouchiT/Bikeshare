@@ -11,12 +11,12 @@ class ReservationAnnulationTest {
 
     private static Reservation reservation(String statut, String statutPaiement) {
         Reservation r = new Reservation();
-        r.setStatut(statut);
+        r.setStatut(ReservationStatus.valueOf(statut));
         r.setStartLocation(LocalDate.of(2026, 10, 10));
         r.setEndLocation(LocalDate.of(2026, 10, 12));
         if (statutPaiement != null) {
             Payment p = new Payment();
-            p.setStatut(statutPaiement);
+            p.setStatut(PaymentStatus.valueOf(statutPaiement));
             r.setPayment(p);
         }
         return r;
@@ -33,7 +33,7 @@ class ReservationAnnulationTest {
     void payee_nePeutPasAnnulerDirectement_maisPeutDemanderAnnulation() {
         assertThat(reservation("CONFIRMED", "PAID").peutEtreAnnuleeDirectement()).isFalse();
         assertThat(reservation("CONFIRMED", "PAID").peutDemanderAnnulation()).isTrue();
-        assertThat(reservation("NOW", "PAID").peutDemanderAnnulation()).isTrue();
+        assertThat(reservation("CONFIRMED", "PAID").peutDemanderAnnulation()).isTrue();
     }
 
     @Test

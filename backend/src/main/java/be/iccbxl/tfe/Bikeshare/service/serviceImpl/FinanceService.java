@@ -1,5 +1,9 @@
 package be.iccbxl.tfe.Bikeshare.service.serviceImpl;
 
+import be.iccbxl.tfe.Bikeshare.model.PaymentStatus;
+import be.iccbxl.tfe.Bikeshare.model.GainStatus;
+import be.iccbxl.tfe.Bikeshare.model.ReservationStatus;
+
 import be.iccbxl.tfe.Bikeshare.model.Bike;
 import be.iccbxl.tfe.Bikeshare.model.Gain;
 import be.iccbxl.tfe.Bikeshare.model.Payment;
@@ -48,8 +52,8 @@ public class FinanceService {
     public boolean annulerAvecRemboursement(Long reservationId, int pourcentage) {
         if (pourcentage != 0 && pourcentage != 100) return false;
         Reservation r = reservationRepository.findById(reservationId).orElse(null);
-        if (r == null || r.getPayment() == null || !"PAID".equals(r.getPayment().getStatut())) return false;
-        if ("CANCELLED".equals(r.getStatut())) return false;
+        if (r == null || r.getPayment() == null || r.getPayment().getStatut() != PaymentStatus.PAID) return false;
+        if (r.getStatut() == ReservationStatus.CANCELLED) return false;
 
         Payment p = r.getPayment();
         if (pourcentage == 100) {
@@ -59,15 +63,15 @@ public class FinanceService {
             refund.setRefundPercentage(100);
             refund.setCreatedAt(LocalDateTime.now());
             refundRepository.save(refund);
-            p.setStatut("REFUNDED");
+            p.setStatut(PaymentStatus.REFUNDED);
             paymentRepository.save(p);
             Gain gain = p.getGain();
             if (gain != null) {
-                gain.setStatus("ANNULE");
+                gain.setStatus(GainStatus.ANNULE);
                 gainRepository.save(gain);
             }
         }
-        r.setStatut("CANCELLED");
+        r.setStatut(ReservationStatus.CANCELLED);
         r.setCancellationRequested(false);
         reservationRepository.save(r);
         return true;
@@ -97,7 +101,7 @@ public class FinanceService {
     /** Montant encore dû aux propriétaires : somme des gains non versés. */
     public double getMontantDu() {
         return gainRepository.findAll().stream()
-                .filter(g -> "PENDING".equals(g.getStatus()))
+                .filter(g -> g.getStatus() == GainStatus.PENDING)
                 .mapToDouble(Gain::getAmountEarned)
                 .sum();
     }
@@ -106,8 +110,8 @@ public class FinanceService {
     @Transactional
     public boolean marquerVerse(Long gainId) {
         Gain gain = gainRepository.findById(gainId).orElse(null);
-        if (gain == null || !"PENDING".equals(gain.getStatus())) return false;
-        gain.setStatus("TRANSFERRED");
+        if (gain == null || gain.getStatus() != GainStatus.PENDING) return false;
+        gain.setStatus(GainStatus.TRANSFERRED);
         gainRepository.save(gain);
         return true;
     }
@@ -137,8 +141,8 @@ public class FinanceService {
                     montant(p.getTotalPrice()),
                     montant(p.getPartBikeshare()),
                     g != null ? montant(g.getAmountEarned()) : "",
-                    p.getStatut(),
-                    g != null ? g.getStatus() : ""))
+                    p.getStatut().getLibelle(),
+                    g != null ? g.getStatus().getLibelle() : ""))
                .append('\n');
         }
         return csv.toString();

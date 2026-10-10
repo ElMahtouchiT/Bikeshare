@@ -42,8 +42,8 @@
             <td class="fw-bold text-success" th:text="${g.amountEarned + ' €'}"></td>
             <td>
               <span class="badge"
-                    th:classappend="${g.status == 'TRANSFERRED'} ? 'bg-success' : 'bg-warning text-dark'"
-                    th:text="${g.status}"></span>
+                    th:classappend="${g.status.name() == 'TRANSFERRED'} ? 'bg-success' : 'bg-warning text-dark'"
+                    th:text="${g.status.libelle}"></span>
             </td>
             <td th:text="${g.createdAt != null ? #temporals.format(g.createdAt, 'dd/MM/yyyy') : '—'}"></td>
           </tr>

@@ -1,5 +1,7 @@
 package be.iccbxl.tfe.Bikeshare.service.serviceImpl;
 
+import be.iccbxl.tfe.Bikeshare.model.PaymentStatus;
+
 import be.iccbxl.tfe.Bikeshare.model.Bike;
 import be.iccbxl.tfe.Bikeshare.model.Payment;
 import be.iccbxl.tfe.Bikeshare.model.Price;
@@ -39,7 +41,7 @@ class InvoiceServiceTest {
         payment.setId(42L);
         payment.setTotalPrice(54.0);
         payment.setPartBikeshare(8.1);
-        payment.setStatut("PAID");
+        payment.setStatut(PaymentStatus.PAID);
         payment.setPaymentMode("STRIPE");
         payment.setCreatedAt(LocalDateTime.of(2026, 10, 8, 12, 0));
         Reservation reservation = new Reservation();

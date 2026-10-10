@@ -1,5 +1,7 @@
 package be.iccbxl.tfe.Bikeshare.controller;
 
+import be.iccbxl.tfe.Bikeshare.model.ReservationStatus;
+
 import be.iccbxl.tfe.Bikeshare.model.Bike;
 import be.iccbxl.tfe.Bikeshare.model.Photo;
 import be.iccbxl.tfe.Bikeshare.model.Price;
@@ -56,7 +58,7 @@ public class AccountController {
         int confirmedAsTenant = 0;
         if (user.getReservations() != null) {
             for (Reservation r : user.getReservations()) {
-                if ("CONFIRMED".equalsIgnoreCase(r.getStatut()) || "NOW".equalsIgnoreCase(r.getStatut()))
+                if (ReservationStatus.CONFIRMED == r.getStatut())
                     confirmedAsTenant++;
             }
         }
@@ -102,7 +104,7 @@ public class AccountController {
     public String confirmReservation(@PathVariable Long id,
                                      @AuthenticationPrincipal CustomUserDetail userDetails,
                                      RedirectAttributes redirectAttributes) {
-        return updateReservationStatusAsOwner(id, userDetails, "CONFIRMED",
+        return updateReservationStatusAsOwner(id, userDetails, ReservationStatus.CONFIRMED,
                 "Réservation confirmée.", redirectAttributes);
     }
 
@@ -110,12 +112,12 @@ public class AccountController {
     public String refuseReservation(@PathVariable Long id,
                                     @AuthenticationPrincipal CustomUserDetail userDetails,
                                     RedirectAttributes redirectAttributes) {
-        return updateReservationStatusAsOwner(id, userDetails, "REFUSED",
+        return updateReservationStatusAsOwner(id, userDetails, ReservationStatus.REFUSED,
                 "Réservation refusée.", redirectAttributes);
     }
 
     private String updateReservationStatusAsOwner(Long id, CustomUserDetail userDetails,
-                                                  String status, String successMsg,
+                                                  ReservationStatus status, String successMsg,
                                                   RedirectAttributes redirectAttributes) {
         if (userDetails == null) return "redirect:/login";
         Reservation r = reservationService.getReservationById(id);
@@ -124,7 +126,7 @@ public class AccountController {
             redirectAttributes.addFlashAttribute("error", "Réservation introuvable ou accès refusé.");
             return "redirect:/account/received-reservations";
         }
-        if ("CONFIRMED".equals(status) && reservationService.hasOverlapWithOthers(
+        if (status == ReservationStatus.CONFIRMED && reservationService.hasOverlapWithOthers(
                 r.getBike().getId(), r.getStartLocation(), r.getEndLocation(), r.getId())) {
             redirectAttributes.addFlashAttribute("error",
                     "Impossible de confirmer : ces dates chevauchent une autre réservation de ce vélo.");
@@ -132,7 +134,7 @@ public class AccountController {
         }
         r.setStatut(status);
         reservationService.saveReservation(r);
-        if ("CONFIRMED".equals(status)) {
+        if (status == ReservationStatus.CONFIRMED) {
             notifierLocataire(r, "Votre demande de réservation est confirmée. Votre réservation est en attente de paiement.");
         }
         redirectAttributes.addFlashAttribute("success", successMsg);
@@ -153,7 +155,7 @@ public class AccountController {
             redirectAttributes.addFlashAttribute("error",
                     "Cette réservation ne peut pas être annulée directement. Si elle est payée, demandez son annulation.");
         } else {
-            r.setStatut("CANCELLED");
+            r.setStatut(ReservationStatus.CANCELLED);
             reservationService.saveReservation(r);
             notifierProprietaire(r, "Réservation annulée par le locataire.");
             redirectAttributes.addFlashAttribute("success", "Réservation annulée.");
@@ -214,7 +216,7 @@ public class AccountController {
             redirectAttributes.addFlashAttribute("error",
                     "Cette location ne peut pas être marquée comme rendue : elle doit être payée et terminée.");
         } else {
-            r.setStatut("COMPLETED");
+            r.setStatut(ReservationStatus.COMPLETED);
             reservationService.saveReservation(r);
             redirectAttributes.addFlashAttribute("success",
                     "Location terminée. Vous pouvez maintenant évaluer le locataire.");
@@ -275,7 +277,7 @@ public class AccountController {
     /** Raison pour laquelle le propriétaire ne peut pas évaluer ce locataire, sinon null. */
     private String evaluationLocataireBloquee(Reservation r, User user) {
         if (!estProprietaire(r, user)) return "Réservation introuvable ou accès refusé.";
-        if (!"COMPLETED".equalsIgnoreCase(r.getStatut()))
+        if (r.getStatut() != ReservationStatus.COMPLETED)
             return "Vous ne pouvez évaluer le locataire qu'une fois la location terminée.";
         if (evaluationLocataireService.existePour(r.getId())) return "Vous avez déjà évalué ce locataire.";
         return null;
@@ -368,7 +370,7 @@ public class AccountController {
     private String evaluationBlockedReason(Reservation r, Long userId) {
         if (r == null || r.getUser() == null || !r.getUser().getId().equals(userId))
             return "Réservation introuvable ou accès refusé.";
-        if (!"COMPLETED".equalsIgnoreCase(r.getStatut()))
+        if (r.getStatut() != ReservationStatus.COMPLETED)
             return "Vous ne pouvez évaluer qu'une location terminée.";
         if (r.getEvaluation() != null)
             return "Vous avez déjà évalué cette réservation.";
