@@ -4,10 +4,15 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.multipart.support.MultipartFilter;
 
 /**
@@ -54,11 +59,28 @@ public class SecurityConfig {
             .formLogin(form -> form.loginPage("/login")
                 .successHandler(loginSuccessHandler).permitAll())
             .logout(logout -> logout.logoutSuccessUrl("/").permitAll())
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(entreeAuthentification()))
             .authenticationProvider(authenticationProvider())
             // CSRF activé pour les formulaires navigateur (Thymeleaf injecte le token).
             // Exempté pour l'API REST stateless (/api) et le WebSocket (/ws).
             .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**", "/ws/**"));
         return http.build();
+    }
+
+    /**
+     * Visiteur non connecté : l'API (/api/**) répond 401 en JSON, les pages redirigent vers la connexion.
+     */
+    private AuthenticationEntryPoint entreeAuthentification() {
+        AuthenticationEntryPoint connexion = new LoginUrlAuthenticationEntryPoint("/login");
+        AuthenticationEntryPoint api = new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED);
+        AntPathRequestMatcher requeteApi = new AntPathRequestMatcher("/api/**");
+        return (request, response, authException) -> {
+            if (requeteApi.matches(request)) {
+                api.commence(request, response, authException);
+            } else {
+                connexion.commence(request, response, authException);
+            }
+        };
     }
 
     /**
