@@ -1,10 +1,15 @@
 package be.iccbxl.tfe.Bikeshare.DTO;
 
 import be.iccbxl.tfe.Bikeshare.model.*;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.stream.Collectors;
 
 /** Conversion des entités en DTO. */
 public class MapperDTO {
+
+    /** « Aujourd'hui » se calcule à l'heure de Bruxelles : le serveur tourne en UTC. */
+    private static final ZoneId FUSEAU = ZoneId.of("Europe/Brussels");
 
     public static UserDTO toUserDTO(User user) {
         if (user == null) return null;
@@ -119,7 +124,7 @@ public class MapperDTO {
         dto.setPaid(r.getPayment() != null && r.getPayment().getStatut() == PaymentStatus.PAID);
         dto.setCancellationRequested(r.isCancellationRequested());
         dto.setAnnulableDirectement(r.peutEtreAnnuleeDirectement());
-        dto.setDemandeAnnulationPossible(r.peutDemanderAnnulation());
+        dto.setDemandeAnnulationPossible(r.peutDemanderAnnulation(LocalDate.now(FUSEAU)));
         return dto;
     }
 

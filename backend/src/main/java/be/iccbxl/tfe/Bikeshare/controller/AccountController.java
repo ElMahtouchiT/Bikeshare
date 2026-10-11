@@ -175,9 +175,10 @@ public class AccountController {
         Reservation r = reservationService.getReservationById(id);
         if (r == null || r.getUser() == null || !r.getUser().getId().equals(userDetails.getUser().getId())) {
             redirectAttributes.addFlashAttribute("error", "Réservation introuvable ou accès refusé.");
-        } else if (!r.peutDemanderAnnulation()) {
+        } else if (!r.peutDemanderAnnulation(LocalDate.now(FUSEAU))) {
             redirectAttributes.addFlashAttribute("error",
-                    "Cette réservation ne peut pas faire l'objet d'une demande d'annulation.");
+                    "Cette réservation ne peut pas faire l'objet d'une demande d'annulation : "
+                    + "la demande doit être faite avant la date de début de la location.");
         } else {
             r.setCancellationRequested(true);
             reservationService.saveReservation(r);

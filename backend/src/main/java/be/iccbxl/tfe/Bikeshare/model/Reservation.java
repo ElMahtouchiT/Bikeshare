@@ -55,9 +55,10 @@ public class Reservation {
         return (statut == ReservationStatus.PENDING || statut == ReservationStatus.CONFIRMED) && !estPayee();
     }
 
-    /** Une location payée (confirmée ou en cours) ne s'annule que sur demande à l'administrateur. */
-    public boolean peutDemanderAnnulation() {
-        return statut == ReservationStatus.CONFIRMED && estPayee() && !cancellationRequested;
+    /** Une location payée ne s'annule que sur demande à l'administrateur, et la demande se fait avant la date de début. */
+    public boolean peutDemanderAnnulation(LocalDate aujourdhui) {
+        return statut == ReservationStatus.CONFIRMED && estPayee() && !cancellationRequested
+                && startLocation != null && aujourdhui.isBefore(startLocation);
     }
 
     /** Le propriétaire peut marquer le vélo comme rendu : location payée, commencée, pas encore terminée. */
