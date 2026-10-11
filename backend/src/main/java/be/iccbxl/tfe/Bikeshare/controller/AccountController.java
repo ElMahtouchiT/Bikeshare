@@ -26,6 +26,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import be.iccbxl.tfe.Bikeshare.model.Equipment;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -36,6 +37,9 @@ import java.util.stream.Collectors;
 public class AccountController {
 
     private static final Logger logger = LoggerFactory.getLogger(AccountController.class);
+
+    /** « Aujourd'hui » se calcule à l'heure de Bruxelles : le serveur tourne en UTC. */
+    private static final ZoneId FUSEAU = ZoneId.of("Europe/Brussels");
 
     @Autowired private UserService userService;
     @Autowired private BikeService bikeService;
@@ -82,7 +86,7 @@ public class AccountController {
     public String myReservations(@AuthenticationPrincipal CustomUserDetail userDetails, Model model) {
         if (userDetails == null) return "redirect:/login";
         User user = userDetails.getUser();
-        reservationService.terminerLocationsPassees(LocalDate.now());
+        reservationService.terminerLocationsPassees(LocalDate.now(FUSEAU));
         model.addAttribute("reservations", reservationService.getReservationsByUser(user));
         return "account/reservations/index";
     }
@@ -92,10 +96,10 @@ public class AccountController {
     @GetMapping("/account/received-reservations")
     public String receivedReservations(@AuthenticationPrincipal CustomUserDetail userDetails, Model model) {
         if (userDetails == null) return "redirect:/login";
-        reservationService.terminerLocationsPassees(LocalDate.now());
+        reservationService.terminerLocationsPassees(LocalDate.now(FUSEAU));
         model.addAttribute("reservations",
                 reservationService.getReservationsOnOwnerBikes(userDetails.getUser()));
-        model.addAttribute("aujourdhui", LocalDate.now());
+        model.addAttribute("aujourdhui", LocalDate.now(FUSEAU));
         model.addAttribute("evaluees", evaluationLocataireService.idsReservationsEvaluees());
         return "account/reservations/received";
     }
@@ -212,9 +216,13 @@ public class AccountController {
         Reservation r = reservationService.getReservationById(id);
         if (!estProprietaire(r, userDetails.getUser())) {
             redirectAttributes.addFlashAttribute("error", "Réservation introuvable ou accès refusé.");
-        } else if (!r.peutEtreMarqueeRendue(LocalDate.now())) {
+        } else if (r.getStatut() == ReservationStatus.COMPLETED) {
+            // Déjà terminée (double clic ou page restée ouverte) : ce n'est pas une erreur.
+            redirectAttributes.addFlashAttribute("success", "Cette location est déjà terminée.");
+        } else if (!r.peutEtreMarqueeRendue(LocalDate.now(FUSEAU))) {
             redirectAttributes.addFlashAttribute("error",
-                    "Cette location ne peut pas être marquée comme rendue : elle doit être payée et terminée.");
+                    "Cette location ne peut pas être marquée comme rendue : elle doit être confirmée, payée, "
+                    + "et sa date de fin doit être atteinte.");
         } else {
             r.setStatut(ReservationStatus.COMPLETED);
             reservationService.saveReservation(r);
