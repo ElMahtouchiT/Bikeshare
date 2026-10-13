@@ -13,12 +13,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class ReservationService implements ReservationServiceI {
+
+    /** « Maintenant » se calcule à l'heure de Bruxelles : le serveur tourne en UTC. */
+    private static final ZoneId FUSEAU = ZoneId.of("Europe/Brussels");
 
     /** Statuts considérés comme « en cours » : bloquent la suppression du vélo. */
     private static final List<ReservationStatus> ACTIVE_STATUSES =
@@ -69,7 +74,11 @@ public class ReservationService implements ReservationServiceI {
         r.setEndLocation(end);
         r.setDuration((int) ChronoUnit.DAYS.between(start, end));
         r.setAssurance(assurance);
-        r.setStatut("AUTOMATIC".equalsIgnoreCase(bike.getReservationMode()) ? ReservationStatus.CONFIRMED : ReservationStatus.PENDING);
+        if ("AUTOMATIC".equalsIgnoreCase(bike.getReservationMode())) {
+            r.confirmer(LocalDateTime.now(FUSEAU));
+        } else {
+            r.setStatut(ReservationStatus.PENDING);
+        }
         return reservationRepository.save(r);
     }
 

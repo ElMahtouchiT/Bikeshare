@@ -18,6 +18,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findByStatutInAndUser(List<ReservationStatus> statuses, User user);
 
     long countByStatut(ReservationStatus statut);
+    List<Reservation> findByStatut(ReservationStatus statut);
     boolean existsByBikeIdAndStatutIn(Long bikeId, List<ReservationStatus> statuses);
     List<Reservation> findByBikeIdAndStatutIn(Long bikeId, List<ReservationStatus> statuses);
 

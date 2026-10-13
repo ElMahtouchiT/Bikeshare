@@ -26,6 +26,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import be.iccbxl.tfe.Bikeshare.model.Equipment;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
@@ -130,13 +131,21 @@ public class AccountController {
             redirectAttributes.addFlashAttribute("error", "Réservation introuvable ou accès refusé.");
             return "redirect:/account/received-reservations";
         }
+        if (r.getStatut() != ReservationStatus.PENDING) {
+            redirectAttributes.addFlashAttribute("error", "Seule une demande en attente peut être confirmée ou refusée.");
+            return "redirect:/account/received-reservations";
+        }
         if (status == ReservationStatus.CONFIRMED && reservationService.hasOverlapWithOthers(
                 r.getBike().getId(), r.getStartLocation(), r.getEndLocation(), r.getId())) {
             redirectAttributes.addFlashAttribute("error",
                     "Impossible de confirmer : ces dates chevauchent une autre réservation de ce vélo.");
             return "redirect:/account/received-reservations";
         }
-        r.setStatut(status);
+        if (status == ReservationStatus.CONFIRMED) {
+            r.confirmer(LocalDateTime.now(FUSEAU));
+        } else {
+            r.setStatut(status);
+        }
         reservationService.saveReservation(r);
         if (status == ReservationStatus.CONFIRMED) {
             notifierLocataire(r, "Votre demande de réservation est confirmée. Votre réservation est en attente de paiement.");

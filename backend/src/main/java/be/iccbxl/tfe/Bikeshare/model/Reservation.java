@@ -30,6 +30,13 @@ public class Reservation {
     @Column(columnDefinition = "boolean not null default false")
     private boolean cancellationRequested;
 
+    // Moment de la confirmation : point de départ du délai de paiement (absent des réservations antérieures).
+    @Column(name = "confirmed_at")
+    private LocalDateTime confirmedAt;
+
+    /** Délai accordé au locataire pour payer une réservation confirmée. */
+    public static final long DELAI_PAIEMENT_HEURES = 24;
+
     @ManyToOne
     @JoinColumn(name = "bike_id", nullable = false)
     private Bike bike;
@@ -59,6 +66,18 @@ public class Reservation {
     public boolean peutDemanderAnnulation(LocalDate aujourdhui) {
         return statut == ReservationStatus.CONFIRMED && estPayee() && !cancellationRequested
                 && startLocation != null && aujourdhui.isBefore(startLocation);
+    }
+
+    /** Confirme la réservation et date la confirmation, point de départ du délai de paiement. */
+    public void confirmer(LocalDateTime maintenant) {
+        this.statut = ReservationStatus.CONFIRMED;
+        this.confirmedAt = maintenant;
+    }
+
+    /** Une réservation confirmée, non payée, dont le délai de paiement est dépassé doit être annulée. */
+    public boolean doitExpirerFauteDePaiement(LocalDateTime maintenant) {
+        return statut == ReservationStatus.CONFIRMED && !estPayee()
+                && confirmedAt != null && confirmedAt.plusHours(DELAI_PAIEMENT_HEURES).isBefore(maintenant);
     }
 
     /** Le propriétaire peut marquer le vélo comme rendu : location payée, commencée, pas encore terminée. */
