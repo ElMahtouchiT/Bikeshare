@@ -69,6 +69,13 @@ public class User {
     @Column(name = "delete_requested", columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean deleteRequested;
 
+    /** Double authentification (TOTP, appli Authenticator) : activée ou non + secret Base32. */
+    @Column(name = "two_factor_enabled", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean twoFactorEnabled;
+
+    @Column(name = "two_factor_secret")
+    private String twoFactorSecret;
+
     /** Réinitialisation du mot de passe : token à usage unique + date d'expiration. */
     @Column(name = "reset_token")
     private String resetToken;
