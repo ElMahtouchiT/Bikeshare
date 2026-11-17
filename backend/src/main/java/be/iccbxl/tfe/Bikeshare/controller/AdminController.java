@@ -109,12 +109,12 @@ public class AdminController {
         User user = userService.getUserById(id);
         if (user == null) { ra.addFlashAttribute("error", "Utilisateur introuvable."); return "redirect:/admin/users"; }
         String photo = user.getPhotoUrl();
-        boolean supprime = userService.deleteUser(id);
+        userService.deleteUser(id);
         // Après la transaction : le fichier n'est effacé que si la base a bien été mise à jour
         fileStorageService.delete(photo);
-        ra.addFlashAttribute("success", supprime
-                ? "Utilisateur supprimé."
-                : "Utilisateur anonymisé et désactivé : ses vélos, réservations et paiements sont conservés.");
+        ra.addFlashAttribute("success",
+                "Compte anonymisé (suppression logique) : les données personnelles sont neutralisées ; "
+                + "les vélos sont archivés et l'historique (réservations, paiements) est conservé.");
         return "redirect:/admin/users";
     }
 

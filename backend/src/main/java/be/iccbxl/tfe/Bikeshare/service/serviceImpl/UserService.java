@@ -37,24 +37,19 @@ public class UserService implements UserServiceI {
     @Override public long getTotalUsers() { return userRepository.count(); }
 
     /**
-     * Suppression d'un membre. Un compte qui a laissé une trace (vélos, réservations, notifications)
-     * est anonymisé et désactivé : réservations, paiements et gains restent en base pour la comptabilité.
-     * Un compte sans aucune trace est supprimé physiquement.
-     * @return true si le compte a été supprimé, false s'il a été anonymisé
+     * Suppression LOGIQUE d'un membre (soft delete). Le compte n'est jamais effacé physiquement :
+     * il est anonymisé, désactivé et marqué « deleted ». Les vélos sont archivés ; les réservations,
+     * paiements et gains restent en base pour la comptabilité et l'intégrité référentielle.
+     * @return true si le compte a été traité, false s'il est introuvable.
      */
     @Override
     @Transactional
     public boolean deleteUser(Long id) {
         User user = userRepository.findById(id).orElse(null);
         if (user == null) return false;
-        boolean aDesTraces = !user.getOwnedBikes().isEmpty()
-                || !user.getReservations().isEmpty()
-                || !notificationRepository.findByToUserOrFromUser(user, user).isEmpty();
-        if (aDesTraces) {
-            anonymise(user);
-            return false;
-        }
-        userRepository.delete(user);
+        // Suppression LOGIQUE systématique (soft delete) : on n'efface jamais physiquement le
+        // compte, afin de préserver l'intégrité de l'historique (réservations, paiements, gains).
+        anonymise(user);
         return true;
     }
 
@@ -90,6 +85,7 @@ public class UserService implements UserServiceI {
         user.setResetTokenExpiry(null);
         user.setDeleteRequested(false);
         user.setVerified(false);
+        user.setDeleted(true);        // marqueur explicite de suppression logique
         user.getRoles().clear();
         userRepository.save(user);
     }

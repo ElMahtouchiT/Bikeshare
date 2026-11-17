@@ -69,6 +69,11 @@ public class User {
     @Column(name = "delete_requested", columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean deleteRequested;
 
+    /** Suppression LOGIQUE (soft delete) : le compte est anonymisé et marqué « supprimé »,
+     *  mais la ligne et l'historique (réservations, paiements) sont conservés. */
+    @Column(name = "deleted", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean deleted;
+
     /** Double authentification (TOTP, appli Authenticator) : activée ou non + secret Base32. */
     @Column(name = "two_factor_enabled", columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean twoFactorEnabled;
@@ -94,7 +99,9 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<Role> roles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    // Pas de suppression en cascade : les réservations (et leurs paiements/gains) sont des données
+    // comptables à conserver, même après l'anonymisation du compte (soft delete).
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Reservation> reservations;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)

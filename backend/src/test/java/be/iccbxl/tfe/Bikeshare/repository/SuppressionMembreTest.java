@@ -27,7 +27,8 @@ import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** Suppression d'un membre : physique s'il n'a aucune trace, sinon anonymisé et désactivé. */
+/** Suppression LOGIQUE d'un membre (soft delete) : toujours anonymisé et marqué « deleted »,
+ *  jamais effacé physiquement ; l'historique (réservations, paiements) est conservé. */
 @DataJpaTest
 @Import({UserService.class, SuppressionMembreTest.Encodeur.class})
 class SuppressionMembreTest {
@@ -120,16 +121,21 @@ class SuppressionMembreTest {
     }
 
     @Test
-    void membreSansTrace_estSupprime_etLeRoleResteEnBase() {
+    void membreSansTrace_estAnonymise_jamaisSupprimePhysiquement() {
         Role role = role();
         User u = membre("vide@test.be", role);
         em.flush(); em.clear();
 
-        boolean supprime = userService.deleteUser(u.getId());
-        em.flush();
+        boolean traite = userService.deleteUser(u.getId());
+        em.flush(); em.clear();
 
-        assertThat(supprime).isTrue();
-        assertThat(count("select count(u) from User u")).isZero();
+        // Soft delete : la ligne est CONSERVÉE, le compte est anonymisé et marqué « deleted ».
+        assertThat(traite).isTrue();
+        assertThat(count("select count(u) from User u")).isEqualTo(1);
+        User apres = em.find(User.class, u.getId());
+        assertThat(apres.isDeleted()).isTrue();
+        assertThat(apres.getEmail()).startsWith("anonyme-");
+        assertThat(apres.getRoles()).isEmpty();
         assertThat(count("select count(r) from Role r")).isEqualTo(1);
     }
 
@@ -146,9 +152,10 @@ class SuppressionMembreTest {
         boolean supprime = userService.deleteUser(proprio.getId());
         em.flush(); em.clear();
 
-        assertThat(supprime).isFalse();
+        assertThat(supprime).isTrue();
         User apres = em.find(User.class, proprio.getId());
         assertThat(apres).isNotNull();
+        assertThat(apres.isDeleted()).isTrue();
         assertThat(apres.getEmail()).isEqualTo("anonyme-" + apres.getId() + "@supprime.invalid");
         assertThat(apres.getFirstName()).isEqualTo("Ancien");
         assertThat(apres.getPhone()).isNull();
@@ -178,7 +185,7 @@ class SuppressionMembreTest {
         boolean supprime = userService.deleteUser(loc.getId());
         em.flush(); em.clear();
 
-        assertThat(supprime).isFalse();
+        assertThat(supprime).isTrue();
         assertThat(count("select count(r) from Reservation r")).isEqualTo(1);
         assertThat(em.find(Reservation.class, r.getId()).getUser().getEmail())
                 .startsWith("anonyme-");
@@ -205,7 +212,7 @@ class SuppressionMembreTest {
         boolean supprime = userService.deleteUser(proprio.getId());
         em.flush(); em.clear();
 
-        assertThat(supprime).isFalse();
+        assertThat(supprime).isTrue();
         assertThat(em.find(ChatMessage.class, message.getId()).getContent()).isEqualTo("[supprimé]");
         assertThat(em.find(Notification.class, n.getId()).getMessage()).isEqualTo("[supprimé]");
         Bike apres = em.find(Bike.class, b.getId());
