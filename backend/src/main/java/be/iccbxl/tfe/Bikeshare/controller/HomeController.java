@@ -58,6 +58,9 @@ public class HomeController {
     @GetMapping("/conditions")
     public String conditions() { return "pages/conditions"; }
 
+    @GetMapping("/faq")
+    public String faq() { return "pages/faq"; }
+
     @GetMapping("/mentions-legales")
     public String mentionsLegales() { return "pages/mentions-legales"; }
 
